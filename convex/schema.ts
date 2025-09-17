@@ -181,26 +181,6 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_job", ["jobId"]),
 
-  emailTemplates: defineTable({
-    name: v.string(),
-    subject: v.string(),
-    content: v.string(),
-    type: v.union(
-      v.literal("interview_invitation"),
-      v.literal("rejection"),
-      v.literal("offer"),
-      v.literal("follow_up"),
-      v.literal("assessment"),
-      v.literal("custom")
-    ),
-    variables: v.array(v.string()),
-    isActive: v.boolean(),
-    createdAt: v.string(),
-    updatedAt: v.string(),
-  })
-    .index("by_type", ["type"])
-    .index("by_active", ["isActive"]),
-
   // EEOC Compliance Tables
   eeoData: defineTable({
     candidateId: v.id("candidates"),
@@ -697,6 +677,14 @@ export default defineSchema({
   emailTemplates: defineTable({
     name: v.string(),
     category: v.string(), // "application" | "interview" | "offer" | "rejection" | "general"
+    type: v.optional(v.union(
+      v.literal("interview_invitation"),
+      v.literal("rejection"),
+      v.literal("offer"),
+      v.literal("follow_up"),
+      v.literal("assessment"),
+      v.literal("custom")
+    )),
     subject: v.string(),
     content: v.string(),
     variables: v.array(v.string()), // List of variables used in template
@@ -705,7 +693,9 @@ export default defineSchema({
     useCount: v.number(),
     lastUsed: v.optional(v.string()),
     createdAt: v.string(),
+    updatedAt: v.optional(v.string()),
   })
     .index("by_category", ["category"])
-    .index("by_active", ["isActive"]),
+    .index("by_active", ["isActive"])
+    .index("by_type", ["type"]),
 });

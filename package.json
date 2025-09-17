@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@ax-llm/ax": "^14.0.26",
+    "@clerk/clerk-react": "^5.47.0",
     "@clerk/nextjs": "^6.32.0",
+    "@convex-dev/auth": "^0.0.89",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.3.2",
