@@ -24,7 +24,7 @@ export const upsertTeamMember = mutation({
     // Check if member already exists
     const existing = await ctx.db
       .query("teamMembers")
-      .withIndex("by_userId", q => q.eq("userId", args.userId))
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .first()
 
     if (existing) {
@@ -95,8 +95,8 @@ export const addToHiringTeam = mutation({
     // Check if already on team
     const existing = await ctx.db
       .query("hiringTeams")
-      .withIndex("by_job", q => q.eq("jobId", args.jobId))
-      .filter(q => q.eq(q.field("teamMemberId"), args.teamMemberId))
+      .withIndex("by_job", (q) => q.eq("jobId", args.jobId))
+      .filter((q) => q.eq(q.field("teamMemberId"), args.teamMemberId))
       .first()
 
     if (existing) {
@@ -130,7 +130,7 @@ export const getHiringTeam = query({
   handler: async (ctx, args) => {
     const teamAssignments = await ctx.db
       .query("hiringTeams")
-      .withIndex("by_job", q => q.eq("jobId", args.jobId))
+      .withIndex("by_job", (q) => q.eq("jobId", args.jobId))
       .collect()
 
     const teamWithDetails = await Promise.all(
@@ -209,10 +209,10 @@ export const getComments = query({
   handler: async (ctx, args) => {
     const comments = await ctx.db
       .query("comments")
-      .withIndex("by_entity", q =>
+      .withIndex("by_entity", (q) =>
         q.eq("entityType", args.entityType).eq("entityId", args.entityId)
       )
-      .filter(q => q.eq(q.field("isDeleted"), false))
+      .filter((q) => q.eq(q.field("isDeleted"), false))
       .order("desc")
       .collect()
 
@@ -323,7 +323,7 @@ export const getTeamMembers = query({
   handler: async (ctx) => {
     return await ctx.db
       .query("teamMembers")
-      .filter(q => q.eq(q.field("isActive"), true))
+      .filter((q) => q.eq(q.field("isActive"), true))
       .collect()
   },
 })
@@ -362,8 +362,8 @@ export const submitInterviewFeedback = mutation({
     // Check if feedback already exists
     const existing = await ctx.db
       .query("interviewFeedback")
-      .withIndex("by_interview", q => q.eq("interviewId", args.interviewId))
-      .filter(q => q.eq(q.field("interviewerId"), args.interviewerId))
+      .withIndex("by_interview", (q) => q.eq("interviewId", args.interviewId))
+      .filter((q) => q.eq(q.field("interviewerId"), args.interviewerId))
       .first()
 
     if (existing) {
@@ -407,11 +407,11 @@ export const getInterviewFeedback = query({
     let query = ctx.db.query("interviewFeedback")
 
     if (args.interviewId) {
-      query = query.withIndex("by_interview", q =>
+      query = query.withIndex("by_interview", (q) =>
         q.eq("interviewId", args.interviewId)
       )
     } else if (args.candidateId) {
-      query = query.withIndex("by_candidate", q =>
+      query = query.withIndex("by_candidate", (q) =>
         q.eq("candidateId", args.candidateId)
       )
     }
@@ -538,10 +538,10 @@ export const getMyTasks = query({
   handler: async (ctx, args) => {
     let query = ctx.db
       .query("tasks")
-      .withIndex("by_assignee", q => q.eq("assigneeId", args.teamMemberId))
+      .withIndex("by_assignee", (q) => q.eq("assigneeId", args.teamMemberId))
 
     if (args.status) {
-      query = query.filter(q => q.eq(q.field("status"), args.status))
+      query = query.filter((q) => q.eq(q.field("status"), args.status))
     }
 
     const tasks = await query.order("desc").collect()
@@ -597,8 +597,8 @@ export const upsertOffer = mutation({
     // Check if offer exists
     const existing = await ctx.db
       .query("offers")
-      .withIndex("by_candidate", q => q.eq("candidateId", args.candidateId))
-      .filter(q => q.eq(q.field("jobId"), args.jobId))
+      .withIndex("by_candidate", (q) => q.eq("candidateId", args.candidateId))
+      .filter((q) => q.eq(q.field("jobId"), args.jobId))
       .first()
 
     if (existing) {
@@ -717,7 +717,7 @@ export const getActivityFeed = query({
     let query = ctx.db.query("activityFeed")
 
     if (args.jobId) {
-      query = query.withIndex("by_job", q => q.eq("jobId", args.jobId))
+      query = query.withIndex("by_job", (q) => q.eq("jobId", args.jobId))
     }
 
     const activities = await query
@@ -747,7 +747,7 @@ async function logActivity(
     // It's a userId, need to look up team member
     const teamMember = await ctx.db
       .query("teamMembers")
-      .withIndex("by_userId", (q: any) => q.eq("userId", data.actorId))
+      .withIndex("by_userId", (q) => q.eq("userId", data.actorId))
       .first()
 
     if (teamMember) {

@@ -14,8 +14,8 @@ export const getHiringMetrics = query({
     const totalCandidates = candidates.length
     const totalInterviews = interviews.length
 
-    // Active jobs (open status)
-    const activeJobs = jobs.filter(job => job.status === 'open').length
+    // Active jobs (active status)
+    const activeJobs = jobs.filter(job => job.status === 'active').length
 
     // Candidates by status
     const candidatesByStatus = candidates.reduce((acc, candidate) => {
@@ -68,12 +68,12 @@ export const getFunnelAnalysis = query({
       },
       {
         stage: 'Offer',
-        count: candidates.filter(c => ['offered', 'hired'].includes(c.status)).length,
+        count: candidates.filter(c => c.status === 'offer').length,
         color: '#10b981'
       },
       {
         stage: 'Hired',
-        count: candidates.filter(c => c.status === 'hired').length,
+        count: 0,
         color: '#059669'
       },
     ]
@@ -100,7 +100,7 @@ export const getTimeToHire = query({
 
     const timeToHireData = candidates.map(candidate => {
       const applicationDate = candidate._creationTime
-      const hireDate = candidate.updatedAt || Date.now()
+      const hireDate = Date.now()
       const daysToHire = Math.ceil((hireDate - applicationDate) / (1000 * 60 * 60 * 24))
 
       return {
@@ -129,7 +129,7 @@ export const getSourceEffectiveness = query({
 
     // Group by source and calculate metrics
     const sourceData = candidates.reduce((acc, candidate) => {
-      const source = candidate.source || 'Unknown'
+      const source = 'Unknown'
       if (!acc[source]) {
         acc[source] = {
           source,
@@ -140,8 +140,8 @@ export const getSourceEffectiveness = query({
       }
 
       acc[source].totalApplications++
-      if (candidate.status === 'hired') acc[source].hired++
-      if (['interviewed', 'offered', 'hired'].includes(candidate.status)) {
+      if (candidate.status === 'offer') acc[source].hired++
+      if (['interview', 'offer'].includes(candidate.status)) {
         acc[source].interviewed++
       }
 

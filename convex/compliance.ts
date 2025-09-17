@@ -35,7 +35,7 @@ export const storeEEOData = mutation({
   handler: async (ctx, args) => {
     const existing = await ctx.db
       .query("eeoData")
-      .withIndex("by_candidate", q => q.eq("candidateId", args.candidateId))
+      .withIndex("by_candidate", (q) => q.eq("candidateId", args.candidateId))
       .first()
 
     if (existing) {
@@ -113,9 +113,9 @@ export const getAIDecisions = query({
     let query = ctx.db.query("aiDecisions")
 
     if (args.jobId) {
-      query = query.withIndex("by_job", q => q.eq("jobId", args.jobId))
+      query = query.withIndex("by_job", (q) => q.eq("jobId", args.jobId))
     } else if (args.candidateId) {
-      query = query.withIndex("by_candidate", q => q.eq("candidateId", args.candidateId))
+      query = query.withIndex("by_candidate", (q) => q.eq("candidateId", args.candidateId))
     }
 
     const decisions = await query
@@ -148,7 +148,7 @@ export const calculateBiasMetrics = query({
     // Get all applications for this job
     const applications = await ctx.db
       .query("applications")
-      .withIndex("by_job", q => q.eq("jobId", args.jobId))
+      .withIndex("by_job", (q) => q.eq("jobId", args.jobId))
       .collect()
 
     // Get EEO data for all candidates
@@ -156,7 +156,7 @@ export const calculateBiasMetrics = query({
       applications.map(async (app) => {
         const eeoData = await ctx.db
           .query("eeoData")
-          .withIndex("by_candidate", q => q.eq("candidateId", app.candidateId))
+          .withIndex("by_candidate", (q) => q.eq("candidateId", app.candidateId))
           .first()
 
         return {
@@ -367,7 +367,7 @@ export const getLatestAudit = query({
     let query = ctx.db.query("biasAudits")
 
     if (args.jobId) {
-      query = query.withIndex("by_job", q => q.eq("jobId", args.jobId))
+      query = query.withIndex("by_job", (q) => q.eq("jobId", args.jobId))
     }
 
     const audit = await query
@@ -403,7 +403,7 @@ export const updateComplianceSettings = mutation({
   handler: async (ctx, args) => {
     const existing = await ctx.db
       .query("complianceSettings")
-      .withIndex("by_key", q => q.eq("settingKey", args.settingKey))
+      .withIndex("by_key", (q) => q.eq("settingKey", args.settingKey))
       .first()
 
     if (existing) {
@@ -435,7 +435,7 @@ export const getComplianceSettings = query({
     let query = ctx.db.query("complianceSettings")
 
     if (args.category) {
-      query = query.withIndex("by_category", q => q.eq("category", args.category))
+      query = query.withIndex("by_category", (q) => q.eq("category", args.category))
     }
 
     return await query.collect()

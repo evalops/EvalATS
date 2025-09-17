@@ -24,6 +24,8 @@ export const sendEmail = mutation({
   handler: async (ctx, args) => {
     const now = new Date().toISOString();
 
+    const threadId = args.threadId || `thread_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
     const emailId = await ctx.db.insert("emails", {
       candidateId: args.candidateId,
       jobId: args.jobId,
@@ -36,7 +38,7 @@ export const sendEmail = mutation({
       template: args.template,
       status: "sent", // In real implementation, this would be "draft" initially
       sentAt: now,
-      threadId: args.threadId || `thread_${emailId}`,
+      threadId: threadId,
       replyTo: args.replyTo,
       attachments: args.attachments,
       createdAt: now,
