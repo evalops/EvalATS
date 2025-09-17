@@ -8,9 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@ax-llm/ax':
+        specifier: ^14.0.26
+        version: 14.0.26
       '@clerk/nextjs':
         specifier: ^6.32.0
-        version: 6.32.0(next@14.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 6.32.0(next@14.0.3(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@headlessui/react':
         specifier: ^1.7.17
         version: 1.7.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -103,10 +106,10 @@ importers:
         version: 0.294.0(react@18.3.1)
       next:
         specifier: 14.0.3
-        version: 14.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.0.3(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-themes:
         specifier: ^0.2.1
-        version: 0.2.1(next@14.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 0.2.1(next@14.0.3(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^5.20.3
         version: 5.20.3(zod@3.25.76)
@@ -177,6 +180,9 @@ packages:
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
+
+  '@ax-llm/ax@14.0.26':
+    resolution: {integrity: sha512-E4gO1V74xxc0VSx/+WyhER1BSyEBF/KYcZeMNUIEVmrdrpH/u1djD6RKpWqwDNuwVRH6/EUmeUOlix67eYxd5A==}
 
   '@babel/runtime@7.28.4':
     resolution: {integrity: sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==}
@@ -540,6 +546,10 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
+
+  '@opentelemetry/api@1.9.0':
+    resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
+    engines: {node: '>=8.0.0'}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -1610,6 +1620,9 @@ packages:
   date-fns@2.30.0:
     resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
     engines: {node: '>=0.11'}
+
+  dayjs@1.11.18:
+    resolution: {integrity: sha512-zFBQ7WFRvVRhKcWoUh+ZA1g2HVgUbsZm9sbddh8EC5iv93sui8DVVz1Npvz+r6meo9VKfa8NyLWBsQK1VvIKPA==}
 
   debug@3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
@@ -3050,6 +3063,11 @@ snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
 
+  '@ax-llm/ax@14.0.26':
+    dependencies:
+      '@opentelemetry/api': 1.9.0
+      dayjs: 1.11.18
+
   '@babel/runtime@7.28.4': {}
 
   '@clerk/backend@2.14.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
@@ -3071,13 +3089,13 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       tslib: 2.8.1
 
-  '@clerk/nextjs@6.32.0(next@14.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@clerk/nextjs@6.32.0(next@14.0.3(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@clerk/backend': 2.14.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@clerk/clerk-react': 5.47.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@clerk/shared': 3.25.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@clerk/types': 4.86.0
-      next: 14.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 14.0.3(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       server-only: 0.0.1
@@ -3341,6 +3359,8 @@ snapshots:
       fastq: 1.19.1
 
   '@nolyfill/is-core-module@1.0.39': {}
+
+  '@opentelemetry/api@1.9.0': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -4405,6 +4425,8 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.4
 
+  dayjs@1.11.18: {}
+
   debug@3.2.7:
     dependencies:
       ms: 2.1.3
@@ -5267,13 +5289,13 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next-themes@0.2.1(next@14.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next-themes@0.2.1(next@14.0.3(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      next: 14.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 14.0.3(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  next@14.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next@14.0.3(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 14.0.3
       '@swc/helpers': 0.5.2
@@ -5294,6 +5316,7 @@ snapshots:
       '@next/swc-win32-arm64-msvc': 14.0.3
       '@next/swc-win32-ia32-msvc': 14.0.3
       '@next/swc-win32-x64-msvc': 14.0.3
+      '@opentelemetry/api': 1.9.0
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros

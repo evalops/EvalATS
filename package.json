@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@ax-llm/ax": "^14.0.26",
     "@clerk/nextjs": "^6.32.0",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",

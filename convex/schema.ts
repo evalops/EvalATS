@@ -200,4 +200,139 @@ export default defineSchema({
   })
     .index("by_type", ["type"])
     .index("by_active", ["isActive"]),
+
+  // EEOC Compliance Tables
+  eeoData: defineTable({
+    candidateId: v.id("candidates"),
+    // Voluntary self-identification data
+    race: v.optional(v.union(
+      v.literal("american_indian_alaska_native"),
+      v.literal("asian"),
+      v.literal("black_african_american"),
+      v.literal("hispanic_latino"),
+      v.literal("native_hawaiian_pacific_islander"),
+      v.literal("white"),
+      v.literal("two_or_more_races"),
+      v.literal("decline_to_answer")
+    )),
+    gender: v.optional(v.union(
+      v.literal("male"),
+      v.literal("female"),
+      v.literal("non_binary"),
+      v.literal("decline_to_answer")
+    )),
+    veteranStatus: v.optional(v.union(
+      v.literal("protected_veteran"),
+      v.literal("not_protected_veteran"),
+      v.literal("decline_to_answer")
+    )),
+    disabilityStatus: v.optional(v.union(
+      v.literal("yes"),
+      v.literal("no"),
+      v.literal("decline_to_answer")
+    )),
+    collectedDate: v.string(),
+    // Store separately from main candidate data for compliance
+    isVoluntary: v.boolean(),
+  })
+    .index("by_candidate", ["candidateId"]),
+
+  // AI Decision Audit Trail
+  aiDecisions: defineTable({
+    candidateId: v.id("candidates"),
+    jobId: v.id("jobs"),
+    decisionType: v.union(
+      v.literal("resume_screening"),
+      v.literal("skill_matching"),
+      v.literal("ranking"),
+      v.literal("recommendation")
+    ),
+    modelUsed: v.string(),
+    modelVersion: v.string(),
+    inputData: v.string(), // JSON string of inputs
+    outputData: v.string(), // JSON string of outputs
+    score: v.optional(v.number()),
+    reasoning: v.string(),
+    humanReview: v.optional(v.object({
+      reviewerId: v.string(),
+      reviewDate: v.string(),
+      agreedWithAI: v.boolean(),
+      overrideReason: v.optional(v.string()),
+    })),
+    timestamp: v.string(),
+    // For bias monitoring
+    protected_attributes_masked: v.boolean(),
+  })
+    .index("by_candidate", ["candidateId"])
+    .index("by_job", ["jobId"])
+    .index("by_timestamp", ["timestamp"]),
+
+  // Bias Audit Reports
+  biasAudits: defineTable({
+    auditId: v.string(),
+    jobId: v.optional(v.id("jobs")),
+    auditDate: v.string(),
+    period: v.object({
+      start: v.string(),
+      end: v.string(),
+    }),
+    metrics: v.object({
+      // Four-fifths rule compliance
+      selectionRates: v.object({
+        overall: v.number(),
+        byGroup: v.array(v.object({
+          group: v.string(),
+          category: v.string(), // race, gender, etc.
+          rate: v.number(),
+          count: v.number(),
+          total: v.number(),
+        })),
+      }),
+      impactRatios: v.array(v.object({
+        category: v.string(),
+        group1: v.string(),
+        group2: v.string(),
+        ratio: v.number(),
+        passes_four_fifths: v.boolean(),
+      })),
+      // Statistical significance
+      statisticalTests: v.optional(v.array(v.object({
+        test: v.string(),
+        pValue: v.number(),
+        significant: v.boolean(),
+      }))),
+    }),
+    recommendations: v.array(v.string()),
+    certifiedBy: v.optional(v.object({
+      name: v.string(),
+      title: v.string(),
+      date: v.string(),
+    })),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("under_review"),
+      v.literal("approved"),
+      v.literal("archived")
+    ),
+  })
+    .index("by_date", ["auditDate"])
+    .index("by_job", ["jobId"])
+    .index("by_status", ["status"]),
+
+  // Compliance Settings
+  complianceSettings: defineTable({
+    settingKey: v.string(),
+    value: v.any(),
+    category: v.union(
+      v.literal("eeo"),
+      v.literal("ofccp"),
+      v.literal("state"),
+      v.literal("ai_governance")
+    ),
+    description: v.string(),
+    lastUpdated: v.string(),
+    updatedBy: v.string(),
+  })
+    .index("by_key", ["settingKey"])
+    .index("by_category", ["category"]),
 });
