@@ -8,7 +8,8 @@ import {
   Mail, Plus, Trash2, Edit, Save, X, Eye, Send,
   Code, Copy, FileText, Users, Calendar, Package,
   ChevronDown, Tag, Sparkles, Link, Image, List,
-  Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight
+  Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight,
+  AlertCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,6 +23,7 @@ import { Switch } from "@/components/ui/switch"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { toast } from "sonner"
 
 type TemplateCategory = "application" | "interview" | "offer" | "rejection" | "general"

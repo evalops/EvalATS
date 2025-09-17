@@ -80,7 +80,7 @@ export default function CareersPage() {
               Join Our Team at EvalATS
             </h1>
             <p className="text-xl sm:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              Help us revolutionize the hiring process. We're looking for passionate individuals
+              Help us revolutionize the hiring process. We’re looking for passionate individuals
               who want to make a difference.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -281,10 +281,10 @@ export default function CareersPage() {
       <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Don't see the right position?
+            Don’t see the right position?
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            We're always looking for talented people. Send us your resume and we'll keep you in mind for future opportunities.
+            We’re always looking for talented people. Send us your resume and we’ll keep you in mind for future opportunities.
           </p>
           <a
             href="mailto:careers@evalats.com"

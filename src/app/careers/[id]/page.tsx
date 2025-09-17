@@ -93,7 +93,7 @@ export default function JobDetailsPage() {
     // In a real app, this would submit to Convex
     toast({
       title: 'Application submitted',
-      description: `Thanks for applying to the ${job.title} role. We'll review your details shortly.`,
+      description: `Thanks for applying to the ${job.title} role. We’ll review your details shortly.`,
     })
     setSubmitted(true)
     setIsApplying(false)
@@ -125,7 +125,7 @@ export default function JobDetailsPage() {
             Application Submitted!
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Thank you for applying to the {job.title} position. We'll review your application and get back to you within 3-5 business days.
+            Thank you for applying to the {job.title} position. We’ll review your application and get back to you within 3-5 business days.
           </p>
           <div className="space-y-3">
             <Link
@@ -489,7 +489,7 @@ export default function JobDetailsPage() {
                   rows={5}
                   value={formData.coverLetter}
                   onChange={(e) => setFormData({ ...formData, coverLetter: e.target.value })}
-                  placeholder="Tell us why you're interested in this position..."
+                  placeholder="Tell us why you’re interested in this position..."
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
               </div>

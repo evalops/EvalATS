@@ -631,7 +631,9 @@ export function AdvancedSearch() {
                   <div className="flex-1">
                     <p className="font-medium">{search.name}</p>
                     <p className="text-sm text-gray-600">
-                      {search.entity} • "{search.query}" • {Object.keys(search.filters).length} filters
+                      {search.entity} • {"“"}
+                      {search.query}
+                      {"”"} • {Object.keys(search.filters).length} filters
                     </p>
                   </div>
                   <div className="flex gap-2">
