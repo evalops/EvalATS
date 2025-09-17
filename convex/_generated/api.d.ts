@@ -22,6 +22,8 @@ import type * as files from "../files.js";
 import type * as interviews from "../interviews.js";
 import type * as jobs from "../jobs.js";
 import type * as seed from "../seed.js";
+import type * as teams from "../teams.js";
+import type * as workflows from "../workflows.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -41,6 +43,8 @@ declare const fullApi: ApiFromModules<{
   interviews: typeof interviews;
   jobs: typeof jobs;
   seed: typeof seed;
+  teams: typeof teams;
+  workflows: typeof workflows;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

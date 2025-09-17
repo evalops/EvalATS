@@ -335,4 +335,343 @@ export default defineSchema({
   })
     .index("by_key", ["settingKey"])
     .index("by_category", ["category"]),
+
+  // Team Collaboration Tables
+  teamMembers: defineTable({
+    userId: v.string(), // Clerk user ID
+    email: v.string(),
+    name: v.string(),
+    role: v.union(
+      v.literal("admin"),
+      v.literal("hiring_manager"),
+      v.literal("recruiter"),
+      v.literal("interviewer"),
+      v.literal("coordinator"),
+      v.literal("viewer")
+    ),
+    department: v.optional(v.string()),
+    avatar: v.optional(v.string()),
+    isActive: v.boolean(),
+    createdAt: v.string(),
+    permissions: v.array(v.string()), // Granular permissions
+  })
+    .index("by_userId", ["userId"])
+    .index("by_email", ["email"])
+    .index("by_role", ["role"]),
+
+  hiringTeams: defineTable({
+    jobId: v.id("jobs"),
+    teamMemberId: v.id("teamMembers"),
+    role: v.union(
+      v.literal("hiring_manager"),
+      v.literal("recruiter"),
+      v.literal("interviewer"),
+      v.literal("coordinator")
+    ),
+    isPrimary: v.boolean(), // Primary recruiter/HM
+    addedAt: v.string(),
+    addedBy: v.string(),
+  })
+    .index("by_job", ["jobId"])
+    .index("by_member", ["teamMemberId"]),
+
+  // Enhanced Interview Feedback
+  interviewFeedback: defineTable({
+    interviewId: v.id("interviews"),
+    candidateId: v.id("candidates"),
+    interviewerId: v.id("teamMembers"),
+    scorecardId: v.optional(v.id("scorecards")),
+
+    // Structured ratings
+    ratings: v.object({
+      technical: v.optional(v.number()),
+      communication: v.optional(v.number()),
+      problemSolving: v.optional(v.number()),
+      culturalFit: v.optional(v.number()),
+      leadership: v.optional(v.number()),
+      overall: v.number(),
+    }),
+
+    // Detailed feedback
+    strengths: v.array(v.string()),
+    concerns: v.array(v.string()),
+    questions: v.array(v.object({
+      question: v.string(),
+      answer: v.string(),
+      rating: v.optional(v.number()),
+    })),
+
+    recommendation: v.union(
+      v.literal("strong_hire"),
+      v.literal("hire"),
+      v.literal("no_hire"),
+      v.literal("strong_no_hire")
+    ),
+
+    notes: v.string(),
+    submittedAt: v.string(),
+    isComplete: v.boolean(),
+  })
+    .index("by_interview", ["interviewId"])
+    .index("by_candidate", ["candidateId"])
+    .index("by_interviewer", ["interviewerId"]),
+
+  // Interview Scorecards Templates
+  scorecards: defineTable({
+    name: v.string(),
+    jobId: v.optional(v.id("jobs")),
+    department: v.optional(v.string()),
+
+    sections: v.array(v.object({
+      title: v.string(),
+      weight: v.number(), // Weight in final score
+      criteria: v.array(v.object({
+        name: v.string(),
+        description: v.string(),
+        scale: v.object({
+          min: v.number(),
+          max: v.number(),
+          labels: v.optional(v.array(v.string())),
+        }),
+        required: v.boolean(),
+      })),
+    })),
+
+    isActive: v.boolean(),
+    createdAt: v.string(),
+    createdBy: v.string(),
+  })
+    .index("by_job", ["jobId"])
+    .index("by_active", ["isActive"]),
+
+  // Real-time Comments System
+  comments: defineTable({
+    entityType: v.union(
+      v.literal("candidate"),
+      v.literal("job"),
+      v.literal("interview")
+    ),
+    entityId: v.string(), // ID of candidate/job/interview
+
+    authorId: v.id("teamMembers"),
+    content: v.string(),
+
+    // For threading
+    parentId: v.optional(v.id("comments")),
+
+    // Mentions
+    mentions: v.array(v.id("teamMembers")),
+
+    // Rich content
+    attachments: v.optional(v.array(v.object({
+      name: v.string(),
+      url: v.string(),
+      type: v.string(),
+    }))),
+
+    isEdited: v.boolean(),
+    editedAt: v.optional(v.string()),
+    isDeleted: v.boolean(),
+    createdAt: v.string(),
+
+    // Reactions
+    reactions: v.optional(v.array(v.object({
+      emoji: v.string(),
+      userId: v.id("teamMembers"),
+    }))),
+  })
+    .index("by_entity", ["entityType", "entityId"])
+    .index("by_author", ["authorId"])
+    .index("by_parent", ["parentId"]),
+
+  // Workflow Automation
+  workflows: defineTable({
+    name: v.string(),
+    description: v.string(),
+    isActive: v.boolean(),
+
+    trigger: v.object({
+      type: v.union(
+        v.literal("status_change"),
+        v.literal("time_based"),
+        v.literal("score_threshold"),
+        v.literal("stage_duration")
+      ),
+      conditions: v.any(), // JSON conditions
+    }),
+
+    actions: v.array(v.object({
+      type: v.union(
+        v.literal("send_email"),
+        v.literal("change_status"),
+        v.literal("assign_task"),
+        v.literal("add_tag"),
+        v.literal("notify_team")
+      ),
+      config: v.any(), // Action-specific config
+      delay: v.optional(v.number()), // Delay in minutes
+    })),
+
+    scope: v.object({
+      jobs: v.optional(v.array(v.id("jobs"))),
+      departments: v.optional(v.array(v.string())),
+    }),
+
+    createdAt: v.string(),
+    createdBy: v.string(),
+    lastTriggered: v.optional(v.string()),
+    triggerCount: v.number(),
+  })
+    .index("by_active", ["isActive"])
+    .index("by_trigger_type", ["trigger.type"]),
+
+  // Tasks & Reminders
+  tasks: defineTable({
+    title: v.string(),
+    description: v.optional(v.string()),
+
+    type: v.union(
+      v.literal("review_application"),
+      v.literal("schedule_interview"),
+      v.literal("provide_feedback"),
+      v.literal("check_references"),
+      v.literal("send_offer"),
+      v.literal("follow_up"),
+      v.literal("custom")
+    ),
+
+    assigneeId: v.id("teamMembers"),
+    creatorId: v.id("teamMembers"),
+
+    relatedTo: v.optional(v.object({
+      type: v.union(
+        v.literal("candidate"),
+        v.literal("job"),
+        v.literal("interview")
+      ),
+      id: v.string(),
+    })),
+
+    priority: v.union(
+      v.literal("urgent"),
+      v.literal("high"),
+      v.literal("medium"),
+      v.literal("low")
+    ),
+
+    status: v.union(
+      v.literal("pending"),
+      v.literal("in_progress"),
+      v.literal("completed"),
+      v.literal("cancelled")
+    ),
+
+    dueDate: v.string(),
+    completedAt: v.optional(v.string()),
+    createdAt: v.string(),
+
+    // For automated tasks
+    automatedBy: v.optional(v.id("workflows")),
+  })
+    .index("by_assignee", ["assigneeId"])
+    .index("by_status", ["status"])
+    .index("by_due_date", ["dueDate"])
+    .index("by_related", ["relatedTo.type", "relatedTo.id"]),
+
+  // Offer Management
+  offers: defineTable({
+    candidateId: v.id("candidates"),
+    jobId: v.id("jobs"),
+
+    details: v.object({
+      salary: v.number(),
+      currency: v.string(),
+      bonus: v.optional(v.number()),
+      equity: v.optional(v.string()),
+      startDate: v.string(),
+      location: v.string(),
+      employmentType: v.string(),
+      benefits: v.array(v.string()),
+    }),
+
+    customTerms: v.optional(v.string()),
+
+    status: v.union(
+      v.literal("draft"),
+      v.literal("pending_approval"),
+      v.literal("approved"),
+      v.literal("sent"),
+      v.literal("viewed"),
+      v.literal("accepted"),
+      v.literal("declined"),
+      v.literal("expired"),
+      v.literal("withdrawn")
+    ),
+
+    approvals: v.array(v.object({
+      approverId: v.id("teamMembers"),
+      role: v.string(),
+      status: v.union(
+        v.literal("pending"),
+        v.literal("approved"),
+        v.literal("rejected")
+      ),
+      comments: v.optional(v.string()),
+      timestamp: v.string(),
+    })),
+
+    letterTemplateId: v.optional(v.string()),
+    letterUrl: v.optional(v.string()),
+
+    sentAt: v.optional(v.string()),
+    viewedAt: v.optional(v.string()),
+    respondedAt: v.optional(v.string()),
+    expiresAt: v.string(),
+
+    createdBy: v.id("teamMembers"),
+    createdAt: v.string(),
+  })
+    .index("by_candidate", ["candidateId"])
+    .index("by_job", ["jobId"])
+    .index("by_status", ["status"]),
+
+  // Activity Feed for Team Visibility
+  activityFeed: defineTable({
+    actor: v.object({
+      id: v.id("teamMembers"),
+      name: v.string(),
+      avatar: v.optional(v.string()),
+    }),
+
+    action: v.union(
+      v.literal("candidate_applied"),
+      v.literal("status_changed"),
+      v.literal("interview_scheduled"),
+      v.literal("feedback_submitted"),
+      v.literal("comment_added"),
+      v.literal("offer_sent"),
+      v.literal("candidate_rejected"),
+      v.literal("task_completed")
+    ),
+
+    target: v.object({
+      type: v.union(
+        v.literal("candidate"),
+        v.literal("job"),
+        v.literal("interview"),
+        v.literal("offer")
+      ),
+      id: v.string(),
+      name: v.string(),
+    }),
+
+    metadata: v.optional(v.any()), // Additional context
+
+    jobId: v.optional(v.id("jobs")),
+    isRead: v.boolean(),
+    timestamp: v.string(),
+  })
+    .index("by_timestamp", ["timestamp"])
+    .index("by_job", ["jobId"])
+    .index("by_actor", ["actor.id"]),
 });
