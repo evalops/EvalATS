@@ -226,8 +226,7 @@ export function AdvancedSearch() {
   const handleSaveSearch = async () => {
     if (!saveSearchName) return
 
-    await saveSearch({
-      name: saveSearchName,
+    await saveSearch(saveSearchName, {
       query: searchQuery,
       filters,
       entity
@@ -653,7 +652,7 @@ export function AdvancedSearch() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => deleteSearch({ id: search._id })}
+                      onClick={() => deleteSearch(search._id)}
                     >
                       <X className="h-4 w-4" />
                     </Button>

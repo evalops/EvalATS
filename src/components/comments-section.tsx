@@ -37,20 +37,44 @@ interface CommentsSectionProps {
 
 interface Comment {
   _id: Id<'comments'>
+  _creationTime: number
   content: string
   authorId: Id<'teamMembers'>
   author?: {
-    name: string
+    _id: Id<'teamMembers'>
+    _creationTime: number
+    department?: string
     avatar?: string
+    name: string
+    email: string
     role: string
-  }
+    createdAt: string
+    userId: string
+    isActive: boolean
+    permissions: string[]
+  } | null
+  entityType: string
+  entityId: string
   createdAt: string
   isEdited: boolean
   editedAt?: string
   parentId?: Id<'comments'>
   mentions: Id<'teamMembers'>[]
-  mentionedUsers?: Array<{ name: string }>
+  mentionedUsers?: Array<{
+    _id: Id<'teamMembers'>
+    _creationTime: number
+    department?: string
+    avatar?: string
+    name: string
+    email: string
+    role: string
+    createdAt: string
+    userId: string
+    isActive: boolean
+    permissions: string[]
+  } | null>
   reactions?: Array<{ emoji: string; userId: Id<'teamMembers'> }>
+  isDeleted: boolean
   replies?: Comment[]
 }
 
@@ -318,7 +342,7 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
                   {comment.content.split(/(@\w+\s?\w*)/g).map((part, i) => {
                     if (part.startsWith('@')) {
                       const mentionedUser = comment.mentionedUsers?.find(u =>
-                        part.includes(u.name)
+                        u && part.includes(u.name)
                       )
                       return mentionedUser ? (
                         <span key={i} className="text-blue-600 font-medium">

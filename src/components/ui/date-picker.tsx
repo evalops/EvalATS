@@ -1,6 +1,7 @@
 import * as React from "react"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
+import { DateRange } from "react-day-picker"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -40,10 +41,7 @@ export function DatePicker() {
 }
 
 export function DatePickerWithRange() {
-  const [date, setDate] = React.useState<{ from: Date | undefined; to: Date | undefined }>({
-    from: undefined,
-    to: undefined,
-  })
+  const [date, setDate] = React.useState<DateRange | undefined>()
 
   return (
     <Popover>
