@@ -692,4 +692,20 @@ export default defineSchema({
     timestamp: v.string(),
   })
     .index("by_timestamp", ["timestamp"]),
+
+  // Email templates for candidate communication
+  emailTemplates: defineTable({
+    name: v.string(),
+    category: v.string(), // "application" | "interview" | "offer" | "rejection" | "general"
+    subject: v.string(),
+    content: v.string(),
+    variables: v.array(v.string()), // List of variables used in template
+    tags: v.array(v.string()),
+    isActive: v.boolean(),
+    useCount: v.number(),
+    lastUsed: v.optional(v.string()),
+    createdAt: v.string(),
+  })
+    .index("by_category", ["category"])
+    .index("by_active", ["isActive"]),
 });

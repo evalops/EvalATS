@@ -881,3 +881,71 @@ export const getSearchHistory = query({
       .take(limit)
   },
 })
+
+// Get email templates
+export const getEmailTemplates = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("emailTemplates").collect()
+  },
+})
+
+// Save email template
+export const saveEmailTemplate = mutation({
+  args: {
+    _id: v.optional(v.id("emailTemplates")),
+    name: v.string(),
+    category: v.string(),
+    subject: v.string(),
+    content: v.string(),
+    variables: v.array(v.string()),
+    tags: v.array(v.string()),
+    isActive: v.boolean(),
+    useCount: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const { _id, ...data } = args
+
+    if (_id) {
+      await ctx.db.patch(_id, data)
+      return _id
+    } else {
+      return await ctx.db.insert("emailTemplates", {
+        ...data,
+        createdAt: new Date().toISOString(),
+        lastUsed: null,
+      })
+    }
+  },
+})
+
+// Delete email template
+export const deleteEmailTemplate = mutation({
+  args: {
+    id: v.id("emailTemplates"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id)
+  },
+})
+
+// Duplicate email template
+export const duplicateEmailTemplate = mutation({
+  args: {
+    id: v.id("emailTemplates"),
+    name: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const original = await ctx.db.get(args.id)
+    if (!original) throw new Error("Template not found")
+
+    const { _id, _creationTime, ...templateData } = original as any
+    return await ctx.db.insert("emailTemplates", {
+      ...templateData,
+      name: args.name,
+      useCount: 0,
+      createdAt: new Date().toISOString(),
+      lastUsed: null,
+    })
+  },
+})
