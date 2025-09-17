@@ -7,7 +7,7 @@ import {
   ArrowLeft, MapPin, Clock, Briefcase, DollarSign, Users, Calendar,
   FileText, Upload, Github, Linkedin, Globe, CheckCircle, AlertCircle
 } from 'lucide-react'
-import { toast } from 'sonner'
+import { useToast } from '@/hooks/use-toast'
 
 // This would come from Convex
 const job = {
@@ -55,6 +55,7 @@ const job = {
 
 export default function JobDetailsPage() {
   const params = useParams()
+  const { toast } = useToast()
   const [isApplying, setIsApplying] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [formData, setFormData] = useState({
@@ -81,12 +82,19 @@ export default function JobDetailsPage() {
 
     // Validation
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.resumeFile) {
-      toast.error('Please fill in all required fields')
+      toast({
+        title: 'Missing information',
+        description: 'Please fill in all required fields before submitting your application.',
+        variant: 'destructive',
+      })
       return
     }
 
     // In a real app, this would submit to Convex
-    toast.success('Application submitted successfully!')
+    toast({
+      title: 'Application submitted',
+      description: `Thanks for applying to the ${job.title} role. We'll review your details shortly.`,
+    })
     setSubmitted(true)
     setIsApplying(false)
   }
@@ -95,7 +103,11 @@ export default function JobDetailsPage() {
     const file = e.target.files?.[0]
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('File size must be less than 5MB')
+        toast({
+          title: 'File too large',
+          description: 'Please upload a resume that is smaller than 5MB.',
+          variant: 'destructive',
+        })
         return
       }
       setFormData({ ...formData, resumeFile: file })

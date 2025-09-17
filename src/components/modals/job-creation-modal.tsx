@@ -16,8 +16,7 @@ const jobTypes = [
   { value: 'full-time', label: 'Full-time' },
   { value: 'part-time', label: 'Part-time' },
   { value: 'contract', label: 'Contract' },
-  { value: 'internship', label: 'Internship' },
-]
+] as const
 
 const departments = [
   'Engineering',
@@ -38,17 +37,18 @@ const urgencyLevels = [
   { value: 'high', label: 'High Priority', color: 'text-red-600' },
 ]
 
+type JobType = (typeof jobTypes)[number]['value']
+
 interface JobFormData {
   title: string
   department: string
   location: string
-  type: string
+  type: JobType
   urgency: 'low' | 'medium' | 'high'
   salaryMin: string
   salaryMax: string
   description: string
   requirements: string[]
-  status: 'active' | 'paused' | 'closed'
 }
 
 export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
@@ -66,7 +66,6 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
     salaryMax: '',
     description: '',
     requirements: [''],
-    status: 'active',
   })
 
   const [errors, setErrors] = useState<Partial<Record<keyof JobFormData, string>>>({})
@@ -125,8 +124,6 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
         salaryMax,
         description: formData.description.trim(),
         requirements,
-        status: formData.status,
-        postedDate: new Date().toISOString().split('T')[0], // Today's date
       })
 
       toast({
@@ -145,7 +142,6 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
         salaryMax: '',
         description: '',
         requirements: [''],
-        status: 'active',
       })
 
       onClose()
@@ -260,7 +256,9 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
               </label>
               <select
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, type: e.target.value as JobType })
+                }
                 className="input-clean"
               >
                 {jobTypes.map((type) => (
@@ -275,7 +273,9 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
               </label>
               <select
                 value={formData.urgency}
-                onChange={(e) => setFormData({ ...formData, urgency: e.target.value as any })}
+                onChange={(e) =>
+                  setFormData({ ...formData, urgency: e.target.value as JobFormData['urgency'] })
+                }
                 className="input-clean"
               >
                 {urgencyLevels.map((level) => (

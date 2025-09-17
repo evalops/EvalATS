@@ -15,7 +15,7 @@ export const getHiringMetrics = query({
     const totalInterviews = interviews.length
 
     // Active jobs (open status)
-    const activeJobs = jobs.filter(job => job.status === 'open').length
+    const activeJobs = jobs.filter(job => job.status === 'active').length
 
     // Candidates by status
     const candidatesByStatus = candidates.reduce((acc, candidate) => {
@@ -58,17 +58,17 @@ export const getFunnelAnalysis = query({
       { stage: 'Applied', count: candidates.length, color: '#3b82f6' },
       {
         stage: 'Screening',
-        count: candidates.filter(c => ['screening', 'interviewed', 'offered', 'hired'].includes(c.status)).length,
+        count: candidates.filter(c => ['screening', 'interview', 'offer', 'hired'].includes(c.status)).length,
         color: '#8b5cf6'
       },
       {
         stage: 'Interview',
-        count: candidates.filter(c => ['interviewed', 'offered', 'hired'].includes(c.status)).length,
+        count: candidates.filter(c => ['interview', 'offer', 'hired'].includes(c.status)).length,
         color: '#06b6d4'
       },
       {
         stage: 'Offer',
-        count: candidates.filter(c => ['offered', 'hired'].includes(c.status)).length,
+        count: candidates.filter(c => ['offer', 'hired'].includes(c.status)).length,
         color: '#10b981'
       },
       {
@@ -100,7 +100,7 @@ export const getTimeToHire = query({
 
     const timeToHireData = candidates.map(candidate => {
       const applicationDate = candidate._creationTime
-      const hireDate = candidate.updatedAt || Date.now()
+      const hireDate = candidate.hiredAt || candidate.updatedAt || Date.now()
       const daysToHire = Math.ceil((hireDate - applicationDate) / (1000 * 60 * 60 * 24))
 
       return {
@@ -141,7 +141,7 @@ export const getSourceEffectiveness = query({
 
       acc[source].totalApplications++
       if (candidate.status === 'hired') acc[source].hired++
-      if (['interviewed', 'offered', 'hired'].includes(candidate.status)) {
+      if (['interview', 'offer', 'hired'].includes(candidate.status)) {
         acc[source].interviewed++
       }
 

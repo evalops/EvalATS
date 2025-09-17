@@ -24,7 +24,7 @@ export const sendEmail = mutation({
   handler: async (ctx, args) => {
     const now = new Date().toISOString();
 
-    const emailId = await ctx.db.insert("emails", {
+    const baseEmail = {
       candidateId: args.candidateId,
       jobId: args.jobId,
       from: "noreply@evalats.com", // This would be configured in settings
@@ -34,14 +34,20 @@ export const sendEmail = mutation({
       subject: args.subject,
       content: args.content,
       template: args.template,
-      status: "sent", // In real implementation, this would be "draft" initially
+      status: "sent" as const, // In real implementation, this would be "draft" initially
       sentAt: now,
-      threadId: args.threadId || `thread_${emailId}`,
+      threadId: args.threadId,
       replyTo: args.replyTo,
       attachments: args.attachments,
       createdAt: now,
       sender: args.sender,
-    });
+    };
+
+    const emailId = await ctx.db.insert("emails", baseEmail);
+
+    if (!args.threadId) {
+      await ctx.db.patch(emailId, { threadId: `thread_${emailId}` });
+    }
 
     // In a real implementation, you'd integrate with an email service like SendGrid, AWS SES, etc.
     // For now, we'll just mark it as sent
@@ -129,10 +135,10 @@ export const getEmailTemplates = query({
       .query("emailTemplates")
       .withIndex("by_active", (q) => q.eq("isActive", true));
 
-    if (args.type) {
+    if (typeof args.type === "string") {
       const templates = await ctx.db
         .query("emailTemplates")
-        .withIndex("by_type", (q) => q.eq("type", args.type))
+        .withIndex("by_type", (q) => q.eq("type", args.type!))
         .filter((q) => q.eq(q.field("isActive"), true))
         .collect();
       return templates;

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { Doc, Id } from "./_generated/dataModel";
 
 // Get all jobs
 export const list = query({
@@ -50,12 +51,23 @@ export const get = query({
       .withIndex("by_job", q => q.eq("jobId", args.id))
       .collect();
 
-    const applicants = await Promise.all(
-      applications.map(async (app) => {
-        const candidate = await ctx.db.get(app.candidateId);
-        return { ...candidate, applicationId: app._id, applicationStatus: app.status };
-      })
-    );
+    type ApplicantWithApplication = Doc<"candidates"> & {
+      applicationId: Id<"applications">;
+      applicationStatus: Doc<"applications">["status"];
+    };
+
+    const applicants: ApplicantWithApplication[] = [];
+
+    for (const app of applications) {
+      const candidate = await ctx.db.get(app.candidateId);
+      if (!candidate) continue;
+
+      applicants.push({
+        ...candidate,
+        applicationId: app._id,
+        applicationStatus: app.status,
+      });
+    }
 
     return {
       ...job,
@@ -75,13 +87,21 @@ export const create = mutation({
     requirements: v.array(v.string()),
     salaryMin: v.optional(v.number()),
     salaryMax: v.optional(v.number()),
+    urgency: v.optional(v.union(v.literal("high"), v.literal("medium"), v.literal("low"))),
   },
   handler: async (ctx, args) => {
     const jobId = await ctx.db.insert("jobs", {
-      ...args,
+      title: args.title,
+      department: args.department,
+      location: args.location,
+      type: args.type,
+      description: args.description,
+      requirements: args.requirements,
+      salaryMin: args.salaryMin,
+      salaryMax: args.salaryMax,
       postedDate: new Date().toISOString().split('T')[0],
       status: "active",
-      urgency: "medium",
+      urgency: args.urgency ?? "medium",
     });
 
     return jobId;

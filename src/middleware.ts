@@ -8,22 +8,14 @@ const isPublicRoute = createRouteMatcher([
   '/api/public(.*)',
 ])
 
-export default clerkMiddleware((auth, req) => {
-  const { userId, sessionId } = auth()
-
-  // If user is signed in and trying to access sign-in/sign-up pages, redirect to home
-  if (userId && sessionId) {
-    if (req.nextUrl.pathname.startsWith('/sign-in') || req.nextUrl.pathname.startsWith('/sign-up')) {
-      return NextResponse.redirect(new URL('/', req.url))
-    }
-  }
-
+export default clerkMiddleware(async (auth, req) => {
   // If it's a public route, allow access
   if (isPublicRoute(req)) {
     return NextResponse.next()
   }
 
   // For protected routes, check authentication
+  const { userId } = await auth()
   if (!userId) {
     // Store the original URL to redirect back after login
     const signInUrl = new URL('/sign-in', req.url)

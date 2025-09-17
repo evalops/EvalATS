@@ -72,10 +72,12 @@ export const create = mutation({
     skills: v.array(v.string()),
   },
   handler: async (ctx, args) => {
+    const now = Date.now()
     const candidateId = await ctx.db.insert("candidates", {
       ...args,
       appliedDate: new Date().toISOString().split('T')[0],
       status: "applied",
+      updatedAt: now,
       evaluation: {
         overall: 0,
         technical: 0,
@@ -107,12 +109,23 @@ export const updateStatus = mutation({
       v.literal("screening"),
       v.literal("interview"),
       v.literal("offer"),
+      v.literal("hired"),
       v.literal("rejected"),
       v.literal("withdrawn")
     ),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.id, { status: args.status });
+    const now = Date.now()
+    const updates: Record<string, any> = {
+      status: args.status,
+      updatedAt: now,
+    }
+
+    if (args.status === "hired") {
+      updates.hiredAt = now
+    }
+
+    await ctx.db.patch(args.id, updates);
 
     // Add to timeline
     await ctx.db.insert("timeline", {
