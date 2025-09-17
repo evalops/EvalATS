@@ -62,7 +62,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between px-6 border-b border-border">
-            <h1 className="text-xl font-semibold">EvalATS</h1>
+            <h1 className="text-xl font-semibold">ATS</h1>
             <button
               onClick={() => setSidebarOpen(false)}
               className="p-1 rounded-md lg:hidden hover:bg-accent"

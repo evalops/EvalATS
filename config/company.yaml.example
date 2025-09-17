@@ -1,0 +1,92 @@
+# Company Configuration
+# Customize this file with your company's information
+
+company:
+  # Basic Information
+  name: "Your Company"
+  tagline: "Your company tagline"
+  website: "https://yourcompany.com"
+
+  # Branding
+  logo:
+    text: "YourCo"  # Text logo if no image
+    image: "/logo.png"  # Path to logo image (optional)
+
+  # Contact Information
+  contact:
+    email: "careers@yourcompany.com"
+    phone: "+1 (555) 123-4567"
+    address:
+      street: "123 Main St"
+      city: "San Francisco"
+      state: "CA"
+      zip: "94105"
+      country: "USA"
+
+  # Social Media
+  social:
+    linkedin: "https://linkedin.com/company/yourcompany"
+    twitter: "https://twitter.com/yourcompany"
+    github: "https://github.com/yourcompany"
+    facebook: ""
+    instagram: ""
+
+  # Careers Page Content
+  careers:
+    hero:
+      title: "Join Our Team"
+      subtitle: "Help us build the future"
+      description: "We're looking for passionate individuals who want to make a difference."
+
+    stats:
+      - label: "Team Members"
+        value: "50+"
+      - label: "Open Positions"
+        value: "15+"
+      - label: "Glassdoor Rating"
+        value: "4.8"
+      - label: "Remote Friendly"
+        value: "100%"
+
+    culture:
+      title: "Why Work With Us"
+      subtitle: "We offer more than just a job - we offer a career"
+      values:
+        - icon: "Users"
+          title: "Great Team"
+          description: "Work with talented and passionate people who love what they do"
+        - icon: "TrendingUp"
+          title: "Growth"
+          description: "Continuous learning opportunities and career development"
+        - icon: "Heart"
+          title: "Benefits"
+          description: "Competitive salary, health insurance, and flexible work arrangements"
+        - icon: "Building2"
+          title: "Remote First"
+          description: "Work from anywhere with flexible hours and async communication"
+
+    cta:
+      title: "Don't see the right position?"
+      description: "We're always looking for talented people. Send us your resume and we'll keep you in mind for future opportunities."
+      buttonText: "Send Your Resume"
+
+  # Application Settings
+  application:
+    requireCoverLetter: false
+    requireLinkedIn: false
+    requireGitHub: false
+    requirePortfolio: false
+    maxResumeSize: 5242880  # 5MB in bytes
+    allowedResumeFormats: [".pdf", ".doc", ".docx"]
+
+  # Email Templates
+  emailTemplates:
+    applicationReceived:
+      subject: "Thank you for applying to {{jobTitle}}"
+      sender: "Hiring Team"
+
+  # Theme Settings
+  theme:
+    primaryColor: "#3B82F6"  # Blue-600
+    secondaryColor: "#8B5CF6"  # Purple-600
+    darkMode: true  # Enable dark mode toggle

@@ -41,3 +41,6 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+
+# Company configuration (use company.yaml.example as template)
+/config/company.yaml
