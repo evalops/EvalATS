@@ -813,3 +813,71 @@ async function createNotification(
   // or integrate with external notification service
   console.log(`Notification: ${data.type} for user ${data.userId}`)
 }
+
+// Save search configuration
+export const saveSearch = mutation({
+  args: {
+    name: v.string(),
+    query: v.string(),
+    filters: v.any(),
+    entity: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("savedSearches", {
+      name: args.name,
+      query: args.query,
+      filters: args.filters,
+      entity: args.entity,
+      createdAt: new Date().toISOString(),
+    })
+  },
+})
+
+// Get saved searches
+export const getSavedSearches = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("savedSearches").collect()
+  },
+})
+
+// Delete saved search
+export const deleteSavedSearch = mutation({
+  args: {
+    id: v.id("savedSearches"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id)
+  },
+})
+
+// Add search to history
+export const addSearchHistory = mutation({
+  args: {
+    query: v.string(),
+    entity: v.string(),
+    filters: v.any(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("searchHistory", {
+      query: args.query,
+      entity: args.entity,
+      filters: args.filters,
+      timestamp: new Date().toISOString(),
+    })
+  },
+})
+
+// Get search history
+export const getSearchHistory = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = args.limit || 10
+    return await ctx.db
+      .query("searchHistory")
+      .order("desc")
+      .take(limit)
+  },
+})

@@ -674,4 +674,22 @@ export default defineSchema({
     .index("by_timestamp", ["timestamp"])
     .index("by_job", ["jobId"])
     .index("by_actor", ["actor.id"]),
+
+  // Saved searches for users
+  savedSearches: defineTable({
+    name: v.string(),
+    query: v.string(),
+    filters: v.any(), // Complex filter object
+    entity: v.string(), // "candidates" | "jobs" | "interviews" | "all"
+    createdAt: v.string(),
+  }),
+
+  // Search history for recent searches
+  searchHistory: defineTable({
+    query: v.string(),
+    entity: v.string(),
+    filters: v.any(),
+    timestamp: v.string(),
+  })
+    .index("by_timestamp", ["timestamp"]),
 });
