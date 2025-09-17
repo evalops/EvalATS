@@ -1,12 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import { useMutation } from 'convex/react'
+import { api } from '@/convex/_generated/api'
+import { Id } from '@/convex/_generated/dataModel'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Shield, Info } from 'lucide-react'
+import { toast } from '@/components/ui/use-toast'
 
 interface EEOFormData {
   race?: string
@@ -16,27 +20,75 @@ interface EEOFormData {
 }
 
 interface EEOFormProps {
-  candidateId: string
-  onSubmit: (data: EEOFormData) => void
+  candidateId: Id<"candidates">
+  onSubmit?: (data: EEOFormData) => void
   isRequired?: boolean
 }
 
 export function EEOForm({ candidateId, onSubmit, isRequired = false }: EEOFormProps) {
   const [formData, setFormData] = useState<EEOFormData>({})
   const [showForm, setShowForm] = useState(false)
+  const storeEEOData = useMutation(api.compliance.storeEEOData)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(formData)
+
+    try {
+      await storeEEOData({
+        candidateId,
+        race: formData.race as any,
+        gender: formData.gender as any,
+        veteranStatus: formData.veteranStatus as any,
+        disabilityStatus: formData.disabilityStatus as any,
+      })
+
+      toast({
+        title: "Thank you",
+        description: "Your information has been recorded confidentially.",
+      })
+
+      if (onSubmit) {
+        onSubmit(formData)
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save information. Please try again.",
+        variant: "destructive"
+      })
+    }
   }
 
-  const handleDecline = () => {
-    onSubmit({
-      race: 'decline_to_answer',
-      gender: 'decline_to_answer',
-      veteranStatus: 'decline_to_answer',
-      disabilityStatus: 'decline_to_answer'
-    })
+  const handleDecline = async () => {
+    try {
+      await storeEEOData({
+        candidateId,
+        race: 'decline_to_answer',
+        gender: 'decline_to_answer',
+        veteranStatus: 'decline_to_answer',
+        disabilityStatus: 'decline_to_answer',
+      })
+
+      toast({
+        title: "Thank you",
+        description: "Your preference has been recorded.",
+      })
+
+      if (onSubmit) {
+        onSubmit({
+          race: 'decline_to_answer',
+          gender: 'decline_to_answer',
+          veteranStatus: 'decline_to_answer',
+          disabilityStatus: 'decline_to_answer'
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save information. Please try again.",
+        variant: "destructive"
+      })
+    }
   }
 
   if (!showForm) {

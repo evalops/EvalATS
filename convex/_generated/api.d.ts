@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as analytics from "../analytics.js";
 import type * as candidates from "../candidates.js";
+import type * as compliance from "../compliance.js";
 import type * as emailSeeds from "../emailSeeds.js";
 import type * as emails from "../emails.js";
 import type * as files from "../files.js";
@@ -33,6 +34,7 @@ import type * as seed from "../seed.js";
 declare const fullApi: ApiFromModules<{
   analytics: typeof analytics;
   candidates: typeof candidates;
+  compliance: typeof compliance;
   emailSeeds: typeof emailSeeds;
   emails: typeof emails;
   files: typeof files;
