@@ -19,7 +19,7 @@ const stages: { id: Stage; label: string; color: string }[] = [
 ]
 
 export function PipelineBoard() {
-  const candidatesData = useQuery(api.candidates.list) || []
+  const candidatesData = useQuery(api.candidates.list, {}) || []
 
   // Helper function to calculate days since application
   const getDaysAgo = (dateString: string) => {

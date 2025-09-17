@@ -57,8 +57,8 @@ export function ReportingDashboard() {
   const [compareMode, setCompareMode] = useState(false)
 
   // Mock Convex queries - replace with actual API calls
-  const candidates = useQuery(api.teams.getCandidates) || []
-  const jobs = useQuery(api.teams.getJobs) || []
+  const candidates = useQuery(api.candidates.list, {}) || []
+  const jobs = useQuery(api.jobs.list, {}) || []
   const interviews = useQuery(api.interviews.list, {}) || []
   const teamMembers = useQuery(api.teams.getTeamMembers) || []
 
@@ -69,27 +69,29 @@ export function ReportingDashboard() {
     const startDate = new Date(now.getTime() - timeRangeDays * 24 * 60 * 60 * 1000)
 
     // Filter data by time range
-    const filteredCandidates = candidates.filter(c =>
+    const filteredCandidates = candidates.filter((c: any) =>
       new Date(c.appliedDate) >= startDate
     )
 
-    const filteredInterviews = interviews.filter(i =>
+    const filteredInterviews = interviews.filter((i: any) =>
       new Date(i.date) >= startDate
     )
 
     // Key metrics
     const totalApplications = filteredCandidates.length
-    const activePositions = jobs.filter(j => j.status === "active").length
-    const hiredCandidates = filteredCandidates.filter(c => c.status === "hired").length
-    const rejectedCandidates = filteredCandidates.filter(c => c.status === "rejected").length
+    const activePositions = jobs.filter((j: any) => j.status === "active").length
+    const hiredCandidatesArray = filteredCandidates.filter((c: any) => c.status === "hired")
+    const hiredCandidates = hiredCandidatesArray.length
+    const rejectedCandidatesArray = filteredCandidates.filter((c: any) => c.status === "rejected")
+    const rejectedCandidates = rejectedCandidatesArray.length
 
     // Calculate averages
-    const avgTimeToHire = hiredCandidates.length > 0
+    const avgTimeToHire = hiredCandidates > 0
       ? Math.round(Math.random() * 30) // Mock calculation
       : 0
 
-    const offerAcceptanceRate = hiredCandidates.length > 0
-      ? Math.round((hiredCandidates.length / (hiredCandidates.length + 2)) * 100)
+    const offerAcceptanceRate = hiredCandidates > 0
+      ? Math.round((hiredCandidates / (hiredCandidates + 2)) * 100)
       : 0
 
     // Calculate changes (mock data for demo)
@@ -101,14 +103,14 @@ export function ReportingDashboard() {
     return {
       totalApplications,
       activePositions,
-      hiredCandidates: hiredCandidates.length,
-      rejectedCandidates: rejectedCandidates.length,
+      hiredCandidates: hiredCandidates,
+      rejectedCandidates: rejectedCandidates,
       avgTimeToHire,
       offerAcceptanceRate,
       applicationChange,
       interviewsScheduled: filteredInterviews.length,
       conversionRate: totalApplications > 0
-        ? Math.round((hiredCandidates.length / totalApplications) * 100)
+        ? Math.round((hiredCandidates / totalApplications) * 100)
         : 0
     }
   }

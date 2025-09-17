@@ -8,12 +8,14 @@ import {
   Mail, Plus, Trash2, Edit, Save, X, Eye, Send,
   Code, Copy, FileText, Users, Calendar, Package,
   ChevronDown, Tag, Sparkles, Link, Image, List,
-  Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight
+  Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight,
+  AlertCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
@@ -374,16 +376,16 @@ export function EmailTemplateEditor() {
                 <div className="space-y-2 p-4">
                   {filteredTemplates.map((template) => (
                     <div
-                      key={template._id || template.name}
+                      key={'_id' in template ? template._id : template.name}
                       className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
-                        selectedTemplate?._id === template._id ? "border-blue-500 bg-blue-50" : ""
+                        selectedTemplate && '_id' in selectedTemplate && '_id' in template && selectedTemplate._id === template._id ? "border-blue-500 bg-blue-50" : ""
                       }`}
-                      onClick={() => setSelectedTemplate(template)}
+                      onClick={() => setSelectedTemplate(template as EmailTemplate)}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <div className={`h-2 w-2 rounded-full ${getCategoryColor(template.category)}`} />
+                            <div className={`h-2 w-2 rounded-full ${getCategoryColor(template.category as TemplateCategory)}`} />
                             <p className="font-medium text-sm">{template.name}</p>
                           </div>
                           <p className="text-xs text-gray-600 mt-1 line-clamp-1">{template.subject}</p>

@@ -42,7 +42,7 @@ interface JobFormData {
   title: string
   department: string
   location: string
-  type: string
+  type: 'full-time' | 'part-time' | 'contract'
   urgency: 'low' | 'medium' | 'high'
   salaryMin: string
   salaryMax: string
@@ -125,8 +125,7 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
         salaryMax,
         description: formData.description.trim(),
         requirements,
-        status: formData.status,
-        postedDate: new Date().toISOString().split('T')[0], // Today's date
+        // status is set to 'active' by default in the mutation handler
       })
 
       toast({
@@ -260,7 +259,7 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
               </label>
               <select
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, type: e.target.value as 'full-time' | 'part-time' | 'contract' })}
                 className="input-clean"
               >
                 {jobTypes.map((type) => (

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 export default function CompliancePage() {
   // Get latest audit data from Convex
-  const auditData = useQuery(api.compliance.getLatestAudit)
+  const auditData = useQuery(api.compliance.getLatestAudit, {})
 
   // Get AI decisions from Convex
   const aiDecisions = useQuery(api.compliance.getAIDecisions, { limit: 20 })

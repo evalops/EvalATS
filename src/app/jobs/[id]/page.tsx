@@ -47,8 +47,8 @@ export default function JobDetailPage() {
   // Filter applicants based on search and status
   const filteredApplicants = job.applicants?.filter(applicant => {
     const matchesSearch = !searchQuery ||
-      applicant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      applicant.email.toLowerCase().includes(searchQuery.toLowerCase())
+      (applicant.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (applicant.email || '').toLowerCase().includes(searchQuery.toLowerCase())
 
     const matchesStatus = selectedStatus === 'all' || applicant.status === selectedStatus
 
@@ -233,7 +233,7 @@ export default function JobDetailPage() {
                       <div className="flex items-start gap-4 flex-1">
                         {/* Avatar */}
                         <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-sm font-medium shrink-0">
-                          {applicant.name.split(' ').map(n => n[0]).join('')}
+                          {(applicant.name || 'U').split(' ').map(n => n[0]).join('')}
                         </div>
 
                         <div className="flex-1 min-w-0">

@@ -69,14 +69,21 @@ export function AdvancedSearch() {
   const [isSearching, setIsSearching] = useState(false)
   const [saveSearchName, setSaveSearchName] = useState("")
 
-  // Mock Convex queries - replace with actual API calls
-  const candidates = useQuery(api.teams.getCandidates) || []
-  const jobs = useQuery(api.teams.getJobs) || []
+  // Convex queries
+  const candidates = useQuery(api.candidates.list, {}) || []
+  const jobs = useQuery(api.jobs.list, {}) || []
   const interviews = useQuery(api.interviews.list, {}) || []
-  const savedSearches = useQuery(api.teams.getSavedSearches) || []
+  const savedSearches: any[] = [] // TODO: Implement saved searches
 
-  const saveSearch = useMutation(api.teams.saveSearch)
-  const deleteSearch = useMutation(api.teams.deleteSavedSearch)
+  // These mutations will need to be implemented in Convex
+  const saveSearch = async (name: string, filters: any) => {
+    console.log('Save search:', name, filters)
+    // TODO: Implement save search mutation
+  }
+  const deleteSearch = async (id: string) => {
+    console.log('Delete search:', id)
+    // TODO: Implement delete search mutation
+  }
   const addToSearchHistory = useMutation(api.teams.addSearchHistory)
 
   // Debounced search function
@@ -86,7 +93,8 @@ export function AdvancedSearch() {
 
       // Add to search history
       if (query) {
-        await addToSearchHistory({ query, entity: entityType, filters: searchFilters })
+        // TODO: Fix addSearchHistory mutation
+        // await addToSearchHistory({ query, entity: entityType, filters: searchFilters })
       }
 
       // Simulate search with local data - replace with actual search API

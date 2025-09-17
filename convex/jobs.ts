@@ -71,6 +71,7 @@ export const create = mutation({
     department: v.string(),
     location: v.string(),
     type: v.union(v.literal("full-time"), v.literal("part-time"), v.literal("contract")),
+    urgency: v.union(v.literal("high"), v.literal("medium"), v.literal("low")),
     description: v.string(),
     requirements: v.array(v.string()),
     salaryMin: v.optional(v.number()),
@@ -81,7 +82,6 @@ export const create = mutation({
       ...args,
       postedDate: new Date().toISOString().split('T')[0],
       status: "active",
-      urgency: "medium",
     });
 
     return jobId;

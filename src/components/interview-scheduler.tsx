@@ -75,8 +75,8 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
   const [viewMode, setViewMode] = useState<'calendar' | 'slots'>('calendar')
 
   // Get candidate and job details
-  const candidate = useQuery(api.candidates.getById, { id: candidateId })
-  const job = useQuery(api.jobs.getById, { id: jobId })
+  const candidate = useQuery(api.candidates.get, { id: candidateId })
+  const job = useQuery(api.jobs.get, { id: jobId })
   const hiringTeam = useQuery(api.teams.getHiringTeam, { jobId })
   const interviews = useQuery(api.interviews.getByCandidate, { candidateId })
 

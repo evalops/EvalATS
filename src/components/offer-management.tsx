@@ -123,9 +123,10 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
   const [sendingOffer, setSendingOffer] = useState(false)
 
   // Get data from Convex
-  const candidate = useQuery(api.candidates.getById, { id: candidateId })
-  const job = useQuery(api.jobs.getById, { id: jobId })
-  const offer = useQuery(api.teams.getOffer, { candidateId, jobId })
+  const candidate = useQuery(api.candidates.get, { id: candidateId })
+  const job = useQuery(api.jobs.get, { id: jobId })
+  // TODO: Implement getOffer query in teams
+  const offer: any = null // useQuery(api.teams.getOffer, { candidateId, jobId })
   const hiringTeam = useQuery(api.teams.getHiringTeam, { jobId })
 
   // Mutations
@@ -191,7 +192,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
       return
     }
 
-    if (offer.status !== 'approved') {
+    if (offer?.status !== 'approved') {
       toast({
         title: "Approval required",
         description: "The offer must be approved before sending",
@@ -203,10 +204,10 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
     setSendingOffer(true)
     try {
       // Generate offer letter URL (would integrate with document generation service)
-      const letterUrl = `https://offers.company.com/${offer._id}`
+      const letterUrl = `https://offers.company.com/${offer?._id}`
 
       await sendOffer({
-        offerId: offer._id,
+        offerId: offer?._id,
         letterUrl
       })
 
@@ -233,7 +234,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
 
     try {
       await reviewOffer({
-        offerId: offer._id,
+        offerId: offer?._id,
         approverId: currentUser.teamMemberId,
         status: approved ? 'approved' : 'rejected',
         comments: approved ? 'Approved' : 'Changes required'
@@ -291,7 +292,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                 Create and manage offer for {candidate?.name} - {job?.title}
               </CardDescription>
             </div>
-            {offer && getStatusBadge(offer.status)}
+            {offer && getStatusBadge(offer?.status)}
           </div>
         </CardHeader>
         <CardContent>
@@ -304,12 +305,12 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                   <div>
                     <p className="text-sm font-medium">Created</p>
                     <p className="text-xs text-muted-foreground">
-                      {format(new Date(offer.createdAt), 'MMM d, yyyy')}
+                      {format(new Date(offer?.createdAt), 'MMM d, yyyy')}
                     </p>
                   </div>
                 </div>
 
-                {offer.sentAt && (
+                {offer?.sentAt && (
                   <>
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
                     <div className="flex items-center gap-2">
@@ -317,14 +318,14 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                       <div>
                         <p className="text-sm font-medium">Sent</p>
                         <p className="text-xs text-muted-foreground">
-                          {format(new Date(offer.sentAt), 'MMM d, yyyy')}
+                          {format(new Date(offer?.sentAt), 'MMM d, yyyy')}
                         </p>
                       </div>
                     </div>
                   </>
                 )}
 
-                {offer.viewedAt && (
+                {offer?.viewedAt && (
                   <>
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
                     <div className="flex items-center gap-2">
@@ -332,28 +333,28 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                       <div>
                         <p className="text-sm font-medium">Viewed</p>
                         <p className="text-xs text-muted-foreground">
-                          {format(new Date(offer.viewedAt), 'MMM d, yyyy')}
+                          {format(new Date(offer?.viewedAt), 'MMM d, yyyy')}
                         </p>
                       </div>
                     </div>
                   </>
                 )}
 
-                {offer.respondedAt && (
+                {offer?.respondedAt && (
                   <>
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
                     <div className="flex items-center gap-2">
-                      {offer.status === 'accepted' ? (
+                      {offer?.status === 'accepted' ? (
                         <CheckCircle2 className="h-4 w-4 text-green-600" />
                       ) : (
                         <XCircle className="h-4 w-4 text-red-600" />
                       )}
                       <div>
                         <p className="text-sm font-medium">
-                          {offer.status === 'accepted' ? 'Accepted' : 'Declined'}
+                          {offer?.status === 'accepted' ? 'Accepted' : 'Declined'}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {format(new Date(offer.respondedAt), 'MMM d, yyyy')}
+                          {format(new Date(offer?.respondedAt), 'MMM d, yyyy')}
                         </p>
                       </div>
                     </div>
@@ -364,7 +365,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Expires</p>
                 <p className="text-sm font-medium">
-                  {format(new Date(offer.expiresAt), 'MMM d, yyyy')}
+                  {format(new Date(offer?.expiresAt), 'MMM d, yyyy')}
                 </p>
               </div>
             </div>
@@ -634,9 +635,9 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
               {/* Approvers */}
               <div className="space-y-3">
                 <h4 className="font-medium">Required Approvals</h4>
-                {offer?.approvals && offer.approvals.length > 0 ? (
+                {offer?.approvals && offer?.approvals.length > 0 ? (
                   <div className="space-y-2">
-                    {offer.approvals.map((approval, idx) => {
+                    {offer?.approvals.map((approval: any, idx: number) => {
                       const approver = hiringTeam?.find(m => m.teamMemberId === approval.approverId)
                       return (
                         <div key={idx} className="flex items-center justify-between p-3 border rounded-lg">
@@ -708,7 +709,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
               </div>
 
               {/* Approval Actions */}
-              {offer && offer.status === 'draft' && (
+              {offer && offer?.status === 'draft' && (
                 <div className="flex gap-3">
                   <Button
                     onClick={() => handleApproval(true)}
@@ -729,7 +730,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                 </div>
               )}
 
-              {offer && offer.status === 'approved' && (
+              {offer && offer?.status === 'approved' && (
                 <Alert className="border-green-200 bg-green-50">
                   <CheckCircle2 className="h-4 w-4 text-green-600" />
                   <AlertTitle>Offer Approved</AlertTitle>
@@ -849,7 +850,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
               </Button>
               <Button
                 onClick={handleSendOffer}
-                disabled={!offer || offer.status !== 'approved' || sendingOffer}
+                disabled={!offer || offer?.status !== 'approved' || sendingOffer}
                 className="flex-1"
               >
                 {sendingOffer ? (

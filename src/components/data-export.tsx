@@ -199,11 +199,11 @@ export function DataExport() {
   const [exportProgress, setExportProgress] = useState(0)
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
 
-  // Mock Convex queries - replace with actual queries
-  const candidates = useQuery(api.teams.getCandidates) || []
-  const jobs = useQuery(api.teams.getJobs) || []
+  // Convex queries
+  const candidates = useQuery(api.candidates.list, {}) || []
+  const jobs = useQuery(api.jobs.list, {}) || []
   const interviews = useQuery(api.interviews.list, {}) || []
-  const teamMembers = useQuery(api.teams.getTeamMembers) || []
+  const teamMembers = useQuery(api.teams.getTeamMembers, {}) || []
 
   const handlePresetSelect = (presetId: string) => {
     const preset = exportPresets.find(p => p.id === presetId)
@@ -637,7 +637,7 @@ export function DataExport() {
                 <Label>Export Format</Label>
                 <RadioGroup
                   value={config.format}
-                  onValueChange={(value) =>
+                  onValueChange={(value: string) =>
                     setConfig(prev => ({ ...prev, format: value as ExportFormat }))
                   }
                   className="grid grid-cols-2 gap-4 mt-2"
