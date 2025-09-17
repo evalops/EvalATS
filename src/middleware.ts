@@ -3,12 +3,12 @@ import { NextResponse } from 'next/server'
 
 const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)'])
 
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
   // If it's a public route, allow access
   if (isPublicRoute(req)) return NextResponse.next()
 
   // For protected routes, check authentication
-  const { userId } = auth()
+  const { userId } = await auth()
   if (!userId) {
     return NextResponse.redirect(new URL('/sign-in', req.url))
   }

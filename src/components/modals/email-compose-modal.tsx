@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { toast } from 'sonner'
+import { useToast } from '@/hooks/use-toast'
 import {
   Dialog,
   DialogContent,
@@ -22,7 +22,7 @@ import {
 import {
   Mail,
   Send,
-  Template,
+  FileText,
   Plus,
   X,
   Paperclip,
@@ -74,7 +74,8 @@ export function EmailComposeModal({
   const [ccInput, setCcInput] = useState('')
   const [bccInput, setBccInput] = useState('')
 
-  const templates = useQuery(api.emails.getEmailTemplates)
+  const { toast } = useToast()
+  const templates = useQuery(api.emails.getEmailTemplates, {})
   const sendEmail = useMutation(api.emails.sendEmail)
   const processTemplate = useMutation(api.emails.processEmailTemplate)
 
@@ -96,16 +97,29 @@ export function EmailComposeModal({
         sender: 'John Doe' // This would come from auth context
       })
 
-      toast.success('Email sent successfully!')
+      toast({
+        title: 'Email sent',
+        description: `Message delivered to ${formData.to}.`,
+      })
       onClose()
     } catch (error) {
-      toast.error('Failed to send email')
+      toast({
+        title: 'Failed to send email',
+        description: 'There was an issue delivering the email. Please try again.',
+        variant: 'destructive',
+      })
       console.error('Error sending email:', error)
     }
   }
 
   const handleTemplateSelect = async (templateId: string) => {
-    if (!templateId) return
+    if (!templateId) {
+      setFormData({
+        ...formData,
+        template: undefined,
+      })
+      return
+    }
 
     try {
       const processed = await processTemplate({
@@ -124,7 +138,11 @@ export function EmailComposeModal({
         template: processed.template
       })
     } catch (error) {
-      toast.error('Failed to load template')
+      toast({
+        title: 'Template error',
+        description: 'We were unable to load that template. Please try again.',
+        variant: 'destructive',
+      })
     }
   }
 
@@ -168,7 +186,7 @@ export function EmailComposeModal({
           {/* Template Selection */}
           <div className="space-y-2">
             <Label htmlFor="template">Email Template</Label>
-            <Select value={formData.template} onValueChange={handleTemplateSelect}>
+            <Select value={formData.template ?? ''} onValueChange={handleTemplateSelect}>
               <SelectTrigger>
                 <SelectValue placeholder="Choose a template (optional)" />
               </SelectTrigger>
@@ -177,7 +195,7 @@ export function EmailComposeModal({
                 {templates?.map((template) => (
                   <SelectItem key={template._id} value={template._id}>
                     <div className="flex items-center gap-2">
-                      <Template className="h-4 w-4" />
+                      <FileText className="h-4 w-4" />
                       {template.name}
                     </div>
                   </SelectItem>

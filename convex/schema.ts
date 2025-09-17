@@ -11,12 +11,14 @@ export default defineSchema({
     github: v.optional(v.string()),
     portfolio: v.optional(v.string()),
     position: v.string(),
+    source: v.optional(v.string()),
     appliedDate: v.string(),
     status: v.union(
       v.literal("applied"),
       v.literal("screening"),
       v.literal("interview"),
       v.literal("offer"),
+      v.literal("hired"),
       v.literal("rejected"),
       v.literal("withdrawn")
     ),
@@ -28,6 +30,8 @@ export default defineSchema({
     resumeFilename: v.optional(v.string()),
     coverLetter: v.optional(v.id("_storage")),
     coverLetterFilename: v.optional(v.string()),
+    updatedAt: v.optional(v.number()),
+    hiredAt: v.optional(v.number()),
     evaluation: v.object({
       overall: v.number(),
       technical: v.number(),
@@ -101,6 +105,7 @@ export default defineSchema({
       v.literal("interview"),
       v.literal("assessment"),
       v.literal("offer"),
+      v.literal("hired"),
       v.literal("rejected"),
       v.literal("withdrawn")
     ),
