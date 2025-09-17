@@ -1,215 +1,186 @@
-# EvalATS - Modern Applicant Tracking System
+# EvalATS – Modern Applicant Tracking System
 
-A comprehensive, modern Applicant Tracking System (ATS) built with Next.js 14, TypeScript, Convex, and Clerk authentication. EvalATS streamlines the hiring process with powerful features for managing candidates, jobs, interviews, and communications.
+EvalATS is a full-stack Applicant Tracking System (ATS) built with Next.js 14, TypeScript, Convex, and Clerk. The application streamlines hiring workflows with real-time collaboration, structured evaluations, and compliance tooling so teams can move faster while staying aligned.
 
-## 🚀 Features
+## Table of Contents
+- [Overview](#overview)
+- [Architecture](#architecture)
+  - [Frontend](#frontend)
+  - [Backend](#backend)
+  - [Authentication](#authentication)
+- [Feature Highlights](#feature-highlights)
+- [Quick Start](#quick-start)
+- [Environment Variables](#environment-variables)
+- [Project Structure](#project-structure)
+- [Convex Data Model](#convex-data-model)
+- [Development Workflow](#development-workflow)
+- [Seeding and Demo Data](#seeding-and-demo-data)
+- [Deployment](#deployment)
+- [Additional Documentation](#additional-documentation)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
 
-### Core Functionality
-- **📊 Dashboard**: Real-time overview of hiring pipeline and key metrics
-- **💼 Job Management**: Create, edit, and manage job postings with full CRUD operations
-- **👥 Candidate Tracking**: Comprehensive candidate profiles with evaluation scores
-- **📅 Interview Scheduling**: Schedule and manage interviews with calendar integration
-- **📧 Email Communications**: Built-in email system with templates and threading
-- **📈 Analytics Dashboard**: Hiring funnel analysis, source effectiveness, and time-to-hire metrics
-- **🔒 Authentication**: Secure authentication with Clerk, supporting SSO and MFA
+## Overview
+EvalATS centralizes job, candidate, interview, and communication management into a single experience. The UI is powered by the Next.js App Router and a library of composable shadcn-inspired components, while Convex provides a reactive backend with real-time updates. Clerk handles authentication, multi-tenancy, and secure session management.
 
-### Advanced Features
-- **📁 Document Management**: Upload and manage resumes, cover letters, and other candidate documents
-- **⭐ Interview Feedback**: Structured feedback collection with multi-criteria ratings
-- **🔄 Status Pipeline**: Visual candidate pipeline with quick status updates
-- **🔍 Smart Search**: Real-time search and filtering across all data
-- **📝 Notes System**: Collaborative notes and comments on candidates
-- **📊 Evaluation Scoring**: Multi-dimensional candidate evaluation system
-- **🎯 Source Tracking**: Track and analyze candidate sources for ROI
-- **📨 Email Templates**: Pre-built and custom email templates with variable substitution
+## Architecture
 
-## 🛠️ Tech Stack
+### Frontend
+- **Framework**: Next.js 14 with the App Router and TypeScript.
+- **Styling**: Tailwind CSS with dark mode and component primitives located in `src/components/ui`.
+- **State/Data**: Convex React client for real-time data and TanStack Query for local caching where needed.
+- **Key Experiences**:
+  - Dashboard with stats, recent activity, and pipeline board (`src/app/page.tsx`).
+  - Candidate management (`src/app/candidates`) with profile views, notes, assessments, and timeline.
+  - Job, interview, analytics, compliance, and settings sections under `src/app/*`.
+  - API routes in `src/app/api` for file downloads and resume parsing.
 
-- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS
-- **Backend**: Convex (Real-time database and serverless functions)
-- **Authentication**: Clerk (with Convex integration)
-- **UI Components**: Custom components with shadcn/ui patterns
-- **File Storage**: Convex File Storage
-- **State Management**: React hooks with Convex real-time queries
-- **Styling**: Tailwind CSS with dark mode support
-
-## 📦 Installation
-
-### Prerequisites
-- Node.js 18+
-- pnpm (recommended) or npm
-- Convex account (free tier available)
-- Clerk account (free tier available)
-
-### Setup Instructions
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/yourusername/evalats.git
-cd evalats/frontend
-```
-
-2. **Install dependencies**
-```bash
-pnpm install
-```
-
-3. **Set up Convex**
-```bash
-npx convex dev
-```
-This will prompt you to log in to Convex and set up a new project.
-
-4. **Configure environment variables**
-Create a `.env.local` file with:
-```env
-# Convex
-NEXT_PUBLIC_CONVEX_URL=your_convex_deployment_url
-CONVEX_DEPLOYMENT=your_convex_deployment
-
-# Clerk
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-CLERK_SECRET_KEY=your_clerk_secret_key
-CLERK_JWT_ISSUER_DOMAIN=your_clerk_jwt_issuer_domain
-```
-
-5. **Seed the database (optional)**
-```bash
-npx convex run emailSeeds:seedEmailTemplates
-```
-
-6. **Start the development server**
-```bash
-pnpm dev
-```
-
-Visit `http://localhost:3000` to see the application.
-
-## 🏗️ Project Structure
-
-```
-frontend/
-├── src/
-│   ├── app/                 # Next.js 14 app router pages
-│   │   ├── (auth)/          # Authentication pages
-│   │   ├── analytics/       # Analytics dashboard
-│   │   ├── candidates/      # Candidate management
-│   │   ├── interviews/      # Interview scheduling
-│   │   ├── jobs/           # Job postings
-│   │   └── settings/       # Application settings
-│   ├── components/          # React components
-│   │   ├── layout/         # Layout components (AppShell, etc.)
-│   │   ├── modals/         # Modal components
-│   │   ├── emails/         # Email-related components
-│   │   └── ui/             # Base UI components
-│   ├── lib/                # Utility functions
-│   └── providers/          # Context providers
-├── convex/                 # Convex backend
-│   ├── _generated/         # Auto-generated Convex files
-│   ├── schema.ts          # Database schema
-│   ├── auth.config.ts     # Authentication configuration
-│   └── *.ts               # Convex functions (mutations/queries)
-├── public/                # Static assets
-└── package.json          # Dependencies
-```
-
-## 🔧 Configuration
-
-### Database Schema
-The application uses Convex with the following main tables:
-- `candidates` - Candidate information and evaluation scores
-- `jobs` - Job postings and requirements
-- `interviews` - Interview scheduling and feedback
-- `emails` - Email communications and templates
-- `timeline` - Candidate activity timeline
-- `assessments` - Candidate assessments and tests
-- `notes` - Collaborative notes on candidates
-- `applications` - Job applications linking candidates to jobs
+### Backend
+- **Convex** provides the application database, mutations, and query endpoints located in the `convex/` directory.
+- Strongly-typed schema defined in `convex/schema.ts` with indexes for efficient querying.
+- Dedicated modules for core resources such as candidates, jobs, interviews, workflows, and compliance reporting.
+- Utility mutations for seeding (`convex/seed.ts`) and templated email content (`convex/emailSeeds.ts`).
 
 ### Authentication
-Clerk is configured with:
-- Email/password authentication
-- Social login providers (configurable in Clerk dashboard)
-- Protected routes via middleware
-- JWT tokens for Convex integration
+- **Clerk** protects routes and exposes user context through providers in `src/providers/auth-provider.tsx`.
+- Supports email/password plus optional SSO as configured in the Clerk dashboard.
+- JWT template named `convex` enables Convex server integration (see [CLERK_SETUP.md](./CLERK_SETUP.md)).
 
-## 🚢 Deployment
+## Feature Highlights
+- **Pipeline dashboard**: KPI cards, activity feed, and drag-friendly pipeline view keep hiring progress visible.
+- **Candidate workspace**: Search, filter, and status management backed by Convex queries; each profile surfaces interviews, assessments, notes, and evaluation scores.
+- **Job management**: CRUD operations for open roles with urgency, salary ranges, and department tracking.
+- **Interview scheduling & scorecards**: Schedule interviews, capture structured feedback, and aggregate ratings.
+- **Email & templates**: Send, draft, and template candidate communications with attachment support via Convex storage.
+- **Compliance & analytics**: EEOC/OFCCP data capture, AI audit logging, and reporting dashboards for bias monitoring and hiring metrics.
+- **Collaboration tooling**: Comments, tasks, hiring team assignments, and workflow automation tables enable coordinated hiring.
 
-### Production Deployment
+## Quick Start
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/evalats.git
+   cd evalats
+   ```
 
-1. **Deploy to Vercel** (recommended)
-```bash
-vercel
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
+
+3. **Configure environment variables**
+   Create a `.env.local` file (see [Environment Variables](#environment-variables)) and populate it with your Convex and Clerk credentials. Optional integrations (e.g., resume parsing) require additional keys.
+
+4. **Run Convex locally**
+   ```bash
+   npx convex dev
+   ```
+   Log in or create a Convex project when prompted. Leave this process running to serve the real-time backend.
+
+5. **Start the Next.js development server** (in a new terminal)
+   ```bash
+   pnpm dev
+   ```
+
+6. **Access the app**
+   Visit [http://localhost:3000](http://localhost:3000). You will be prompted to sign in via Clerk before accessing the dashboard.
+
+## Environment Variables
+Create `.env.local` in the project root with the following keys:
+
+| Variable | Description |
+| --- | --- |
+| `NEXT_PUBLIC_CONVEX_URL` | Convex deployment URL returned from `npx convex dev` or the production deployment. |
+| `CONVEX_DEPLOYMENT` | Name of the Convex deployment (e.g., `dev:YOUR_PROJECT`). Required for running Convex CLI commands. |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk publishable key used by the frontend provider. |
+| `CLERK_SECRET_KEY` | Clerk secret key used for server-side operations. |
+| `CLERK_JWT_ISSUER_DOMAIN` | Issuer URL from the Clerk JWT template named `convex`. |
+| `OPENAI_API_KEY` (optional) | Enables resume parsing via the `/api/parse-resume` endpoint. |
+
+> 📘 Detailed Clerk setup instructions live in [CLERK_SETUP.md](./CLERK_SETUP.md).
+
+## Project Structure
+```
+.
+├── src/
+│   ├── app/                  # Next.js routes, pages, and API handlers
+│   ├── components/           # Reusable UI and feature components (dashboard, emails, pipeline, etc.)
+│   ├── hooks/                # Custom React hooks
+│   ├── lib/                  # Utilities and helpers
+│   ├── providers/            # Context providers (Clerk, Convex)
+│   └── middleware.ts         # Clerk auth middleware
+├── convex/                   # Convex schema, queries, mutations, and seeds
+├── public/                   # Static assets
+├── CLERK_SETUP.md            # Authentication configuration guide
+├── README.md                 # Project overview (this file)
+└── package.json              # Scripts and dependencies
 ```
 
-2. **Configure production environment variables** in Vercel dashboard
+## Convex Data Model
+Key tables defined in `convex/schema.ts`:
+- **candidates**: Core candidate profile, evaluation scores, and resume metadata.
+- **jobs**: Job postings, department associations, and salary ranges.
+- **interviews** & **interviewFeedback**: Scheduling details, participants, structured feedback, and recommendations.
+- **timeline**, **assessments**, **notes**: Chronological history, test results, and collaborative annotations for each candidate.
+- **emails** & **emailTemplates**: Outbound messages, delivery status, and reusable templates.
+- **applications**: Links candidates to jobs with status tracking.
+- **compliance tables** (`eeoData`, `biasAudits`, `aiDecisions`, `complianceSettings`): Support reporting and regulatory requirements.
+- **collaboration tables** (`teamMembers`, `hiringTeams`, `comments`, `tasks`, `activityFeed`, `workflows`): Drive automation, tasking, and visibility across the hiring team.
 
-3. **Deploy Convex to production**
-```bash
-npx convex deploy
-```
+The Convex client auto-generates typed APIs in `convex/_generated/api.ts` for use within React components and server routes.
 
-4. **Update environment variables** with production URLs
+## Development Workflow
+- **Linting**: `pnpm lint`
+- **Type checking**: `pnpm type-check`
+- **Formatting**: The project relies on Prettier through the IDE; ensure Markdown and TypeScript stay consistent.
+- **Convex CLI**: Use `npx convex` for schema pushes, running mutations locally, and deploying.
+- **Recommended flow**:
+  1. Start `npx convex dev`.
+  2. Run `pnpm dev` for the Next.js server.
+  3. Use Convex mutations/queries via the generated `api` helper.
 
-## 📊 Key Features Deep Dive
+## Seeding and Demo Data
+- **Email templates**: Populate default candidate communication templates:
+  ```bash
+  npx convex run emailSeeds:seedEmailTemplates
+  ```
+- **Sample data**: Create demo candidates, jobs, applications, and related records:
+  ```bash
+  npx convex run seed:seedData
+  ```
+- **Reset data**: Remove previously seeded records:
+  ```bash
+  npx convex run seed:clearData
+  ```
 
-### Email System
-- Compose and send emails directly from candidate profiles
-- Email threading for conversation tracking
-- Template system with variable substitution
-- Delivery status tracking
-- CC/BCC support
-- File attachments (via Convex storage)
+These commands require `CONVEX_DEPLOYMENT` to be set and an active Convex session (`npx convex dev`).
 
-### Analytics Dashboard
-- Hiring funnel visualization
-- Source effectiveness analysis
-- Time-to-hire metrics
-- Interview completion rates
-- Rating distributions
-- Real-time metric updates
+## Deployment
+1. **Deploy the Next.js app** – Vercel is recommended for seamless Next.js hosting.
+2. **Set production environment variables** – Configure Convex and Clerk credentials in your hosting platform.
+3. **Deploy Convex** – Promote your Convex functions and schema:
+   ```bash
+   npx convex deploy
+   ```
+4. **Update frontend configuration** – Point `NEXT_PUBLIC_CONVEX_URL` and Clerk keys to the production values.
 
-### Interview Feedback System
-- Structured feedback forms
-- Multi-criteria evaluation (technical, cultural fit, communication)
-- Star ratings with detailed assessments
-- Hiring recommendations
-- Feedback aggregation and reporting
+## Additional Documentation
+- [CLERK_SETUP.md](./CLERK_SETUP.md): step-by-step authentication setup guide.
+- [`convex/README.md`](./convex/README.md): working with Convex functions, schema, and CLI tips.
 
-## 🔒 Security
+## Contributing
+Contributions are welcome! Please:
+1. Fork the repository.
+2. Create a descriptive branch (`git checkout -b feature/amazing-feature`).
+3. Run linting and type checks before committing.
+4. Submit a Pull Request describing your changes and testing strategy.
 
-- Secure authentication with Clerk
-- Row-level security via Convex
-- Environment variable protection
-- HTTPS enforcement in production
-- Input validation and sanitization
-- Protected API routes
+## License
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- Built with [Next.js](https://nextjs.org/)
-- Real-time backend by [Convex](https://www.convex.dev/)
-- Authentication by [Clerk](https://clerk.dev/)
-- UI components inspired by [shadcn/ui](https://ui.shadcn.com/)
-
-## 📞 Support
-
-For support, please open an issue in the GitHub repository or contact the development team.
+## Support
+Open an issue on GitHub for bugs or feature requests, or reach out to the maintainers directly.
 
 ---
 
-**EvalATS** - Streamlining the hiring process with modern technology 🚀
+**EvalATS** – Streamlining the hiring process with modern technology 🚀
