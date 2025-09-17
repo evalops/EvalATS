@@ -45,7 +45,7 @@ interface EmailTemplate {
 }
 
 const templateVariables: TemplateVariable[] = [
-  { key: "{{candidate_name}}", label: "Candidate Name", example: "John Doe" },
+  { key: "{{candidate_name}}", label: "Candidate Name", example: "Jonathan Haas" },
   { key: "{{candidate_first}}", label: "First Name", example: "John" },
   { key: "{{candidate_email}}", label: "Candidate Email", example: "john@example.com" },
   { key: "{{position}}", label: "Position", example: "Senior Software Engineer" },

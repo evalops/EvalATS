@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useMutation } from 'convex/react'
+import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useToast } from '@/hooks/use-toast'
 import { ConfirmationModal } from '@/components/ui/modal'
+import { EmailComposeModal } from '@/components/modals/email-compose-modal'
 import {
   CheckCircle,
   ArrowRight,
@@ -53,10 +54,12 @@ export function CandidateStatusActions({
 }: CandidateStatusActionsProps) {
   const { toast } = useToast()
   const updateStatus = useMutation(api.candidates.updateStatus)
+  const candidate = useQuery(api.candidates.get, { id: candidateId })
 
   const [isUpdating, setIsUpdating] = useState(false)
   const [showRejectModal, setShowRejectModal] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
+  const [showEmailModal, setShowEmailModal] = useState(false)
 
   const handleStatusUpdate = async (newStatus: string, action: string) => {
     setIsUpdating(true)
@@ -156,11 +159,7 @@ export function CandidateStatusActions({
                 <button
                   onClick={() => {
                     setShowDropdown(false)
-                    // TODO: Implement email functionality
-                    toast({
-                      title: 'Email Feature',
-                      description: 'Email functionality coming soon!',
-                    })
+                    setShowEmailModal(true)
                   }}
                   className="w-full text-left px-4 py-2 text-sm hover:bg-accent flex items-center gap-2"
                 >
@@ -227,6 +226,17 @@ export function CandidateStatusActions({
         confirmText="Reject"
         variant="destructive"
       />
+
+      {/* Email Compose Modal */}
+      {candidate && (
+        <EmailComposeModal
+          isOpen={showEmailModal}
+          onClose={() => setShowEmailModal(false)}
+          candidateId={candidateId}
+          candidateName={candidateName}
+          candidateEmail={candidate.email}
+        />
+      )}
 
       {/* Click outside to close dropdown */}
       {showDropdown && (

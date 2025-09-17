@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { useQuery } from 'convex/react'
+import { api } from '../../../convex/_generated/api'
 import {
   Briefcase,
   Users,
@@ -36,6 +38,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+
+  // Get current user data from Convex
+  const currentUser = useQuery(api.users.getCurrentUser)
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
 
@@ -95,11 +100,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="p-4 border-t border-border">
             <div className="flex items-center gap-3 px-3 py-2">
               <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
-                JD
+                {currentUser?.avatar ? (
+                  <img
+                    src={currentUser.avatar}
+                    alt={currentUser.name || 'User'}
+                    className="h-full w-full rounded-full object-cover"
+                  />
+                ) : (
+                  currentUser?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U'
+                )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">John Doe</p>
-                <p className="text-xs text-muted-foreground truncate">john@example.com</p>
+                <p className="text-sm font-medium truncate">{currentUser?.name || 'Loading...'}</p>
+                <p className="text-xs text-muted-foreground truncate">{currentUser?.email || ''}</p>
               </div>
             </div>
           </div>
@@ -158,7 +171,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   className="flex items-center gap-2 p-2 rounded-md hover:bg-accent"
                 >
                   <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
-                    JD
+                    {currentUser?.avatar ? (
+                      <img
+                        src={currentUser.avatar}
+                        alt={currentUser.name || 'User'}
+                        className="h-full w-full rounded-full object-cover"
+                      />
+                    ) : (
+                      currentUser?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U'
+                    )}
                   </div>
                   <ChevronDown className="h-4 w-4 hidden sm:block" />
                 </button>

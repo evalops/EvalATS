@@ -23,6 +23,7 @@ import type * as interviews from "../interviews.js";
 import type * as jobs from "../jobs.js";
 import type * as seed from "../seed.js";
 import type * as teams from "../teams.js";
+import type * as users from "../users.js";
 import type * as workflows from "../workflows.js";
 
 /**
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   jobs: typeof jobs;
   seed: typeof seed;
   teams: typeof teams;
+  users: typeof users;
   workflows: typeof workflows;
 }>;
 export declare const api: FilterApi<

@@ -404,19 +404,27 @@ export const getInterviewFeedback = query({
     candidateId: v.optional(v.id("candidates")),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("interviewFeedback")
+    let feedback
 
-    if (args.interviewId) {
-      query = query.withIndex("by_interview", (q) =>
-        q.eq("interviewId", args.interviewId)
-      )
-    } else if (args.candidateId) {
-      query = query.withIndex("by_candidate", (q) =>
-        q.eq("candidateId", args.candidateId)
-      )
+    if (args.interviewId !== undefined) {
+      feedback = await ctx.db
+        .query("interviewFeedback")
+        .withIndex("by_interview", (q) =>
+          q.eq("interviewId", args.interviewId!)
+        )
+        .collect()
+    } else if (args.candidateId !== undefined) {
+      feedback = await ctx.db
+        .query("interviewFeedback")
+        .withIndex("by_candidate", (q) =>
+          q.eq("candidateId", args.candidateId!)
+        )
+        .collect()
+    } else {
+      feedback = await ctx.db
+        .query("interviewFeedback")
+        .collect()
     }
-
-    const feedback = await query.collect()
 
     // Get interviewer details
     const feedbackWithDetails = await Promise.all(
@@ -714,15 +722,20 @@ export const getActivityFeed = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("activityFeed")
+    let activities
 
-    if (args.jobId) {
-      query = query.withIndex("by_job", (q) => q.eq("jobId", args.jobId))
+    if (args.jobId !== undefined) {
+      activities = await ctx.db
+        .query("activityFeed")
+        .withIndex("by_job", (q) => q.eq("jobId", args.jobId!))
+        .order("desc")
+        .take(args.limit || 50)
+    } else {
+      activities = await ctx.db
+        .query("activityFeed")
+        .order("desc")
+        .take(args.limit || 50)
     }
-
-    const activities = await query
-      .order("desc")
-      .take(args.limit || 50)
 
     return activities
   },
@@ -747,7 +760,7 @@ async function logActivity(
     // It's a userId, need to look up team member
     const teamMember = await ctx.db
       .query("teamMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", data.actorId))
+      .withIndex("by_userId", (q: any) => q.eq("userId", data.actorId))
       .first()
 
     if (teamMember) {
@@ -913,7 +926,7 @@ export const saveEmailTemplate = mutation({
       return await ctx.db.insert("emailTemplates", {
         ...data,
         createdAt: new Date().toISOString(),
-        lastUsed: null,
+        lastUsed: undefined,
       })
     }
   },

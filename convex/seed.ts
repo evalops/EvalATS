@@ -201,7 +201,7 @@ export const seedData = mutation({
         title: "Phone Screen",
         description: "Initial phone interview",
         status: "completed",
-        interviewer: "John Doe",
+        interviewer: "Jonathan Haas",
         duration: "30 min",
         feedback: "Strong technical background, excellent communication",
         rating: 4.5,

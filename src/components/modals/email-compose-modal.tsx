@@ -22,7 +22,7 @@ import {
 import {
   Mail,
   Send,
-  Template,
+  FileText,
   Plus,
   X,
   Paperclip,
@@ -71,10 +71,13 @@ export function EmailComposeModal({
     template: undefined
   })
   const [showCcBcc, setShowCcBcc] = useState(false)
+
+  // Get current user data from Convex
+  const currentUser = useQuery(api.users.getCurrentUser)
   const [ccInput, setCcInput] = useState('')
   const [bccInput, setBccInput] = useState('')
 
-  const templates = useQuery(api.emails.getEmailTemplates)
+  const templates = useQuery(api.emails.getEmailTemplates, {})
   const sendEmail = useMutation(api.emails.sendEmail)
   const processTemplate = useMutation(api.emails.processEmailTemplate)
 
@@ -93,7 +96,7 @@ export function EmailComposeModal({
         template: formData.template,
         threadId,
         replyTo: replyToId,
-        sender: 'John Doe' // This would come from auth context
+        sender: currentUser?.name || 'User'
       })
 
       toast.success('Email sent successfully!')
@@ -177,7 +180,7 @@ export function EmailComposeModal({
                 {templates?.map((template) => (
                   <SelectItem key={template._id} value={template._id}>
                     <div className="flex items-center gap-2">
-                      <Template className="h-4 w-4" />
+                      <FileText className="h-4 w-4" />
                       {template.name}
                     </div>
                   </SelectItem>

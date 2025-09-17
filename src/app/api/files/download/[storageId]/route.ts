@@ -7,10 +7,11 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { storageId: string } }
+  { params }: { params: Promise<{ storageId: string }> }
 ) {
   try {
-    const storageId = params.storageId as Id<"_storage">
+    const { storageId: storageIdParam } = await params
+    const storageId = storageIdParam as Id<"_storage">
 
     // Get the file URL from Convex
     const fileUrl = await convex.query(api.files.getUrl, { storageId })

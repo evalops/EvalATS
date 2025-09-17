@@ -19,7 +19,7 @@ const activities = [
     id: '2',
     type: 'interview',
     title: 'Interview scheduled',
-    description: 'John Doe - Backend Developer interview tomorrow at 2 PM',
+    description: 'Jonathan Haas - Backend Developer interview tomorrow at 2 PM',
     time: '1 hour ago',
     icon: Calendar,
     color: 'text-yellow-500',

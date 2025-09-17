@@ -3,12 +3,17 @@
 import { useState } from 'react'
 import { AppShell } from '@/components/layout/app-shell'
 import { User, Bell, Shield, Palette, Globe, Database, Key, Save } from 'lucide-react'
+import { useQuery } from 'convex/react'
+import { api } from '../../../convex/_generated/api'
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile')
   const [emailNotifications, setEmailNotifications] = useState(true)
   const [pushNotifications, setPushNotifications] = useState(false)
   const [theme, setTheme] = useState('system')
+
+  // Get current user data from Convex
+  const currentUser = useQuery(api.users.getCurrentUser)
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -64,7 +69,7 @@ export default function SettingsPage() {
                         <label className="text-sm font-medium text-muted-foreground">Full Name</label>
                         <input
                           type="text"
-                          defaultValue="John Doe"
+                          defaultValue={currentUser?.name || ''}
                           className="input-clean mt-1"
                         />
                       </div>
@@ -72,7 +77,7 @@ export default function SettingsPage() {
                         <label className="text-sm font-medium text-muted-foreground">Email</label>
                         <input
                           type="email"
-                          defaultValue="john.doe@evalats.com"
+                          defaultValue={currentUser?.email || ''}
                           className="input-clean mt-1"
                         />
                       </div>

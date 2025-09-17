@@ -14,12 +14,12 @@ export default function CompliancePage() {
   const aiDecisions = useQuery(api.compliance.getAIDecisions, { limit: 20 })
 
   // Format AI decisions for the dashboard
-  const formattedAIDecisions = aiDecisions?.map(decision => ({
+  const formattedAIDecisions = aiDecisions?.map((decision: any) => ({
     id: decision._id,
     timestamp: decision.timestamp,
     decisionType: decision.decisionType
       .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' '),
     candidateName: decision.candidateName,
     score: decision.score || 0,

@@ -104,9 +104,12 @@ export const createEmailTemplate = mutation({
       name: args.name,
       subject: args.subject,
       content: args.content,
+      category: "general", // Required field
       type: args.type,
       variables: args.variables,
+      tags: [], // Required field
       isActive: true,
+      useCount: 0, // Required field
       createdAt: now,
       updatedAt: now,
     });

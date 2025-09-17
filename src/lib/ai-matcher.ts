@@ -75,7 +75,7 @@ export class AIMatcherService {
         name: 'openai',
         apiKey,
         config: {
-          model: 'gpt-4o-mini',
+          model: 'gpt-4o-mini' as any, // Temporary fix for model type
           temperature: 0.1, // Low temperature for consistency
         }
       })
@@ -128,8 +128,8 @@ export class AIMatcherService {
 
       // Calculate overall score (weighted average)
       const overallScore = this.calculateOverallScore(
-        skillMatch.requiredScore,
-        skillMatch.preferredScore,
+        skillMatch.match.requiredScore,
+        skillMatch.match.preferredScore,
         experienceMatch.score,
         educationMatch.score
       )
@@ -148,9 +148,9 @@ export class AIMatcherService {
         score: overallScore,
         reasoning: {
           skillMatch: {
-            required: skillMatch.requiredScore,
-            preferred: skillMatch.preferredScore,
-            details: skillMatch.details
+            required: skillMatch.match.requiredScore,
+            preferred: skillMatch.match.preferredScore,
+            details: skillMatch.match.details
           },
           experienceMatch: {
             score: experienceMatch.score,

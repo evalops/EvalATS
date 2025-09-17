@@ -94,11 +94,11 @@ export function AdvancedSearch() {
 
       if (entityType === "all" || entityType === "candidates") {
         candidates
-          .filter(c => {
+          .filter((c: any) => {
             const matchesQuery = !query ||
               c.name.toLowerCase().includes(query.toLowerCase()) ||
               c.email.toLowerCase().includes(query.toLowerCase()) ||
-              c.skills?.some(s => s.toLowerCase().includes(query.toLowerCase()))
+              c.skills?.some((s: string) => s.toLowerCase().includes(query.toLowerCase()))
 
             const matchesStatus = !searchFilters.status?.length ||
               searchFilters.status.includes(c.status)
@@ -108,7 +108,7 @@ export function AdvancedSearch() {
 
             return matchesQuery && matchesStatus && matchesLocation
           })
-          .forEach(c => {
+          .forEach((c: any) => {
             results.push({
               id: c._id,
               type: "candidate",

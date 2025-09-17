@@ -50,18 +50,23 @@ export const getWorkflows = query({
     jobId: v.optional(v.id("jobs")),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("workflows")
+    let workflows
 
     if (args.isActive !== undefined) {
-      query = query.withIndex("by_active", (q) => q.eq("isActive", args.isActive))
+      workflows = await ctx.db
+        .query("workflows")
+        .withIndex("by_active", (q) => q.eq("isActive", args.isActive!))
+        .collect()
+    } else {
+      workflows = await ctx.db
+        .query("workflows")
+        .collect()
     }
-
-    const workflows = await query.collect()
 
     // Filter by job if specified
     if (args.jobId) {
       return workflows.filter(w =>
-        !w.scope.jobs || w.scope.jobs.includes(args.jobId)
+        !w.scope.jobs || w.scope.jobs.includes(args.jobId!)
       )
     }
 
@@ -202,8 +207,8 @@ async function sendWorkflowEmail(ctx: any, config: any, context: any) {
     // Get primary hiring manager for the job
     const hiringTeam = await ctx.db
       .query("hiringTeams")
-      .withIndex("by_job", (q) => q.eq("jobId", context.jobId))
-      .filter((q) =>
+      .withIndex("by_job", (q: any) => q.eq("jobId", context.jobId))
+      .filter((q: any) =>
         q.and(
           q.eq(q.field("role"), "hiring_manager"),
           q.eq(q.field("isPrimary"), true)
@@ -267,8 +272,8 @@ async function assignTask(ctx: any, config: any, context: any) {
     // Get primary recruiter for the job
     const hiringTeam = await ctx.db
       .query("hiringTeams")
-      .withIndex("by_job", (q) => q.eq("jobId", context.jobId))
-      .filter((q) =>
+      .withIndex("by_job", (q: any) => q.eq("jobId", context.jobId))
+      .filter((q: any) =>
         q.and(
           q.eq(q.field("role"), "recruiter"),
           q.eq(q.field("isPrimary"), true)
@@ -281,8 +286,8 @@ async function assignTask(ctx: any, config: any, context: any) {
     // Get primary hiring manager
     const hiringTeam = await ctx.db
       .query("hiringTeams")
-      .withIndex("by_job", (q) => q.eq("jobId", context.jobId))
-      .filter((q) =>
+      .withIndex("by_job", (q: any) => q.eq("jobId", context.jobId))
+      .filter((q: any) =>
         q.and(
           q.eq(q.field("role"), "hiring_manager"),
           q.eq(q.field("isPrimary"), true)
@@ -339,7 +344,7 @@ async function notifyTeam(ctx: any, config: any, context: any) {
   // Get team members to notify
   const hiringTeam = await ctx.db
     .query("hiringTeams")
-    .withIndex("by_job", (q) => q.eq("jobId", context.jobId))
+    .withIndex("by_job", (q: any) => q.eq("jobId", context.jobId))
     .collect()
 
   for (const member of hiringTeam) {

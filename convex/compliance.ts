@@ -110,17 +110,26 @@ export const getAIDecisions = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("aiDecisions")
+    let decisions
 
-    if (args.jobId) {
-      query = query.withIndex("by_job", (q) => q.eq("jobId", args.jobId))
-    } else if (args.candidateId) {
-      query = query.withIndex("by_candidate", (q) => q.eq("candidateId", args.candidateId))
+    if (args.jobId !== undefined) {
+      decisions = await ctx.db
+        .query("aiDecisions")
+        .withIndex("by_job", (q) => q.eq("jobId", args.jobId!))
+        .order("desc")
+        .take(args.limit || 100)
+    } else if (args.candidateId !== undefined) {
+      decisions = await ctx.db
+        .query("aiDecisions")
+        .withIndex("by_candidate", (q) => q.eq("candidateId", args.candidateId!))
+        .order("desc")
+        .take(args.limit || 100)
+    } else {
+      decisions = await ctx.db
+        .query("aiDecisions")
+        .order("desc")
+        .take(args.limit || 100)
     }
-
-    const decisions = await query
-      .order("desc")
-      .take(args.limit || 100)
 
     // Get candidate names
     const decisionsWithNames = await Promise.all(
@@ -364,15 +373,20 @@ export const getLatestAudit = query({
     jobId: v.optional(v.id("jobs")),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("biasAudits")
+    let audit
 
-    if (args.jobId) {
-      query = query.withIndex("by_job", (q) => q.eq("jobId", args.jobId))
+    if (args.jobId !== undefined) {
+      audit = await ctx.db
+        .query("biasAudits")
+        .withIndex("by_job", (q) => q.eq("jobId", args.jobId!))
+        .order("desc")
+        .first()
+    } else {
+      audit = await ctx.db
+        .query("biasAudits")
+        .order("desc")
+        .first()
     }
-
-    const audit = await query
-      .order("desc")
-      .first()
 
     if (audit && audit.jobId) {
       const job = await ctx.db.get(audit.jobId)
@@ -432,12 +446,15 @@ export const getComplianceSettings = query({
     )),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("complianceSettings")
-
-    if (args.category) {
-      query = query.withIndex("by_category", (q) => q.eq("category", args.category))
+    if (args.category !== undefined) {
+      return await ctx.db
+        .query("complianceSettings")
+        .withIndex("by_category", (q) => q.eq("category", args.category!))
+        .collect()
+    } else {
+      return await ctx.db
+        .query("complianceSettings")
+        .collect()
     }
-
-    return await query.collect()
   },
 })
