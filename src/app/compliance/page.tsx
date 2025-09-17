@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { api } from '../../../convex/_generated/api'
 import { ComplianceDashboard } from '@/components/compliance-dashboard'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'

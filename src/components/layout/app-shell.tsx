@@ -102,7 +102,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
                 {currentUser?.avatar ? (
                   <img
-                    src={currentUser.avatar}
+                    src={currentUser.avatar as string}
                     alt={currentUser.name || 'User'}
                     className="h-full w-full rounded-full object-cover"
                   />
@@ -173,7 +173,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
                     {currentUser?.avatar ? (
                       <img
-                        src={currentUser.avatar}
+                        src={currentUser.avatar as string}
                         alt={currentUser.name || 'User'}
                         className="h-full w-full rounded-full object-cover"
                       />

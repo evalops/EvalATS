@@ -288,9 +288,9 @@ export default function JobDetailPage() {
                             }}
                           >
                             <CandidateStatusActions
-                              candidateId={applicant._id}
-                              currentStatus={applicant.status}
-                              candidateName={applicant.name}
+                              candidateId={applicant._id!}
+                              currentStatus={applicant.status || 'applied'}
+                              candidateName={applicant.name || 'Unknown'}
                               compact={true}
                             />
                           </div>

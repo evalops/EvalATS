@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useQuery, useMutation } from "convex/react"
-import { api } from "@/convex/_generated/api"
-import { Id } from "@/convex/_generated/dataModel"
+import { api } from "../../convex/_generated/api"
+import { Id } from "../../convex/_generated/dataModel"
 import {
   Mail, Plus, Trash2, Edit, Save, X, Eye, Send,
   Code, Copy, FileText, Users, Calendar, Package,

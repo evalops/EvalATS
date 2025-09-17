@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { useQuery, useMutation } from "convex/react"
-import { api } from "@/convex/_generated/api"
-import { Id } from "@/convex/_generated/dataModel"
+import { api } from "../../convex/_generated/api"
+import { Id } from "../../convex/_generated/dataModel"
 import { Download, FileText, Table, Calendar, Filter, Check, AlertCircle, Loader2, Package, Users, Briefcase, ClipboardList } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -446,7 +446,7 @@ export function DataExport() {
                 <Label>Select Data Type</Label>
                 <RadioGroup
                   value={config.entity}
-                  onValueChange={(value) => {
+                  onValueChange={(value: string) => {
                     setConfig(prev => ({
                       ...prev,
                       entity: value as ExportEntity,

@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
-import { Id } from '@/convex/_generated/dataModel'
+import { api } from '../../convex/_generated/api'
+import { Id } from '../../convex/_generated/dataModel'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'

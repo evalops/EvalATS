@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
-import { Id } from '@/convex/_generated/dataModel'
+import { api } from '../../convex/_generated/api'
+import { Id } from '../../convex/_generated/dataModel'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -156,7 +156,7 @@ export function EEOForm({ candidateId, onSubmit, isRequired = false }: EEOFormPr
             <Label>Race/Ethnicity</Label>
             <RadioGroup
               value={formData.race}
-              onValueChange={(value) => setFormData({ ...formData, race: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, race: value })}
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="american_indian_alaska_native" id="race1" />
@@ -210,7 +210,7 @@ export function EEOForm({ candidateId, onSubmit, isRequired = false }: EEOFormPr
             <Label>Gender</Label>
             <RadioGroup
               value={formData.gender}
-              onValueChange={(value) => setFormData({ ...formData, gender: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, gender: value })}
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="male" id="gender1" />
@@ -238,7 +238,7 @@ export function EEOForm({ candidateId, onSubmit, isRequired = false }: EEOFormPr
             <Label>Veteran Status</Label>
             <RadioGroup
               value={formData.veteranStatus}
-              onValueChange={(value) => setFormData({ ...formData, veteranStatus: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, veteranStatus: value })}
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="protected_veteran" id="vet1" />
@@ -270,7 +270,7 @@ export function EEOForm({ candidateId, onSubmit, isRequired = false }: EEOFormPr
             <Label>Disability Status</Label>
             <RadioGroup
               value={formData.disabilityStatus}
-              onValueChange={(value) => setFormData({ ...formData, disabilityStatus: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, disabilityStatus: value })}
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="yes" id="disability1" />

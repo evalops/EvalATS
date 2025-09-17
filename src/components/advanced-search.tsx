@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useQuery, useMutation } from "convex/react"
-import { api } from "@/convex/_generated/api"
-import { Id } from "@/convex/_generated/dataModel"
+import { api } from "../../convex/_generated/api"
+import { Id } from "../../convex/_generated/dataModel"
 import { Search, Filter, X, Save, History, Download, ChevronDown, User, Briefcase, Calendar, Mail, FileText, Building } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -125,7 +125,7 @@ export function AdvancedSearch() {
 
       if (entityType === "all" || entityType === "jobs") {
         jobs
-          .filter(j => {
+          .filter((j: any) => {
             const matchesQuery = !query ||
               j.title.toLowerCase().includes(query.toLowerCase()) ||
               j.department.toLowerCase().includes(query.toLowerCase()) ||
@@ -145,7 +145,7 @@ export function AdvancedSearch() {
 
             return matchesQuery && matchesStatus && matchesDepartment && matchesLocation && matchesType
           })
-          .forEach(j => {
+          .forEach((j: any) => {
             results.push({
               id: j._id,
               type: "job",
@@ -162,7 +162,7 @@ export function AdvancedSearch() {
 
       if (entityType === "all" || entityType === "interviews") {
         interviews
-          .filter(i => {
+          .filter((i: any) => {
             const matchesQuery = !query ||
               i.candidateName?.toLowerCase().includes(query.toLowerCase()) ||
               i.position?.toLowerCase().includes(query.toLowerCase()) ||
@@ -176,7 +176,7 @@ export function AdvancedSearch() {
 
             return matchesQuery && matchesStatus && matchesDateRange
           })
-          .forEach(i => {
+          .forEach((i: any) => {
             results.push({
               id: i._id,
               type: "interview",

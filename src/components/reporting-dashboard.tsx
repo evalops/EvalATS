@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useQuery } from "convex/react"
-import { api } from "@/convex/_generated/api"
+import { api } from "../../convex/_generated/api"
 import {
   BarChart, LineChart, PieChart, TrendingUp, TrendingDown,
   Users, Briefcase, Calendar, Clock, Target, Award,
