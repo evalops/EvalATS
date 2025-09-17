@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuth, useUser } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
 import { AppShell } from '@/components/layout/app-shell'
 import { StatsOverview } from '@/components/dashboard/stats-overview'
 import { RecentActivity } from '@/components/dashboard/recent-activity'
@@ -8,7 +10,33 @@ import { PipelineBoard } from '@/components/pipeline/pipeline-board'
 import { Plus } from 'lucide-react'
 
 export default function HomePage() {
+  const { isLoaded, isSignedIn } = useAuth()
+  const { user } = useUser()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.push('/sign-in')
+    }
+  }, [isLoaded, isSignedIn, router])
   const [activeView, setActiveView] = useState<'overview' | 'pipeline'>('overview')
+
+  // Show loading state while checking auth
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If not signed in, the useEffect will redirect
+  if (!isSignedIn) {
+    return null
+  }
 
   return (
     <AppShell>
@@ -18,7 +46,9 @@ export default function HomePage() {
           <div className="container-max">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Welcome back{user?.firstName ? `, ${user.firstName}` : ''}!
+                </h1>
                 <p className="text-sm text-muted-foreground mt-1">
                   Track your hiring pipeline and manage candidates
                 </p>

@@ -143,3 +143,126 @@ export const addFeedback = mutation({
     });
   },
 });
+
+// Get interviews by candidate
+export const getByCandidate = query({
+  args: { candidateId: v.id("candidates") },
+  handler: async (ctx, args) => {
+    const interviews = await ctx.db
+      .query("interviews")
+      .withIndex("by_candidate", q => q.eq("candidateId", args.candidateId))
+      .collect();
+
+    return interviews;
+  },
+});
+
+// Schedule interview (alias for create with more specific name)
+export const schedule = mutation({
+  args: {
+    candidateId: v.id("candidates"),
+    jobId: v.id("jobs"),
+    type: v.string(),
+    date: v.string(),
+    time: v.string(),
+    duration: v.string(),
+    interviewers: v.array(v.string()),
+    location: v.string(),
+    status: v.union(
+      v.literal("scheduled"),
+      v.literal("completed"),
+      v.literal("cancelled"),
+      v.literal("no-show")
+    ),
+  },
+  handler: async (ctx, args) => {
+    const interviewId = await ctx.db.insert("interviews", args);
+
+    // Add to candidate timeline
+    await ctx.db.insert("timeline", {
+      candidateId: args.candidateId,
+      date: new Date().toISOString().split('T')[0],
+      type: "interview",
+      title: `${args.type} interview scheduled`,
+      description: `Scheduled for ${args.date} at ${args.time}`,
+      status: "scheduled",
+    });
+
+    return interviewId;
+  },
+});
+
+// Update interview
+export const update = mutation({
+  args: {
+    id: v.id("interviews"),
+    date: v.optional(v.string()),
+    time: v.optional(v.string()),
+    duration: v.optional(v.string()),
+    location: v.optional(v.string()),
+    interviewers: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    await ctx.db.patch(id, updates);
+  },
+});
+
+// Cancel interview
+export const cancel = mutation({
+  args: {
+    id: v.id("interviews"),
+    reason: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      status: "cancelled",
+      feedback: args.reason || "Interview cancelled",
+    });
+
+    const interview = await ctx.db.get(args.id);
+    if (interview) {
+      // Add to timeline
+      await ctx.db.insert("timeline", {
+        candidateId: interview.candidateId,
+        date: new Date().toISOString().split('T')[0],
+        type: "interview",
+        title: "Interview cancelled",
+        description: args.reason || "Interview was cancelled",
+        status: "completed",
+      });
+    }
+  },
+});
+
+// Send interview invite
+export const sendInvite = mutation({
+  args: {
+    interviewId: v.id("interviews"),
+    message: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const interview = await ctx.db.get(args.interviewId);
+    if (!interview) throw new Error("Interview not found");
+
+    const candidate = await ctx.db.get(interview.candidateId);
+    if (!candidate) throw new Error("Candidate not found");
+
+    // Create email record
+    await ctx.db.insert("emails", {
+      candidateId: interview.candidateId,
+      jobId: interview.jobId,
+      from: "noreply@company.com",
+      to: candidate.email,
+      subject: `Interview Invitation - ${interview.type} Interview`,
+      content: args.message || `You have been scheduled for an interview on ${interview.date} at ${interview.time}`,
+      template: "interview_invite",
+      status: "sent",
+      sentAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      sender: "System",
+    });
+
+    return args.interviewId;
+  },
+});

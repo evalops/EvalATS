@@ -15,6 +15,9 @@ export default function Page() {
               card: 'shadow-lg border border-gray-200',
             },
           }}
+          signInUrl="/sign-in"
+          forceRedirectUrl="/"
+          fallbackRedirectUrl="/"
         />
       </div>
     </div>
