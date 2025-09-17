@@ -235,6 +235,99 @@ export const getComments = query({
   },
 })
 
+// Edit a comment
+export const editComment = mutation({
+  args: {
+    commentId: v.id("comments"),
+    content: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.commentId, {
+      content: args.content,
+      isEdited: true,
+      editedAt: new Date().toISOString(),
+    })
+    return args.commentId
+  },
+})
+
+// Delete a comment (soft delete)
+export const deleteComment = mutation({
+  args: {
+    commentId: v.id("comments"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.commentId, {
+      isDeleted: true,
+    })
+    return args.commentId
+  },
+})
+
+// Add reaction to comment
+export const addReaction = mutation({
+  args: {
+    commentId: v.id("comments"),
+    emoji: v.string(),
+    userId: v.id("teamMembers"),
+  },
+  handler: async (ctx, args) => {
+    const comment = await ctx.db.get(args.commentId)
+    if (!comment) throw new Error("Comment not found")
+
+    const reactions = comment.reactions || []
+
+    // Check if user already has this reaction
+    const existingIndex = reactions.findIndex(
+      r => r.userId === args.userId && r.emoji === args.emoji
+    )
+
+    if (existingIndex === -1) {
+      reactions.push({
+        emoji: args.emoji,
+        userId: args.userId,
+      })
+
+      await ctx.db.patch(args.commentId, {
+        reactions,
+      })
+    }
+
+    return args.commentId
+  },
+})
+
+// Remove reaction from comment
+export const removeReaction = mutation({
+  args: {
+    commentId: v.id("comments"),
+    emoji: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const comment = await ctx.db.get(args.commentId)
+    if (!comment) throw new Error("Comment not found")
+
+    const reactions = comment.reactions || []
+    const filteredReactions = reactions.filter(r => r.emoji !== args.emoji)
+
+    await ctx.db.patch(args.commentId, {
+      reactions: filteredReactions,
+    })
+
+    return args.commentId
+  },
+})
+
+// Get all team members
+export const getTeamMembers = query({
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("teamMembers")
+      .filter(q => q.eq(q.field("isActive"), true))
+      .collect()
+  },
+})
+
 // Submit interview feedback
 export const submitInterviewFeedback = mutation({
   args: {
