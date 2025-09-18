@@ -5,12 +5,23 @@ import { ConvexReactClient } from 'convex/react'
 import { ConvexProviderWithClerk } from 'convex/react-clerk'
 import { ReactNode } from 'react'
 
-const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
+// Validate required environment variables
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL
+if (!convexUrl) {
+  throw new Error('NEXT_PUBLIC_CONVEX_URL environment variable is required')
+}
+
+const convex = new ConvexReactClient(convexUrl)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+  if (!clerkPublishableKey) {
+    throw new Error('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY environment variable is required')
+  }
+
   return (
     <ClerkProvider
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}
+      publishableKey={clerkPublishableKey}
       appearance={{
         baseTheme: undefined,
         variables: {
