@@ -715,6 +715,39 @@ export const reviewOffer = mutation({
   },
 })
 
+// Get offer for a candidate and job
+export const getOffer = query({
+  args: {
+    candidateId: v.id("candidates"),
+    jobId: v.id("jobs"),
+  },
+  handler: async (ctx, args) => {
+    const offer = await ctx.db
+      .query("offers")
+      .withIndex("by_candidate", (q) => q.eq("candidateId", args.candidateId))
+      .filter((q) => q.eq(q.field("jobId"), args.jobId))
+      .first()
+
+    if (!offer) return null
+
+    // Get approver details
+    const approvalsWithDetails = await Promise.all(
+      offer.approvals.map(async (approval) => {
+        const approver = await ctx.db.get(approval.approverId)
+        return {
+          ...approval,
+          approver,
+        }
+      })
+    )
+
+    return {
+      ...offer,
+      approvals: approvalsWithDetails,
+    }
+  },
+})
+
 // Get activity feed
 export const getActivityFeed = query({
   args: {

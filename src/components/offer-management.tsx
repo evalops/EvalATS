@@ -125,8 +125,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
   // Get data from Convex
   const candidate = useQuery(api.candidates.get, { id: candidateId })
   const job = useQuery(api.jobs.get, { id: jobId })
-  // TODO: Implement getOffer query in teams
-  const offer: any = null // useQuery(api.teams.getOffer, { candidateId, jobId })
+  const offer = useQuery(api.teams.getOffer, { candidateId, jobId })
   const hiringTeam = useQuery(api.teams.getHiringTeam, { jobId })
 
   // Mutations
