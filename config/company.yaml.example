@@ -1,5 +1,6 @@
 # Company Configuration
 # Customize this file with your company's information
+# You can omit any section to fall back to the built-in defaults.
 
 company:
   # Basic Information
