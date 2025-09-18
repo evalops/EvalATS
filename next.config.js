@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  webpack: (config, { isServer }) => {
+    // Fix for pdf-parse build issues
+    if (isServer) {
+      config.externals = config.externals || []
+      config.externals.push('pdf-parse')
+    }
+    return config
+  },
   async headers() {
     return [
       {
