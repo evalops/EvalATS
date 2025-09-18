@@ -722,19 +722,76 @@ export const getActivityFeed = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    // Get current user's identity to enforce authorization
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      return []
+    }
+
+    // Look up user in teamMembers table
+    const teamMember = await ctx.db
+      .query("teamMembers")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .first()
+
+    if (!teamMember) {
+      return []
+    }
+
     let activities
 
     if (args.jobId !== undefined) {
+      // Check if user has access to this specific job
+      const hiringTeamMember = await ctx.db
+        .query("hiringTeams")
+        .withIndex("by_job", (q) => q.eq("jobId", args.jobId!))
+        .filter((q) => q.eq(q.field("teamMemberId"), teamMember._id))
+        .first()
+
+      // Only allow access if user is on the hiring team for this job or is admin
+      if (!hiringTeamMember && teamMember.role !== "admin") {
+        return []
+      }
+
       activities = await ctx.db
         .query("activityFeed")
         .withIndex("by_job", (q) => q.eq("jobId", args.jobId!))
         .order("desc")
         .take(args.limit || 50)
     } else {
-      activities = await ctx.db
+      // Get all jobs this user has access to
+      let accessibleJobIds: string[] = []
+
+      if (teamMember.role === "admin") {
+        // Admins can see all activities
+        const allJobs = await ctx.db.query("jobs").collect()
+        accessibleJobIds = allJobs.map(job => job._id)
+      } else {
+        // Get jobs where user is on the hiring team
+        const hiringTeamAssignments = await ctx.db
+          .query("hiringTeams")
+          .withIndex("by_member", (q) => q.eq("teamMemberId", teamMember._id))
+          .collect()
+        
+        accessibleJobIds = hiringTeamAssignments.map(assignment => assignment.jobId)
+      }
+
+      if (accessibleJobIds.length === 0) {
+        return []
+      }
+
+      // Get activities for accessible jobs
+      const allActivities = await ctx.db
         .query("activityFeed")
         .order("desc")
-        .take(args.limit || 50)
+        .take((args.limit || 50) * 3) // Get more to filter, then limit
+
+      activities = allActivities
+        .filter(activity => 
+          activity.jobId === undefined || // Include activities without jobId
+          accessibleJobIds.includes(activity.jobId)
+        )
+        .slice(0, args.limit || 50)
     }
 
     return activities

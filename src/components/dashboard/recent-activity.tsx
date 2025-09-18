@@ -145,9 +145,14 @@ const ACTIVITY_DISPLAY_MAP: Record<string, ActivityDisplay> = {
 }
 
 export function RecentActivity() {
-  const activities = useQuery(api.teams.getActivityFeed, { limit: 10 })
+  // Get current user to ensure proper authorization
+  const currentUser = useQuery(api.users.getCurrentUser)
+  const activities = useQuery(
+    api.teams.getActivityFeed, 
+    currentUser ? { limit: 10 } : "skip"
+  )
 
-  const isLoading = activities === undefined
+  const isLoading = activities === undefined || currentUser === undefined
   const normalizedActivities = useMemo(
     () => activities?.map((activity) => activity as ActivityEntry) ?? [],
     [activities]
