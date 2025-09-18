@@ -288,13 +288,14 @@ export function DataExport() {
       data = data.filter((item) => config.filters.status?.includes(item.status))
     }
 
-    if (config.filters.dateRange) {
+    if (config.filters.dateRange?.from && config.filters.dateRange?.to) {
+      const { from, to } = config.filters.dateRange
       data = data.filter((item) => {
         const itemDate = new Date(
           item.appliedDate || item.postedDate || item.date || item.createdAt
         )
         return (
-          itemDate >= config.filters.dateRange?.from && itemDate <= config.filters.dateRange?.to
+          itemDate >= from && itemDate <= to
         )
       })
     }
