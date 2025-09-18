@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import ResumeParser from '@/lib/resume-parser'
-import pdf from 'pdf-parse'
+// import pdf from 'pdf-parse'
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,9 +30,14 @@ export async function POST(request: NextRequest) {
     if (fileName.endsWith('.txt')) {
       resumeText = await file.text()
     } else if (fileName.endsWith('.pdf')) {
-      const buffer = await file.arrayBuffer()
-      const data = await pdf(Buffer.from(buffer))
-      resumeText = data.text
+      // TODO: Re-enable PDF parsing after fixing build issue
+      return NextResponse.json(
+        { error: 'PDF parsing temporarily disabled due to build issues' },
+        { status: 400 }
+      )
+      // const buffer = await file.arrayBuffer()
+      // const data = await pdf(Buffer.from(buffer))
+      // resumeText = data.text
     } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
       // For Word documents, we'd need additional processing
       // For now, return an error
