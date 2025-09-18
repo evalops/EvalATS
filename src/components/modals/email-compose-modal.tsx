@@ -1,17 +1,12 @@
 'use client'
 
-import { useState } from 'react'
 import { useMutation, useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
-import { Id } from '../../../convex/_generated/dataModel'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
+import { Briefcase, FileText, Mail, Paperclip, Plus, Send, User, X } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -19,27 +14,29 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
-  Mail,
-  Send,
-  FileText,
-  Plus,
-  X,
-  Paperclip,
-  User,
-  Briefcase
-} from 'lucide-react'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { api } from '../../../convex/_generated/api'
+import type { Id } from '../../../convex/_generated/dataModel'
 
 interface EmailComposeModalProps {
   isOpen: boolean
   onClose: () => void
-  candidateId: Id<"candidates">
+  candidateId: Id<'candidates'>
   candidateName: string
   candidateEmail: string
-  jobId?: Id<"jobs">
+  jobId?: Id<'jobs'>
   jobTitle?: string
   threadId?: string
-  replyToId?: Id<"emails">
+  replyToId?: Id<'emails'>
 }
 
 interface EmailFormData {
@@ -60,7 +57,7 @@ export function EmailComposeModal({
   jobId,
   jobTitle,
   threadId,
-  replyToId
+  replyToId,
 }: EmailComposeModalProps) {
   const [formData, setFormData] = useState<EmailFormData>({
     to: candidateEmail,
@@ -68,7 +65,7 @@ export function EmailComposeModal({
     bcc: [],
     subject: replyToId ? 'Re: ' : '',
     content: '',
-    template: undefined
+    template: undefined,
   })
   const [showCcBcc, setShowCcBcc] = useState(false)
 
@@ -96,7 +93,7 @@ export function EmailComposeModal({
         template: formData.template,
         threadId,
         replyTo: replyToId,
-        sender: currentUser?.name || 'User'
+        sender: currentUser?.name || 'User',
       })
 
       toast.success('Email sent successfully!')
@@ -112,21 +109,21 @@ export function EmailComposeModal({
 
     try {
       const processed = await processTemplate({
-        templateId: templateId as Id<"emailTemplates">,
+        templateId: templateId as Id<'emailTemplates'>,
         variables: {
           candidateName,
           jobTitle: jobTitle || '',
           // Add more variables as needed
-        }
+        },
       })
 
       setFormData({
         ...formData,
         subject: processed.subject,
         content: processed.content,
-        template: processed.template
+        template: processed.template,
       })
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to load template')
     }
   }
@@ -146,11 +143,11 @@ export function EmailComposeModal({
   }
 
   const removeCcEmail = (email: string) => {
-    setFormData({ ...formData, cc: formData.cc.filter(e => e !== email) })
+    setFormData({ ...formData, cc: formData.cc.filter((e) => e !== email) })
   }
 
   const removeBccEmail = (email: string) => {
-    setFormData({ ...formData, bcc: formData.bcc.filter(e => e !== email) })
+    setFormData({ ...formData, bcc: formData.bcc.filter((e) => e !== email) })
   }
 
   return (

@@ -1,10 +1,11 @@
-import { Metadata } from 'next'
+import { Briefcase, Building2, Clock, Heart, MapPin, Search, TrendingUp, Users } from 'lucide-react'
+import type { Metadata } from 'next'
 import Link from 'next/link'
-import { MapPin, Clock, Briefcase, Search, Filter, Building2, Users, TrendingUp, Heart } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Careers at EvalATS - Join Our Team',
-  description: 'Explore exciting career opportunities at EvalATS. We are always looking for talented individuals to join our growing team.',
+  description:
+    'Explore exciting career opportunities at EvalATS. We are always looking for talented individuals to join our growing team.',
   openGraph: {
     title: 'Careers at EvalATS',
     description: 'Join our team and help us build the future of hiring',
@@ -80,14 +81,20 @@ export default function CareersPage() {
               Join Our Team at EvalATS
             </h1>
             <p className="text-xl sm:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              Help us revolutionize the hiring process. We're looking for passionate individuals
-              who want to make a difference.
+              Help us revolutionize the hiring process. We're looking for passionate individuals who
+              want to make a difference.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="#openings" className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 md:py-4 md:text-lg md:px-10 transition-colors">
+              <a
+                href="#openings"
+                className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 md:py-4 md:text-lg md:px-10 transition-colors"
+              >
                 View Open Positions
               </a>
-              <a href="#culture" className="inline-flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white/10 md:py-4 md:text-lg md:px-10 transition-colors">
+              <a
+                href="#culture"
+                className="inline-flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white/10 md:py-4 md:text-lg md:px-10 transition-colors"
+              >
                 Learn About Our Culture
               </a>
             </div>
@@ -143,18 +150,24 @@ export default function CareersPage() {
                 />
               </div>
               <select className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
-                {departments.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
+                {departments.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
                 ))}
               </select>
               <select className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
-                {locations.map(loc => (
-                  <option key={loc} value={loc}>{loc}</option>
+                {locations.map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
+                  </option>
                 ))}
               </select>
               <select className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
-                {types.map(type => (
-                  <option key={type} value={type}>{type}</option>
+                {types.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
                 ))}
               </select>
             </div>
@@ -162,7 +175,7 @@ export default function CareersPage() {
 
           {/* Job Cards */}
           <div className="space-y-4">
-            {jobs.map(job => (
+            {jobs.map((job) => (
               <Link
                 key={job.id}
                 href={`/careers/${job.id}`}
@@ -241,7 +254,9 @@ export default function CareersPage() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full mb-4">
                 <Users className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Great Team</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                Great Team
+              </h3>
               <p className="text-gray-600 dark:text-gray-400">
                 Work with talented and passionate people who love what they do
               </p>
@@ -268,7 +283,9 @@ export default function CareersPage() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full mb-4">
                 <Building2 className="h-8 w-8 text-orange-600 dark:text-orange-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Remote First</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                Remote First
+              </h3>
               <p className="text-gray-600 dark:text-gray-400">
                 Work from anywhere with flexible hours and async communication
               </p>
@@ -280,11 +297,10 @@ export default function CareersPage() {
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Don't see the right position?
-          </h2>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Don't see the right position?</h2>
           <p className="text-xl mb-8 text-blue-100">
-            We're always looking for talented people. Send us your resume and we'll keep you in mind for future opportunities.
+            We're always looking for talented people. Send us your resume and we'll keep you in mind
+            for future opportunities.
           </p>
           <a
             href="mailto:careers@evalats.com"

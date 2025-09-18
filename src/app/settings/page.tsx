@@ -1,9 +1,9 @@
 'use client'
 
+import { useQuery } from 'convex/react'
+import { Bell, Database, Globe, Palette, Save, Shield, User } from 'lucide-react'
 import { useState } from 'react'
 import { AppShell } from '@/components/layout/app-shell'
-import { User, Bell, Shield, Palette, Globe, Database, Key, Save } from 'lucide-react'
-import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 
 export default function SettingsPage() {
@@ -66,7 +66,9 @@ export default function SettingsPage() {
                     <h2 className="text-lg font-medium mb-6">Profile Information</h2>
                     <div className="space-y-4">
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Full Name</label>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Full Name
+                        </label>
                         <input
                           type="text"
                           defaultValue={currentUser?.name || ''}
@@ -90,7 +92,9 @@ export default function SettingsPage() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Department</label>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Department
+                        </label>
                         <input
                           type="text"
                           defaultValue="Engineering"
@@ -112,7 +116,9 @@ export default function SettingsPage() {
                       <div className="flex items-center justify-between py-3 border-b border-border">
                         <div>
                           <p className="font-medium">Email Notifications</p>
-                          <p className="text-sm text-muted-foreground">Receive notifications via email</p>
+                          <p className="text-sm text-muted-foreground">
+                            Receive notifications via email
+                          </p>
                         </div>
                         <button
                           onClick={() => setEmailNotifications(!emailNotifications)}
@@ -130,7 +136,9 @@ export default function SettingsPage() {
                       <div className="flex items-center justify-between py-3 border-b border-border">
                         <div>
                           <p className="font-medium">Push Notifications</p>
-                          <p className="text-sm text-muted-foreground">Receive browser push notifications</p>
+                          <p className="text-sm text-muted-foreground">
+                            Receive browser push notifications
+                          </p>
                         </div>
                         <button
                           onClick={() => setPushNotifications(!pushNotifications)}
@@ -176,25 +184,22 @@ export default function SettingsPage() {
                         <h3 className="font-medium mb-4">Change Password</h3>
                         <div className="space-y-4 max-w-md">
                           <div>
-                            <label className="text-sm font-medium text-muted-foreground">Current Password</label>
-                            <input
-                              type="password"
-                              className="input-clean mt-1"
-                            />
+                            <label className="text-sm font-medium text-muted-foreground">
+                              Current Password
+                            </label>
+                            <input type="password" className="input-clean mt-1" />
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-muted-foreground">New Password</label>
-                            <input
-                              type="password"
-                              className="input-clean mt-1"
-                            />
+                            <label className="text-sm font-medium text-muted-foreground">
+                              New Password
+                            </label>
+                            <input type="password" className="input-clean mt-1" />
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-muted-foreground">Confirm New Password</label>
-                            <input
-                              type="password"
-                              className="input-clean mt-1"
-                            />
+                            <label className="text-sm font-medium text-muted-foreground">
+                              Confirm New Password
+                            </label>
+                            <input type="password" className="input-clean mt-1" />
                           </div>
                           <button className="btn-primary">Update Password</button>
                         </div>
@@ -301,7 +306,9 @@ export default function SettingsPage() {
                         </select>
                       </div>
                       <div className="pt-6 border-t border-border">
-                        <h3 className="font-medium mb-2 text-red-600 dark:text-red-400">Danger Zone</h3>
+                        <h3 className="font-medium mb-2 text-red-600 dark:text-red-400">
+                          Danger Zone
+                        </h3>
                         <p className="text-sm text-muted-foreground mb-4">
                           Permanently delete your account and all associated data
                         </p>

@@ -1,18 +1,18 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
 import { useMutation } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
+import { CheckCircle, type File, Upload, X } from 'lucide-react'
+import { useCallback, useRef, useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
-import { Upload, File, X, CheckCircle, AlertCircle } from 'lucide-react'
-import { Id } from '../../../convex/_generated/dataModel'
+import { api } from '../../../convex/_generated/api'
+import type { Id } from '../../../convex/_generated/dataModel'
 
 interface FileUploadProps {
   type: 'resume' | 'coverLetter'
-  candidateId?: Id<"candidates">
-  currentFileId?: Id<"_storage">
+  candidateId?: Id<'candidates'>
+  currentFileId?: Id<'_storage'>
   currentFileName?: string
-  onUploadComplete?: (storageId: Id<"_storage">, filename: string) => void
+  onUploadComplete?: (storageId: Id<'_storage'>, filename: string) => void
   onUploadError?: (error: string) => void
   onDelete?: () => void
   accept?: string
@@ -30,7 +30,7 @@ export function FileUpload({
   onDelete,
   accept = '.pdf,.doc,.docx,.txt',
   maxSize = 10,
-  disabled = false
+  disabled = false,
 }: FileUploadProps) {
   const { toast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -49,8 +49,8 @@ export function FileUpload({
     }
 
     // Check file type
-    const allowedTypes = accept.split(',').map(t => t.trim())
-    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase()
+    const allowedTypes = accept.split(',').map((t) => t.trim())
+    const fileExtension = `.${file.name.split('.').pop()?.toLowerCase()}`
 
     if (!allowedTypes.includes(fileExtension)) {
       return `File type must be one of: ${allowedTypes.join(', ')}`
@@ -88,7 +88,7 @@ export function FileUpload({
         }
       }
 
-      const uploadPromise = new Promise<{ storageId: Id<"_storage"> }>((resolve, reject) => {
+      const uploadPromise = new Promise<{ storageId: Id<'_storage'> }>((resolve, reject) => {
         xhr.onload = () => {
           if (xhr.status === 200) {
             resolve(JSON.parse(xhr.responseText))
@@ -128,7 +128,7 @@ export function FileUpload({
       })
 
       onUploadComplete?.(storageId, file.name)
-    } catch (error) {
+    } catch (_error) {
       const errorMessage = 'Failed to upload file. Please try again.'
       toast({
         title: 'Upload Failed',
@@ -142,13 +142,16 @@ export function FileUpload({
     }
   }
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (!disabled) {
-      setIsDragOver(true)
-    }
-  }, [disabled])
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (!disabled) {
+        setIsDragOver(true)
+      }
+    },
+    [disabled]
+  )
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -156,27 +159,33 @@ export function FileUpload({
     setIsDragOver(false)
   }, [])
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragOver(false)
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setIsDragOver(false)
 
-    if (disabled || isUploading) return
+      if (disabled || isUploading) return
 
-    const files = Array.from(e.dataTransfer.files)
-    if (files.length > 0) {
-      handleUpload(files[0])
-    }
-  }, [disabled, isUploading])
+      const files = Array.from(e.dataTransfer.files)
+      if (files.length > 0) {
+        handleUpload(files[0])
+      }
+    },
+    [disabled, isUploading, handleUpload]
+  )
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (files && files.length > 0) {
-      handleUpload(files[0])
-    }
-    // Reset input value so same file can be selected again
-    e.target.value = ''
-  }, [])
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files
+      if (files && files.length > 0) {
+        handleUpload(files[0])
+      }
+      // Reset input value so same file can be selected again
+      e.target.value = ''
+    },
+    [handleUpload]
+  )
 
   const handleClick = () => {
     if (!disabled && !isUploading) {
@@ -201,11 +210,7 @@ export function FileUpload({
             </div>
           </div>
           <div className="flex gap-2">
-            <button
-              onClick={handleClick}
-              className="btn-secondary text-sm"
-              disabled={disabled}
-            >
+            <button onClick={handleClick} className="btn-secondary text-sm" disabled={disabled}>
               Replace
             </button>
             {onDelete && (
@@ -235,9 +240,7 @@ export function FileUpload({
   return (
     <div
       className={`relative border-2 border-dashed rounded-lg p-6 transition-colors ${
-        isDragOver
-          ? 'border-primary bg-primary/5'
-          : 'border-border hover:border-primary/50'
+        isDragOver ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -281,9 +284,7 @@ export function FileUpload({
               <p className="text-sm font-medium">
                 Upload {type === 'resume' ? 'Resume' : 'Cover Letter'}
               </p>
-              <p className="text-xs text-muted-foreground">
-                Drag and drop or click to select
-              </p>
+              <p className="text-xs text-muted-foreground">Drag and drop or click to select</p>
               <p className="text-xs text-muted-foreground mt-1">
                 Accepted: {accept} • Max size: {maxSize}MB
               </p>

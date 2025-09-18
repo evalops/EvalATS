@@ -1,12 +1,21 @@
 'use client'
 
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
-import Link from 'next/link'
 import {
-  ArrowLeft, MapPin, Clock, Briefcase, DollarSign, Users, Calendar,
-  FileText, Upload, Github, Linkedin, Globe, CheckCircle, AlertCircle
+  ArrowLeft,
+  Briefcase,
+  CheckCircle,
+  Clock,
+  DollarSign,
+  Github,
+  Globe,
+  Linkedin,
+  MapPin,
+  Upload,
+  Users,
 } from 'lucide-react'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 // This would come from Convex
@@ -26,7 +35,7 @@ const job = {
     'Collaborate with product and design teams to deliver features',
     'Mentor junior developers and review code',
     'Participate in architectural decisions',
-    'Ensure high code quality and testing standards'
+    'Ensure high code quality and testing standards',
   ],
   requirements: [
     '5+ years of experience in software development',
@@ -34,14 +43,14 @@ const job = {
     'Experience with React and modern frontend frameworks',
     'Familiarity with cloud services (AWS, GCP, or Azure)',
     'Excellent problem-solving and communication skills',
-    'Bachelor\'s degree in Computer Science or related field'
+    "Bachelor's degree in Computer Science or related field",
   ],
   niceToHave: [
     'Experience with Next.js and Vercel',
     'Knowledge of Convex or similar real-time databases',
     'Contributions to open-source projects',
     'Experience with CI/CD pipelines',
-    'Understanding of security best practices'
+    'Understanding of security best practices',
   ],
   benefits: [
     'Competitive salary and equity',
@@ -49,12 +58,12 @@ const job = {
     'Unlimited PTO',
     'Remote work flexibility',
     '$1,500 annual learning budget',
-    'Latest MacBook Pro and equipment'
-  ]
+    'Latest MacBook Pro and equipment',
+  ],
 }
 
 export default function JobDetailsPage() {
-  const params = useParams()
+  const _params = useParams()
   const [isApplying, setIsApplying] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [formData, setFormData] = useState({
@@ -113,7 +122,8 @@ export default function JobDetailsPage() {
             Application Submitted!
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Thank you for applying to the {job.title} position. We'll review your application and get back to you within 3-5 business days.
+            Thank you for applying to the {job.title} position. We'll review your application and
+            get back to you within 3-5 business days.
           </p>
           <div className="space-y-3">
             <Link
@@ -155,9 +165,7 @@ export default function JobDetailsPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* Job Header */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                {job.title}
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{job.title}</h1>
               <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
                 <span className="flex items-center gap-1">
                   <Users className="h-4 w-4" />
@@ -444,7 +452,7 @@ export default function JobDetailsPage() {
                           {formData.resumeFile.name}
                         </span>
                       ) : (
-                        <>Drop your resume here or click to browse</>
+                        'Drop your resume here or click to browse'
                       )}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">

@@ -1,20 +1,20 @@
-import { mutation } from "./_generated/server";
+import { mutation } from './_generated/server'
 
 export const seedEmailTemplates = mutation({
   handler: async (ctx) => {
-    const now = new Date().toISOString();
+    const now = new Date().toISOString()
 
     // Check if templates already exist
-    const existingTemplates = await ctx.db.query("emailTemplates").collect();
+    const existingTemplates = await ctx.db.query('emailTemplates').collect()
     if (existingTemplates.length > 0) {
-      return { message: "Templates already exist" };
+      return { message: 'Templates already exist' }
     }
 
     const templates = [
       {
-        name: "Interview Invitation",
-        category: "interview",
-        subject: "Interview Invitation - {{jobTitle}} Position at EvalATS",
+        name: 'Interview Invitation',
+        category: 'interview',
+        subject: 'Interview Invitation - {{jobTitle}} Position at EvalATS',
         content: `Dear {{candidateName}},
 
 Thank you for your interest in the {{jobTitle}} position at EvalATS. We were impressed with your application and would like to invite you for an interview.
@@ -32,18 +32,25 @@ We look forward to speaking with you.
 
 Best regards,
 The EvalATS Team`,
-        type: "interview_invitation" as const,
-        variables: ["candidateName", "jobTitle", "interviewDate", "interviewTime", "interviewDuration", "interviewLocation"],
-        tags: ["interview", "invitation"],
+        type: 'interview_invitation' as const,
+        variables: [
+          'candidateName',
+          'jobTitle',
+          'interviewDate',
+          'interviewTime',
+          'interviewDuration',
+          'interviewLocation',
+        ],
+        tags: ['interview', 'invitation'],
         isActive: true,
         useCount: 0,
         createdAt: now,
         updatedAt: now,
       },
       {
-        name: "Application Acknowledgment",
-        category: "application",
-        subject: "Thank you for your application - {{jobTitle}}",
+        name: 'Application Acknowledgment',
+        category: 'application',
+        subject: 'Thank you for your application - {{jobTitle}}',
         content: `Dear {{candidateName}},
 
 Thank you for applying for the {{jobTitle}} position at EvalATS. We have received your application and are currently reviewing it.
@@ -52,18 +59,18 @@ We will be in touch within the next few days to update you on the status of your
 
 Best regards,
 The EvalATS Team`,
-        type: "follow_up" as const,
-        variables: ["candidateName", "jobTitle"],
-        tags: ["application", "acknowledgment"],
+        type: 'follow_up' as const,
+        variables: ['candidateName', 'jobTitle'],
+        tags: ['application', 'acknowledgment'],
         isActive: true,
         useCount: 0,
         createdAt: now,
         updatedAt: now,
       },
       {
-        name: "Job Offer",
-        category: "offer",
-        subject: "Job Offer - {{jobTitle}} Position at EvalATS",
+        name: 'Job Offer',
+        category: 'offer',
+        subject: 'Job Offer - {{jobTitle}} Position at EvalATS',
         content: `Dear {{candidateName}},
 
 We are pleased to offer you the position of {{jobTitle}} at EvalATS. After careful consideration, we believe you would be a valuable addition to our team.
@@ -82,18 +89,25 @@ Congratulations and we look forward to working with you!
 
 Best regards,
 The EvalATS Team`,
-        type: "offer" as const,
-        variables: ["candidateName", "jobTitle", "startDate", "salary", "benefits", "responseDeadline"],
-        tags: ["offer", "job"],
+        type: 'offer' as const,
+        variables: [
+          'candidateName',
+          'jobTitle',
+          'startDate',
+          'salary',
+          'benefits',
+          'responseDeadline',
+        ],
+        tags: ['offer', 'job'],
         isActive: true,
         useCount: 0,
         createdAt: now,
         updatedAt: now,
       },
       {
-        name: "Application Rejection",
-        category: "rejection",
-        subject: "Update on your application - {{jobTitle}}",
+        name: 'Application Rejection',
+        category: 'rejection',
+        subject: 'Update on your application - {{jobTitle}}',
         content: `Dear {{candidateName}},
 
 Thank you for your interest in the {{jobTitle}} position at EvalATS and for taking the time to apply.
@@ -106,18 +120,18 @@ We wish you the best of luck in your job search.
 
 Best regards,
 The EvalATS Team`,
-        type: "rejection" as const,
-        variables: ["candidateName", "jobTitle"],
-        tags: ["rejection", "application"],
+        type: 'rejection' as const,
+        variables: ['candidateName', 'jobTitle'],
+        tags: ['rejection', 'application'],
         isActive: true,
         useCount: 0,
         createdAt: now,
         updatedAt: now,
       },
       {
-        name: "Assessment Invitation",
-        category: "assessment",
-        subject: "Next Step: Assessment for {{jobTitle}} Position",
+        name: 'Assessment Invitation',
+        category: 'assessment',
+        subject: 'Next Step: Assessment for {{jobTitle}} Position',
         content: `Dear {{candidateName}},
 
 Thank you for your continued interest in the {{jobTitle}} position at EvalATS.
@@ -136,22 +150,30 @@ If you have any technical issues or questions, please contact us immediately.
 
 Best regards,
 The EvalATS Team`,
-        type: "assessment" as const,
-        variables: ["candidateName", "jobTitle", "assessmentType", "timeLimit", "instructions", "deadline", "assessmentLink"],
-        tags: ["assessment", "invitation"],
+        type: 'assessment' as const,
+        variables: [
+          'candidateName',
+          'jobTitle',
+          'assessmentType',
+          'timeLimit',
+          'instructions',
+          'deadline',
+          'assessmentLink',
+        ],
+        tags: ['assessment', 'invitation'],
         isActive: true,
         useCount: 0,
         createdAt: now,
         updatedAt: now,
-      }
-    ];
+      },
+    ]
 
-    const insertedIds = [];
+    const insertedIds = []
     for (const template of templates) {
-      const id = await ctx.db.insert("emailTemplates", template);
-      insertedIds.push(id);
+      const id = await ctx.db.insert('emailTemplates', template)
+      insertedIds.push(id)
     }
 
-    return { message: `Created ${insertedIds.length} email templates`, ids: insertedIds };
+    return { message: `Created ${insertedIds.length} email templates`, ids: insertedIds }
   },
-});
+})

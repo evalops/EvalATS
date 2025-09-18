@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { useAuth, useUser } from '@clerk/nextjs'
-import { useRouter } from 'next/navigation'
-import { AppShell } from '@/components/layout/app-shell'
-import { StatsOverview } from '@/components/dashboard/stats-overview'
-import { RecentActivity } from '@/components/dashboard/recent-activity'
-import { PipelineBoard } from '@/components/pipeline/pipeline-board'
 import { Plus } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { RecentActivity } from '@/components/dashboard/recent-activity'
+import { StatsOverview } from '@/components/dashboard/stats-overview'
+import { AppShell } from '@/components/layout/app-shell'
+import { PipelineBoard } from '@/components/pipeline/pipeline-board'
 
 export default function HomePage() {
   const { isLoaded, isSignedIn } = useAuth()
@@ -112,7 +112,9 @@ export default function HomePage() {
                       </button>
                       <button className="w-full text-left px-4 py-3 rounded-lg border border-border hover:bg-accent transition-colors">
                         <div className="text-sm font-medium">Schedule interviews</div>
-                        <div className="text-xs text-muted-foreground mt-1">5 candidates waiting</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          5 candidates waiting
+                        </div>
                       </button>
                       <button className="w-full text-left px-4 py-3 rounded-lg border border-border hover:bg-accent transition-colors">
                         <div className="text-sm font-medium">Send offer letters</div>

@@ -1,21 +1,35 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { useQuery } from "convex/react"
-import { api } from "../../convex/_generated/api"
+import { useQuery } from 'convex/react'
 import {
-  BarChart, LineChart, PieChart, TrendingUp, TrendingDown,
-  Users, Briefcase, Calendar, Clock, Target, Award,
-  Download, Filter, ChevronUp, ChevronDown, Activity,
-  DollarSign, UserCheck, UserX, Timer, Zap
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { cn } from "@/lib/utils"
+  Activity,
+  Award,
+  Briefcase,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Download,
+  Target,
+  Timer,
+  TrendingDown,
+  TrendingUp,
+  Users,
+  Zap,
+} from 'lucide-react'
+import { useState } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { cn } from '@/lib/utils'
+import { api } from '../../convex/_generated/api'
 
 interface MetricCard {
   title: string
@@ -52,53 +66,50 @@ interface DepartmentMetrics {
 }
 
 export function ReportingDashboard() {
-  const [timeRange, setTimeRange] = useState("30d")
-  const [department, setDepartment] = useState("all")
-  const [compareMode, setCompareMode] = useState(false)
+  const [timeRange, setTimeRange] = useState('30d')
+  const [department, setDepartment] = useState('all')
+  const [_compareMode, _setCompareMode] = useState(false)
 
   // Mock Convex queries - replace with actual API calls
   const candidates = useQuery(api.candidates.list, {}) || []
   const jobs = useQuery(api.jobs.list, {}) || []
   const interviews = useQuery(api.interviews.list, {}) || []
-  const teamMembers = useQuery(api.teams.getTeamMembers) || []
+  const _teamMembers = useQuery(api.teams.getTeamMembers) || []
 
   // Calculate metrics
   const calculateMetrics = () => {
     const now = new Date()
-    const timeRangeDays = parseInt(timeRange)
+    const timeRangeDays = parseInt(timeRange, 10)
     const startDate = new Date(now.getTime() - timeRangeDays * 24 * 60 * 60 * 1000)
 
     // Filter data by time range
-    const filteredCandidates = candidates.filter((c: any) =>
-      new Date(c.appliedDate) >= startDate
-    )
+    const filteredCandidates = candidates.filter((c: any) => new Date(c.appliedDate) >= startDate)
 
-    const filteredInterviews = interviews.filter((i: any) =>
-      new Date(i.date) >= startDate
-    )
+    const filteredInterviews = interviews.filter((i: any) => new Date(i.date) >= startDate)
 
     // Key metrics
     const totalApplications = filteredCandidates.length
-    const activePositions = jobs.filter((j: any) => j.status === "active").length
-    const hiredCandidatesArray = filteredCandidates.filter((c: any) => c.status === "hired")
+    const activePositions = jobs.filter((j: any) => j.status === 'active').length
+    const hiredCandidatesArray = filteredCandidates.filter((c: any) => c.status === 'hired')
     const hiredCandidates = hiredCandidatesArray.length
-    const rejectedCandidatesArray = filteredCandidates.filter((c: any) => c.status === "rejected")
+    const rejectedCandidatesArray = filteredCandidates.filter((c: any) => c.status === 'rejected')
     const rejectedCandidates = rejectedCandidatesArray.length
 
     // Calculate averages
-    const avgTimeToHire = hiredCandidates > 0
-      ? Math.round(Math.random() * 30) // Mock calculation
-      : 0
+    const avgTimeToHire =
+      hiredCandidates > 0
+        ? Math.round(Math.random() * 30) // Mock calculation
+        : 0
 
-    const offerAcceptanceRate = hiredCandidates > 0
-      ? Math.round((hiredCandidates / (hiredCandidates + 2)) * 100)
-      : 0
+    const offerAcceptanceRate =
+      hiredCandidates > 0 ? Math.round((hiredCandidates / (hiredCandidates + 2)) * 100) : 0
 
     // Calculate changes (mock data for demo)
     const previousPeriodApplications = Math.round(totalApplications * 0.8)
-    const applicationChange = previousPeriodApplications > 0
-      ? ((totalApplications - previousPeriodApplications) / previousPeriodApplications) * 100
-      : 0
+    const applicationChange =
+      previousPeriodApplications > 0
+        ? ((totalApplications - previousPeriodApplications) / previousPeriodApplications) * 100
+        : 0
 
     return {
       totalApplications,
@@ -109,9 +120,8 @@ export function ReportingDashboard() {
       offerAcceptanceRate,
       applicationChange,
       interviewsScheduled: filteredInterviews.length,
-      conversionRate: totalApplications > 0
-        ? Math.round((hiredCandidates / totalApplications) * 100)
-        : 0
+      conversionRate:
+        totalApplications > 0 ? Math.round((hiredCandidates / totalApplications) * 100) : 0,
     }
   }
 
@@ -120,70 +130,120 @@ export function ReportingDashboard() {
   // Metric cards data
   const metricCards: MetricCard[] = [
     {
-      title: "Total Applications",
+      title: 'Total Applications',
       value: metrics.totalApplications,
       change: metrics.applicationChange,
-      changeLabel: "vs last period",
+      changeLabel: 'vs last period',
       icon: <Users className="h-4 w-4" />,
-      color: "text-blue-600"
+      color: 'text-blue-600',
     },
     {
-      title: "Active Positions",
+      title: 'Active Positions',
       value: metrics.activePositions,
       change: 12,
-      changeLabel: "new this month",
+      changeLabel: 'new this month',
       icon: <Briefcase className="h-4 w-4" />,
-      color: "text-purple-600"
+      color: 'text-purple-600',
     },
     {
-      title: "Avg. Time to Hire",
+      title: 'Avg. Time to Hire',
       value: `${metrics.avgTimeToHire} days`,
       change: -15,
-      changeLabel: "improvement",
+      changeLabel: 'improvement',
       icon: <Clock className="h-4 w-4" />,
-      color: "text-green-600"
+      color: 'text-green-600',
     },
     {
-      title: "Offer Acceptance",
+      title: 'Offer Acceptance',
       value: `${metrics.offerAcceptanceRate}%`,
       change: 5,
-      changeLabel: "vs last quarter",
+      changeLabel: 'vs last quarter',
       icon: <Target className="h-4 w-4" />,
-      color: "text-orange-600"
-    }
+      color: 'text-orange-600',
+    },
   ]
 
   // Funnel data
   const funnelData: FunnelStage[] = [
-    { name: "Applications", value: metrics.totalApplications, percentage: 100, dropoff: 0 },
-    { name: "Screening", value: Math.round(metrics.totalApplications * 0.6), percentage: 60, dropoff: 40 },
-    { name: "Interview", value: Math.round(metrics.totalApplications * 0.3), percentage: 30, dropoff: 30 },
-    { name: "Offer", value: Math.round(metrics.totalApplications * 0.1), percentage: 10, dropoff: 20 },
-    { name: "Hired", value: metrics.hiredCandidates, percentage: metrics.conversionRate, dropoff: 5 }
+    { name: 'Applications', value: metrics.totalApplications, percentage: 100, dropoff: 0 },
+    {
+      name: 'Screening',
+      value: Math.round(metrics.totalApplications * 0.6),
+      percentage: 60,
+      dropoff: 40,
+    },
+    {
+      name: 'Interview',
+      value: Math.round(metrics.totalApplications * 0.3),
+      percentage: 30,
+      dropoff: 30,
+    },
+    {
+      name: 'Offer',
+      value: Math.round(metrics.totalApplications * 0.1),
+      percentage: 10,
+      dropoff: 20,
+    },
+    {
+      name: 'Hired',
+      value: metrics.hiredCandidates,
+      percentage: metrics.conversionRate,
+      dropoff: 5,
+    },
   ]
 
   // Department metrics
   const departmentMetrics: DepartmentMetrics[] = [
-    { department: "Engineering", openPositions: 8, totalApplications: 245, averageTimeToHire: 28, offerAcceptanceRate: 85 },
-    { department: "Design", openPositions: 3, totalApplications: 89, averageTimeToHire: 21, offerAcceptanceRate: 92 },
-    { department: "Product", openPositions: 4, totalApplications: 112, averageTimeToHire: 24, offerAcceptanceRate: 88 },
-    { department: "Sales", openPositions: 6, totalApplications: 178, averageTimeToHire: 18, offerAcceptanceRate: 78 },
-    { department: "Marketing", openPositions: 2, totalApplications: 67, averageTimeToHire: 22, offerAcceptanceRate: 81 }
+    {
+      department: 'Engineering',
+      openPositions: 8,
+      totalApplications: 245,
+      averageTimeToHire: 28,
+      offerAcceptanceRate: 85,
+    },
+    {
+      department: 'Design',
+      openPositions: 3,
+      totalApplications: 89,
+      averageTimeToHire: 21,
+      offerAcceptanceRate: 92,
+    },
+    {
+      department: 'Product',
+      openPositions: 4,
+      totalApplications: 112,
+      averageTimeToHire: 24,
+      offerAcceptanceRate: 88,
+    },
+    {
+      department: 'Sales',
+      openPositions: 6,
+      totalApplications: 178,
+      averageTimeToHire: 18,
+      offerAcceptanceRate: 78,
+    },
+    {
+      department: 'Marketing',
+      openPositions: 2,
+      totalApplications: 67,
+      averageTimeToHire: 22,
+      offerAcceptanceRate: 81,
+    },
   ]
 
   // Source effectiveness data
   const sourceData = [
-    { source: "LinkedIn", applications: 145, hires: 12, quality: 8.3 },
-    { source: "Indeed", applications: 98, hires: 7, quality: 7.1 },
-    { source: "Company Website", applications: 76, hires: 9, quality: 11.8 },
-    { source: "Employee Referral", applications: 42, hires: 8, quality: 19.0 },
-    { source: "University", applications: 31, hires: 3, quality: 9.7 }
+    { source: 'LinkedIn', applications: 145, hires: 12, quality: 8.3 },
+    { source: 'Indeed', applications: 98, hires: 7, quality: 7.1 },
+    { source: 'Company Website', applications: 76, hires: 9, quality: 11.8 },
+    { source: 'Employee Referral', applications: 42, hires: 8, quality: 19.0 },
+    { source: 'University', applications: 31, hires: 3, quality: 9.7 },
   ]
 
   // Time to hire trend data
   const timeToHireTrend = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    data: [32, 28, 30, 26, 24, 22]
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    data: [32, 28, 30, 26, 24, 22],
   }
 
   const getChangeIcon = (change: number) => {
@@ -194,14 +254,14 @@ export function ReportingDashboard() {
 
   const getChangeColor = (change: number, inverse: boolean = false) => {
     if (inverse) {
-      return change > 0 ? "text-red-600" : change < 0 ? "text-green-600" : "text-gray-600"
+      return change > 0 ? 'text-red-600' : change < 0 ? 'text-green-600' : 'text-gray-600'
     }
-    return change > 0 ? "text-green-600" : change < 0 ? "text-red-600" : "text-gray-600"
+    return change > 0 ? 'text-green-600' : change < 0 ? 'text-red-600' : 'text-gray-600'
   }
 
   const exportReport = () => {
     // Export functionality
-    console.log("Exporting report...")
+    console.log('Exporting report...')
   }
 
   return (
@@ -249,11 +309,14 @@ export function ReportingDashboard() {
           <Card key={i}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-2">
-                <div className={cn("p-2 bg-gray-100 rounded-lg", metric.color)}>
-                  {metric.icon}
-                </div>
+                <div className={cn('p-2 bg-gray-100 rounded-lg', metric.color)}>{metric.icon}</div>
                 {metric.change !== 0 && (
-                  <div className={cn("flex items-center text-sm", getChangeColor(metric.change, metric.title.includes("Time")))}>
+                  <div
+                    className={cn(
+                      'flex items-center text-sm',
+                      getChangeColor(metric.change, metric.title.includes('Time'))
+                    )}
+                  >
                     {getChangeIcon(metric.change)}
                     <span>{Math.abs(metric.change)}%</span>
                   </div>
@@ -336,9 +399,12 @@ export function ReportingDashboard() {
             <div className="h-[250px] flex items-end justify-between gap-2">
               {timeToHireTrend.labels.map((month, i) => (
                 <div key={month} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="relative w-full bg-gray-100 rounded-t" style={{
-                    height: `${(timeToHireTrend.data[i] / Math.max(...timeToHireTrend.data)) * 200}px`
-                  }}>
+                  <div
+                    className="relative w-full bg-gray-100 rounded-t"
+                    style={{
+                      height: `${(timeToHireTrend.data[i] / Math.max(...timeToHireTrend.data)) * 200}px`,
+                    }}
+                  >
                     <div className="absolute inset-0 bg-blue-500 rounded-t" />
                     <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-medium">
                       {timeToHireTrend.data[i]}
@@ -411,10 +477,15 @@ export function ReportingDashboard() {
                         </div>
                       </td>
                       <td className="text-center py-3 px-4">
-                        <Badge className={cn(
-                          efficiencyScore >= 80 ? "bg-green-500" :
-                          efficiencyScore >= 60 ? "bg-yellow-500" : "bg-red-500"
-                        )}>
+                        <Badge
+                          className={cn(
+                            efficiencyScore >= 80
+                              ? 'bg-green-500'
+                              : efficiencyScore >= 60
+                                ? 'bg-yellow-500'
+                                : 'bg-red-500'
+                          )}
+                        >
                           {efficiencyScore}
                         </Badge>
                       </td>
@@ -447,7 +518,10 @@ export function ReportingDashboard() {
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <Progress value={(source.hires / source.applications) * 100} className="flex-1 h-2" />
+                    <Progress
+                      value={(source.hires / source.applications) * 100}
+                      className="flex-1 h-2"
+                    />
                   </div>
                 </div>
               ))}
@@ -532,7 +606,8 @@ export function ReportingDashboard() {
               <div>
                 <p className="font-medium text-sm">Strong Performer</p>
                 <p className="text-sm text-gray-600 mt-1">
-                  Employee referrals show 19% conversion rate, 3x higher than average. Consider increasing referral incentives.
+                  Employee referrals show 19% conversion rate, 3x higher than average. Consider
+                  increasing referral incentives.
                 </p>
               </div>
             </div>
@@ -541,7 +616,8 @@ export function ReportingDashboard() {
               <div>
                 <p className="font-medium text-sm">Opportunity</p>
                 <p className="text-sm text-gray-600 mt-1">
-                  Engineering department has 28-day avg time to hire. Streamlining technical assessments could reduce by 20%.
+                  Engineering department has 28-day avg time to hire. Streamlining technical
+                  assessments could reduce by 20%.
                 </p>
               </div>
             </div>
@@ -550,7 +626,8 @@ export function ReportingDashboard() {
               <div>
                 <p className="font-medium text-sm">Trending Up</p>
                 <p className="text-sm text-gray-600 mt-1">
-                  Offer acceptance rate improved 5% this quarter. Compensation competitiveness is paying off.
+                  Offer acceptance rate improved 5% this quarter. Compensation competitiveness is
+                  paying off.
                 </p>
               </div>
             </div>
@@ -559,7 +636,8 @@ export function ReportingDashboard() {
               <div>
                 <p className="font-medium text-sm">Action Required</p>
                 <p className="text-sm text-gray-600 mt-1">
-                  40% dropout rate at screening stage. Review screening criteria and improve candidate communication.
+                  40% dropout rate at screening stage. Review screening criteria and improve
+                  candidate communication.
                 </p>
               </div>
             </div>

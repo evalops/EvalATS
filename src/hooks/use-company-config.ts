@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CompanyConfig, loadCompanyConfig } from '@/lib/company-config'
+import { type CompanyConfig, loadCompanyConfig } from '@/lib/company-config'
 
 export function useCompanyConfig() {
   const [config, setConfig] = useState<CompanyConfig | null>(null)

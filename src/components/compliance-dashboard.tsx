@@ -1,11 +1,20 @@
 'use client'
 
+import {
+  Activity,
+  AlertTriangle,
+  CheckCircle,
+  Download,
+  Eye,
+  Shield,
+  TrendingUp,
+  Users,
+} from 'lucide-react'
 import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import {
   Table,
@@ -15,17 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  Shield,
-  AlertTriangle,
-  CheckCircle,
-  Download,
-  Eye,
-  TrendingUp,
-  Users,
-  BarChart3,
-  Activity
-} from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface SelectionRate {
   group: string
@@ -81,10 +80,14 @@ export function ComplianceDashboard({ auditData, aiDecisions = [] }: ComplianceD
   const [selectedTab, setSelectedTab] = useState('overview')
 
   // Calculate compliance metrics
-  const fourFifthsCompliant = auditData?.metrics.impactRatios.every(r => r.passes_four_fifths) ?? true
-  const aiAccuracy = aiDecisions.length > 0
-    ? (aiDecisions.filter(d => d.humanReview?.agreedWithAI).length / aiDecisions.filter(d => d.humanReview).length) * 100
-    : 0
+  const fourFifthsCompliant =
+    auditData?.metrics.impactRatios.every((r) => r.passes_four_fifths) ?? true
+  const aiAccuracy =
+    aiDecisions.length > 0
+      ? (aiDecisions.filter((d) => d.humanReview?.agreedWithAI).length /
+          aiDecisions.filter((d) => d.humanReview).length) *
+        100
+      : 0
 
   const exportReport = () => {
     // In production, this would generate a PDF or CSV report
@@ -97,9 +100,7 @@ export function ComplianceDashboard({ auditData, aiDecisions = [] }: ComplianceD
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">EEOC Compliance Dashboard</h2>
-          <p className="text-muted-foreground">
-            Monitor hiring fairness and AI decision auditing
-          </p>
+          <p className="text-muted-foreground">Monitor hiring fairness and AI decision auditing</p>
         </div>
         <Button onClick={exportReport}>
           <Download className="mr-2 h-4 w-4" />
@@ -135,10 +136,10 @@ export function ComplianceDashboard({ auditData, aiDecisions = [] }: ComplianceD
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {aiDecisions.filter(d => d.humanReview).length}/{aiDecisions.length}
+              {aiDecisions.filter((d) => d.humanReview).length}/{aiDecisions.length}
             </div>
             <Progress
-              value={(aiDecisions.filter(d => d.humanReview).length / aiDecisions.length) * 100}
+              value={(aiDecisions.filter((d) => d.humanReview).length / aiDecisions.length) * 100}
               className="mt-2"
             />
           </CardContent>
@@ -151,9 +152,7 @@ export function ComplianceDashboard({ auditData, aiDecisions = [] }: ComplianceD
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{aiAccuracy.toFixed(1)}%</div>
-            <p className="text-xs text-muted-foreground">
-              Human-AI agreement rate
-            </p>
+            <p className="text-xs text-muted-foreground">Human-AI agreement rate</p>
           </CardContent>
         </Card>
 
@@ -229,8 +228,8 @@ export function ComplianceDashboard({ auditData, aiDecisions = [] }: ComplianceD
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle>Compliance Review Required</AlertTitle>
               <AlertDescription>
-                Selection rates indicate potential adverse impact. Review hiring practices
-                and consider adjustments to ensure fair selection across all groups.
+                Selection rates indicate potential adverse impact. Review hiring practices and
+                consider adjustments to ensure fair selection across all groups.
               </AlertDescription>
             </Alert>
           )}
@@ -280,7 +279,8 @@ export function ComplianceDashboard({ auditData, aiDecisions = [] }: ComplianceD
                             <TableCell>{(rate.rate * 100).toFixed(1)}%</TableCell>
                             <TableCell>
                               <span className={diff >= 0 ? 'text-green-600' : 'text-red-600'}>
-                                {diff >= 0 ? '+' : ''}{(diff * 100).toFixed(1)}%
+                                {diff >= 0 ? '+' : ''}
+                                {(diff * 100).toFixed(1)}%
                               </span>
                             </TableCell>
                           </TableRow>
@@ -298,9 +298,7 @@ export function ComplianceDashboard({ auditData, aiDecisions = [] }: ComplianceD
           <Card>
             <CardHeader>
               <CardTitle>AI Decision Audit Trail</CardTitle>
-              <CardDescription>
-                Track and review all AI-assisted hiring decisions
-              </CardDescription>
+              <CardDescription>Track and review all AI-assisted hiring decisions</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -317,9 +315,7 @@ export function ComplianceDashboard({ auditData, aiDecisions = [] }: ComplianceD
                 <TableBody>
                   {aiDecisions.map((decision) => (
                     <TableRow key={decision.id}>
-                      <TableCell>
-                        {new Date(decision.timestamp).toLocaleDateString()}
-                      </TableCell>
+                      <TableCell>{new Date(decision.timestamp).toLocaleDateString()}</TableCell>
                       <TableCell>{decision.decisionType}</TableCell>
                       <TableCell>{decision.candidateName}</TableCell>
                       <TableCell>{decision.score}%</TableCell>

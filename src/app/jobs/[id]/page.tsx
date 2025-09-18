@@ -1,17 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
-import { AppShell } from '@/components/layout/app-shell'
-import Link from 'next/link'
-import {
-  ArrowLeft, Users, MapPin, Clock, Calendar, Filter, Search,
-  MoreVertical, Star, Mail, Phone, Download
-} from 'lucide-react'
 import { useQuery } from 'convex/react'
-import { api } from '../../../../convex/_generated/api'
-import { Id } from '../../../../convex/_generated/dataModel'
+import { ArrowLeft, Calendar, Clock, MapPin, Search, Star, Users } from 'lucide-react'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import { useState } from 'react'
 import { CandidateStatusActions } from '@/components/candidate-status-actions'
+import { AppShell } from '@/components/layout/app-shell'
+import { api } from '../../../../convex/_generated/api'
+import type { Id } from '../../../../convex/_generated/dataModel'
 
 const statusColors = {
   screening: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
@@ -24,7 +21,7 @@ const statusColors = {
 
 export default function JobDetailPage() {
   const params = useParams()
-  const jobId = params.id as Id<"jobs">
+  const jobId = params.id as Id<'jobs'>
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedStatus, setSelectedStatus] = useState('all')
 
@@ -45,15 +42,17 @@ export default function JobDetailPage() {
   }
 
   // Filter applicants based on search and status
-  const filteredApplicants = job.applicants?.filter(applicant => {
-    const matchesSearch = !searchQuery ||
-      (applicant.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (applicant.email || '').toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredApplicants =
+    job.applicants?.filter((applicant) => {
+      const matchesSearch =
+        !searchQuery ||
+        (applicant.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (applicant.email || '').toLowerCase().includes(searchQuery.toLowerCase())
 
-    const matchesStatus = selectedStatus === 'all' || applicant.status === selectedStatus
+      const matchesStatus = selectedStatus === 'all' || applicant.status === selectedStatus
 
-    return matchesSearch && matchesStatus
-  }) || []
+      return matchesSearch && matchesStatus
+    }) || []
 
   return (
     <AppShell>
@@ -62,15 +61,14 @@ export default function JobDetailPage() {
         <div className="section-padding py-8 border-b border-border/50">
           <div className="container-max">
             <div className="flex items-center gap-4 mb-6">
-              <Link
-                href="/jobs"
-                className="p-2 rounded-md hover:bg-accent"
-              >
+              <Link href="/jobs" className="p-2 rounded-md hover:bg-accent">
                 <ArrowLeft className="h-4 w-4" />
               </Link>
               <div>
                 <h1 className="text-2xl font-semibold tracking-tight">{job.title}</h1>
-                <p className="text-sm text-muted-foreground">{job.department} • {job.location}</p>
+                <p className="text-sm text-muted-foreground">
+                  {job.department} • {job.location}
+                </p>
               </div>
             </div>
 
@@ -89,7 +87,9 @@ export default function JobDetailPage() {
                 <div className="flex items-center gap-3">
                   <Calendar className="h-8 w-8 text-blue-500" />
                   <div>
-                    <div className="text-2xl font-semibold">{job.applicants?.filter(a => a.status === 'interview').length || 0}</div>
+                    <div className="text-2xl font-semibold">
+                      {job.applicants?.filter((a) => a.status === 'interview').length || 0}
+                    </div>
                     <p className="text-xs text-muted-foreground">In Interviews</p>
                   </div>
                 </div>
@@ -98,7 +98,9 @@ export default function JobDetailPage() {
                 <div className="flex items-center gap-3">
                   <Star className="h-8 w-8 text-green-500" />
                   <div>
-                    <div className="text-2xl font-semibold">{job.applicants?.filter(a => a.status === 'offer').length || 0}</div>
+                    <div className="text-2xl font-semibold">
+                      {job.applicants?.filter((a) => a.status === 'offer').length || 0}
+                    </div>
                     <p className="text-xs text-muted-foreground">Offers Made</p>
                   </div>
                 </div>
@@ -108,7 +110,9 @@ export default function JobDetailPage() {
                   <Clock className="h-8 w-8 text-purple-500" />
                   <div>
                     <div className="text-2xl font-semibold">
-                      {job.applicants?.filter(a => a.status === 'applied' || a.status === 'screening').length || 0}
+                      {job.applicants?.filter(
+                        (a) => a.status === 'applied' || a.status === 'screening'
+                      ).length || 0}
                     </div>
                     <p className="text-xs text-muted-foreground">Pending Review</p>
                   </div>
@@ -141,7 +145,8 @@ export default function JobDetailPage() {
                     <div className="pt-4 border-t border-border">
                       <h4 className="font-medium mb-2">Compensation</h4>
                       <p className="text-sm font-medium">
-                        ${job.salaryMin?.toLocaleString()} - ${job.salaryMax?.toLocaleString()} annually
+                        ${job.salaryMin?.toLocaleString()} - ${job.salaryMax?.toLocaleString()}{' '}
+                        annually
                       </p>
                     </div>
                   )}
@@ -170,7 +175,9 @@ export default function JobDetailPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Status</span>
-                      <span className={`badge-clean ${statusColors[job.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}>
+                      <span
+                        className={`badge-clean ${statusColors[job.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}
+                      >
                         {job.status}
                       </span>
                     </div>
@@ -213,9 +220,7 @@ export default function JobDetailPage() {
         <div className="section-padding py-8">
           <div className="container-max">
             <div className="mb-6">
-              <h2 className="text-lg font-medium">
-                Applications ({filteredApplicants.length})
-              </h2>
+              <h2 className="text-lg font-medium">Applications ({filteredApplicants.length})</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 Review and manage candidate applications
               </p>
@@ -223,17 +228,16 @@ export default function JobDetailPage() {
 
             <div className="space-y-4">
               {filteredApplicants.map((applicant) => (
-                <Link
-                  key={applicant._id}
-                  href={`/candidates/${applicant._id}`}
-                  className="block"
-                >
+                <Link key={applicant._id} href={`/candidates/${applicant._id}`} className="block">
                   <div className="card-clean hover:shadow-md transition-all cursor-pointer">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4 flex-1">
                         {/* Avatar */}
                         <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-sm font-medium shrink-0">
-                          {(applicant.name || 'U').split(' ').map(n => n[0]).join('')}
+                          {(applicant.name || 'U')
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')}
                         </div>
 
                         <div className="flex-1 min-w-0">
@@ -245,7 +249,9 @@ export default function JobDetailPage() {
                               <p className="text-sm text-muted-foreground">{applicant.email}</p>
                             </div>
                             <div className="text-right">
-                              <div className="text-2xl font-semibold">{applicant.evaluation?.overall || 0}%</div>
+                              <div className="text-2xl font-semibold">
+                                {applicant.evaluation?.overall || 0}%
+                              </div>
                               <p className="text-xs text-muted-foreground">Eval Score</p>
                             </div>
                           </div>
@@ -255,14 +261,8 @@ export default function JobDetailPage() {
                               <MapPin className="h-3 w-3" />
                               {applicant.location}
                             </div>
-                            <div>
-                              {applicant.experience}
-                            </div>
-                            {applicant.currentCompany && (
-                              <div>
-                                {applicant.currentCompany}
-                              </div>
-                            )}
+                            <div>{applicant.experience}</div>
+                            {applicant.currentCompany && <div>{applicant.currentCompany}</div>}
                           </div>
 
                           {/* Skills */}
@@ -307,8 +307,8 @@ export default function JobDetailPage() {
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">
                   {job.applicants?.length === 0
-                    ? "No applications received yet"
-                    : "No applicants match your search criteria"}
+                    ? 'No applications received yet'
+                    : 'No applicants match your search criteria'}
                 </p>
               </div>
             )}

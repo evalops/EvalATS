@@ -1,12 +1,11 @@
 'use client'
 
-import { useState } from 'react'
 import { useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
-import { Card } from '@/components/ui/card'
+import { Clock, DollarSign, MapPin } from 'lucide-react'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Clock, MapPin, DollarSign } from 'lucide-react'
+import { Card } from '@/components/ui/card'
+import { api } from '../../../convex/_generated/api'
 
 type Stage = 'applied' | 'screening' | 'interview' | 'offer' | 'rejected' | 'withdrawn'
 
@@ -31,7 +30,7 @@ export function PipelineBoard() {
   }
 
   const getCandidatesByStage = (stage: Stage) => {
-    return candidatesData.filter(c => c.status === stage)
+    return candidatesData.filter((c) => c.status === stage)
   }
 
   return (
@@ -59,14 +58,15 @@ export function PipelineBoard() {
                   <div className="flex items-start gap-3">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback>
-                        {candidate.name.split(' ').map(n => n[0]).join('')}
+                        {candidate.name
+                          .split(' ')
+                          .map((n) => n[0])
+                          .join('')}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{candidate.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {candidate.position}
-                      </p>
+                      <p className="text-xs text-muted-foreground truncate">{candidate.position}</p>
                     </div>
                   </div>
 

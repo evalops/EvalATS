@@ -1,18 +1,18 @@
 'use client'
 
+import { useMutation, useQuery } from 'convex/react'
+import { Calendar, Clock, MapPin, Plus, Users, Video, X } from 'lucide-react'
 import { useState } from 'react'
 import { Modal } from '@/components/ui/modal'
 import { useToast } from '@/hooks/use-toast'
-import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
-import { Calendar, Clock, Video, MapPin, Users, Plus, X } from 'lucide-react'
-import { Id } from '../../../convex/_generated/dataModel'
+import type { Id } from '../../../convex/_generated/dataModel'
 
 interface InterviewSchedulingModalProps {
   isOpen: boolean
   onClose: () => void
-  candidateId?: Id<"candidates">
-  jobId?: Id<"jobs">
+  candidateId?: Id<'candidates'>
+  jobId?: Id<'jobs'>
   candidateName?: string
   jobTitle?: string
 }
@@ -34,9 +34,24 @@ const durations = [
 ]
 
 const timeSlots = [
-  '09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
-  '12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM',
-  '03:00 PM', '03:30 PM', '04:00 PM', '04:30 PM', '05:00 PM', '05:30 PM',
+  '09:00 AM',
+  '09:30 AM',
+  '10:00 AM',
+  '10:30 AM',
+  '11:00 AM',
+  '11:30 AM',
+  '12:00 PM',
+  '12:30 PM',
+  '01:00 PM',
+  '01:30 PM',
+  '02:00 PM',
+  '02:30 PM',
+  '03:00 PM',
+  '03:30 PM',
+  '04:00 PM',
+  '04:30 PM',
+  '05:00 PM',
+  '05:30 PM',
 ]
 
 interface InterviewFormData {
@@ -57,7 +72,7 @@ export function InterviewSchedulingModal({
   candidateId,
   jobId,
   candidateName = '',
-  jobTitle = ''
+  jobTitle = '',
 }: InterviewSchedulingModalProps) {
   const { toast } = useToast()
   const createInterview = useMutation(api.interviews.create)
@@ -101,7 +116,7 @@ export function InterviewSchedulingModal({
     if (!formData.location.trim()) {
       newErrors.location = 'Please provide interview location or link'
     }
-    if (formData.interviewers.filter(i => i.trim()).length === 0) {
+    if (formData.interviewers.filter((i) => i.trim()).length === 0) {
       newErrors.interviewers = 'Please add at least one interviewer'
     }
 
@@ -120,11 +135,11 @@ export function InterviewSchedulingModal({
 
     try {
       // Filter out empty interviewers
-      const interviewers = formData.interviewers.filter(interviewer => interviewer.trim() !== '')
+      const interviewers = formData.interviewers.filter((interviewer) => interviewer.trim() !== '')
 
       await createInterview({
-        candidateId: formData.candidateId as Id<"candidates">,
-        jobId: formData.jobId as Id<"jobs">,
+        candidateId: formData.candidateId as Id<'candidates'>,
+        jobId: formData.jobId as Id<'jobs'>,
         type: formData.type,
         date: formData.date,
         time: formData.time,
@@ -133,8 +148,8 @@ export function InterviewSchedulingModal({
         location: formData.location.trim(),
       })
 
-      const selectedCandidate = candidates.find(c => c._id === formData.candidateId)
-      const selectedJob = jobs.find(j => j._id === formData.jobId)
+      const selectedCandidate = candidates.find((c) => c._id === formData.candidateId)
+      const selectedJob = jobs.find((j) => j._id === formData.jobId)
 
       toast({
         title: 'Interview Scheduled Successfully',
@@ -155,7 +170,7 @@ export function InterviewSchedulingModal({
       })
 
       onClose()
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: 'Error Scheduling Interview',
         description: 'There was an error scheduling the interview. Please try again.',
@@ -175,7 +190,7 @@ export function InterviewSchedulingModal({
   const addInterviewer = () => {
     setFormData({
       ...formData,
-      interviewers: [...formData.interviewers, '']
+      interviewers: [...formData.interviewers, ''],
     })
   }
 
@@ -264,9 +279,7 @@ export function InterviewSchedulingModal({
                   ))}
                 </select>
               )}
-              {errors.jobId && (
-                <p className="text-sm text-red-500 mt-1">{errors.jobId}</p>
-              )}
+              {errors.jobId && <p className="text-sm text-red-500 mt-1">{errors.jobId}</p>}
             </div>
           </div>
         </div>
@@ -311,9 +324,7 @@ export function InterviewSchedulingModal({
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                 className={`input-clean ${errors.date ? 'border-red-500' : ''}`}
               />
-              {errors.date && (
-                <p className="text-sm text-red-500 mt-1">{errors.date}</p>
-              )}
+              {errors.date && <p className="text-sm text-red-500 mt-1">{errors.date}</p>}
             </div>
 
             <div>
@@ -327,7 +338,9 @@ export function InterviewSchedulingModal({
                 className="input-clean"
               >
                 {timeSlots.map((time) => (
-                  <option key={time} value={time}>{time}</option>
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
                 ))}
               </select>
             </div>
@@ -342,7 +355,9 @@ export function InterviewSchedulingModal({
                 className="input-clean"
               >
                 {durations.map((duration) => (
-                  <option key={duration.value} value={duration.value}>{duration.label}</option>
+                  <option key={duration.value} value={duration.value}>
+                    {duration.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -363,9 +378,7 @@ export function InterviewSchedulingModal({
               className={`input-clean ${errors.location ? 'border-red-500' : ''}`}
               placeholder={getLocationPlaceholder()}
             />
-            {errors.location && (
-              <p className="text-sm text-red-500 mt-1">{errors.location}</p>
-            )}
+            {errors.location && <p className="text-sm text-red-500 mt-1">{errors.location}</p>}
           </div>
 
           <div>
@@ -416,11 +429,7 @@ export function InterviewSchedulingModal({
           >
             Cancel
           </button>
-          <button
-            type="submit"
-            className="btn-primary flex-1"
-            disabled={isLoading}
-          >
+          <button type="submit" className="btn-primary flex-1" disabled={isLoading}>
             {isLoading ? 'Scheduling...' : 'Schedule Interview'}
           </button>
         </div>

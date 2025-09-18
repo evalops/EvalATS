@@ -1,41 +1,45 @@
-import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { v } from 'convex/values'
+import { mutation, query } from './_generated/server'
 
 // Store EEO data for a candidate
 export const storeEEOData = mutation({
   args: {
-    candidateId: v.id("candidates"),
-    race: v.optional(v.union(
-      v.literal("american_indian_alaska_native"),
-      v.literal("asian"),
-      v.literal("black_african_american"),
-      v.literal("hispanic_latino"),
-      v.literal("native_hawaiian_pacific_islander"),
-      v.literal("white"),
-      v.literal("two_or_more_races"),
-      v.literal("decline_to_answer")
-    )),
-    gender: v.optional(v.union(
-      v.literal("male"),
-      v.literal("female"),
-      v.literal("non_binary"),
-      v.literal("decline_to_answer")
-    )),
-    veteranStatus: v.optional(v.union(
-      v.literal("protected_veteran"),
-      v.literal("not_protected_veteran"),
-      v.literal("decline_to_answer")
-    )),
-    disabilityStatus: v.optional(v.union(
-      v.literal("yes"),
-      v.literal("no"),
-      v.literal("decline_to_answer")
-    )),
+    candidateId: v.id('candidates'),
+    race: v.optional(
+      v.union(
+        v.literal('american_indian_alaska_native'),
+        v.literal('asian'),
+        v.literal('black_african_american'),
+        v.literal('hispanic_latino'),
+        v.literal('native_hawaiian_pacific_islander'),
+        v.literal('white'),
+        v.literal('two_or_more_races'),
+        v.literal('decline_to_answer')
+      )
+    ),
+    gender: v.optional(
+      v.union(
+        v.literal('male'),
+        v.literal('female'),
+        v.literal('non_binary'),
+        v.literal('decline_to_answer')
+      )
+    ),
+    veteranStatus: v.optional(
+      v.union(
+        v.literal('protected_veteran'),
+        v.literal('not_protected_veteran'),
+        v.literal('decline_to_answer')
+      )
+    ),
+    disabilityStatus: v.optional(
+      v.union(v.literal('yes'), v.literal('no'), v.literal('decline_to_answer'))
+    ),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
-      .query("eeoData")
-      .withIndex("by_candidate", (q) => q.eq("candidateId", args.candidateId))
+      .query('eeoData')
+      .withIndex('by_candidate', (q) => q.eq('candidateId', args.candidateId))
       .first()
 
     if (existing) {
@@ -46,7 +50,7 @@ export const storeEEOData = mutation({
       })
     } else {
       // Create new record
-      return await ctx.db.insert("eeoData", {
+      return await ctx.db.insert('eeoData', {
         ...args,
         collectedDate: new Date().toISOString(),
         isVoluntary: true,
@@ -58,13 +62,13 @@ export const storeEEOData = mutation({
 // Log an AI decision for audit trail
 export const logAIDecision = mutation({
   args: {
-    candidateId: v.id("candidates"),
-    jobId: v.id("jobs"),
+    candidateId: v.id('candidates'),
+    jobId: v.id('jobs'),
     decisionType: v.union(
-      v.literal("resume_screening"),
-      v.literal("skill_matching"),
-      v.literal("ranking"),
-      v.literal("recommendation")
+      v.literal('resume_screening'),
+      v.literal('skill_matching'),
+      v.literal('ranking'),
+      v.literal('recommendation')
     ),
     modelUsed: v.string(),
     modelVersion: v.string(),
@@ -75,7 +79,7 @@ export const logAIDecision = mutation({
     protected_attributes_masked: v.boolean(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("aiDecisions", {
+    return await ctx.db.insert('aiDecisions', {
       ...args,
       timestamp: new Date().toISOString(),
     })
@@ -85,7 +89,7 @@ export const logAIDecision = mutation({
 // Add human review to an AI decision
 export const addHumanReview = mutation({
   args: {
-    decisionId: v.id("aiDecisions"),
+    decisionId: v.id('aiDecisions'),
     reviewerId: v.string(),
     agreedWithAI: v.boolean(),
     overrideReason: v.optional(v.string()),
@@ -97,7 +101,7 @@ export const addHumanReview = mutation({
         reviewDate: new Date().toISOString(),
         agreedWithAI: args.agreedWithAI,
         overrideReason: args.overrideReason,
-      }
+      },
     })
   },
 })
@@ -105,8 +109,8 @@ export const addHumanReview = mutation({
 // Get AI decisions for review
 export const getAIDecisions = query({
   args: {
-    jobId: v.optional(v.id("jobs")),
-    candidateId: v.optional(v.id("candidates")),
+    jobId: v.optional(v.id('jobs')),
+    candidateId: v.optional(v.id('candidates')),
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
@@ -114,20 +118,20 @@ export const getAIDecisions = query({
 
     if (args.jobId !== undefined) {
       decisions = await ctx.db
-        .query("aiDecisions")
-        .withIndex("by_job", (q) => q.eq("jobId", args.jobId!))
-        .order("desc")
+        .query('aiDecisions')
+        .withIndex('by_job', (q) => q.eq('jobId', args.jobId!))
+        .order('desc')
         .take(args.limit || 100)
     } else if (args.candidateId !== undefined) {
       decisions = await ctx.db
-        .query("aiDecisions")
-        .withIndex("by_candidate", (q) => q.eq("candidateId", args.candidateId!))
-        .order("desc")
+        .query('aiDecisions')
+        .withIndex('by_candidate', (q) => q.eq('candidateId', args.candidateId!))
+        .order('desc')
         .take(args.limit || 100)
     } else {
       decisions = await ctx.db
-        .query("aiDecisions")
-        .order("desc")
+        .query('aiDecisions')
+        .order('desc')
         .take(args.limit || 100)
     }
 
@@ -137,7 +141,7 @@ export const getAIDecisions = query({
         const candidate = await ctx.db.get(decision.candidateId)
         return {
           ...decision,
-          candidateName: candidate?.name || "Unknown",
+          candidateName: candidate?.name || 'Unknown',
         }
       })
     )
@@ -149,23 +153,23 @@ export const getAIDecisions = query({
 // Calculate bias metrics for a job posting
 export const calculateBiasMetrics = query({
   args: {
-    jobId: v.id("jobs"),
+    jobId: v.id('jobs'),
     startDate: v.optional(v.string()),
     endDate: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // Get all applications for this job
     const applications = await ctx.db
-      .query("applications")
-      .withIndex("by_job", (q) => q.eq("jobId", args.jobId))
+      .query('applications')
+      .withIndex('by_job', (q) => q.eq('jobId', args.jobId))
       .collect()
 
     // Get EEO data for all candidates
     const candidateEEOData = await Promise.all(
       applications.map(async (app) => {
         const eeoData = await ctx.db
-          .query("eeoData")
-          .withIndex("by_candidate", (q) => q.eq("candidateId", app.candidateId))
+          .query('eeoData')
+          .withIndex('by_candidate', (q) => q.eq('candidateId', app.candidateId))
           .first()
 
         return {
@@ -180,10 +184,10 @@ export const calculateBiasMetrics = query({
     )
 
     // Calculate selection rates by group
-    const calculateRates = (category: string, field: keyof typeof candidateEEOData[0]) => {
-      const groups = new Map<string, { selected: number, total: number }>()
+    const calculateRates = (category: string, field: keyof (typeof candidateEEOData)[0]) => {
+      const groups = new Map<string, { selected: number; total: number }>()
 
-      candidateEEOData.forEach(data => {
+      candidateEEOData.forEach((data) => {
         const value = data[field] as string
         if (value && value !== 'decline_to_answer') {
           if (!groups.has(value)) {
@@ -215,7 +219,7 @@ export const calculateBiasMetrics = query({
 
     // Calculate overall selection rate
     const totalApplicants = candidateEEOData.length
-    const selectedApplicants = candidateEEOData.filter(d => d.status === 'approved').length
+    const selectedApplicants = candidateEEOData.filter((d) => d.status === 'approved').length
     const overallRate = totalApplicants > 0 ? selectedApplicants / totalApplicants : 0
 
     // Calculate impact ratios (Four-Fifths Rule)
@@ -224,10 +228,10 @@ export const calculateBiasMetrics = query({
 
       if (rates.length > 1) {
         // Compare each group to the group with the highest selection rate
-        const maxRate = Math.max(...rates.map(r => r.rate))
-        const maxGroup = rates.find(r => r.rate === maxRate)
+        const maxRate = Math.max(...rates.map((r) => r.rate))
+        const maxGroup = rates.find((r) => r.rate === maxRate)
 
-        rates.forEach(group => {
+        rates.forEach((group) => {
           if (group !== maxGroup && maxGroup) {
             const ratio = maxRate > 0 ? group.rate / maxRate : 0
             ratios.push({
@@ -264,7 +268,7 @@ export const calculateBiasMetrics = query({
         },
         impactRatios,
       },
-      fourFifthsCompliant: impactRatios.every(r => r.passes_four_fifths),
+      fourFifthsCompliant: impactRatios.every((r) => r.passes_four_fifths),
       recommendations: generateRecommendations(impactRatios),
     }
   },
@@ -275,45 +279,43 @@ function generateRecommendations(impactRatios: any[]): string[] {
   const recommendations = []
 
   const failingCategories = new Set(
-    impactRatios
-      .filter(r => !r.passes_four_fifths)
-      .map(r => r.category)
+    impactRatios.filter((r) => !r.passes_four_fifths).map((r) => r.category)
   )
 
   if (failingCategories.size > 0) {
     recommendations.push(
-      "Review job requirements to ensure they are essential and job-related",
-      "Expand recruitment sources to reach more diverse candidate pools",
-      "Implement structured interviews with standardized questions",
-      "Consider using blind resume review for initial screening"
+      'Review job requirements to ensure they are essential and job-related',
+      'Expand recruitment sources to reach more diverse candidate pools',
+      'Implement structured interviews with standardized questions',
+      'Consider using blind resume review for initial screening'
     )
 
     if (failingCategories.has('Gender')) {
       recommendations.push(
-        "Review job descriptions for gendered language that may discourage applicants",
-        "Ensure diverse interview panels"
+        'Review job descriptions for gendered language that may discourage applicants',
+        'Ensure diverse interview panels'
       )
     }
 
     if (failingCategories.has('Race')) {
       recommendations.push(
-        "Partner with diverse professional organizations and universities",
-        "Review recruitment materials for inclusive imagery and language"
+        'Partner with diverse professional organizations and universities',
+        'Review recruitment materials for inclusive imagery and language'
       )
     }
 
     if (failingCategories.has('Disability')) {
       recommendations.push(
-        "Ensure job postings include accommodation statements",
-        "Review physical requirements to ensure they are essential"
+        'Ensure job postings include accommodation statements',
+        'Review physical requirements to ensure they are essential'
       )
     }
   }
 
   recommendations.push(
-    "Continue monitoring selection rates across all protected categories",
-    "Provide unconscious bias training to all hiring team members",
-    "Document all hiring decisions and the rationale behind them"
+    'Continue monitoring selection rates across all protected categories',
+    'Provide unconscious bias training to all hiring team members',
+    'Document all hiring decisions and the rationale behind them'
   )
 
   return recommendations
@@ -322,37 +324,45 @@ function generateRecommendations(impactRatios: any[]): string[] {
 // Create or update a bias audit report
 export const createBiasAudit = mutation({
   args: {
-    jobId: v.optional(v.id("jobs")),
+    jobId: v.optional(v.id('jobs')),
     metrics: v.object({
       selectionRates: v.object({
         overall: v.number(),
-        byGroup: v.array(v.object({
-          group: v.string(),
-          category: v.string(),
-          rate: v.number(),
-          count: v.number(),
-          total: v.number(),
-        })),
+        byGroup: v.array(
+          v.object({
+            group: v.string(),
+            category: v.string(),
+            rate: v.number(),
+            count: v.number(),
+            total: v.number(),
+          })
+        ),
       }),
-      impactRatios: v.array(v.object({
-        category: v.string(),
-        group1: v.string(),
-        group2: v.string(),
-        ratio: v.number(),
-        passes_four_fifths: v.boolean(),
-      })),
-      statisticalTests: v.optional(v.array(v.object({
-        test: v.string(),
-        pValue: v.number(),
-        significant: v.boolean(),
-      }))),
+      impactRatios: v.array(
+        v.object({
+          category: v.string(),
+          group1: v.string(),
+          group2: v.string(),
+          ratio: v.number(),
+          passes_four_fifths: v.boolean(),
+        })
+      ),
+      statisticalTests: v.optional(
+        v.array(
+          v.object({
+            test: v.string(),
+            pValue: v.number(),
+            significant: v.boolean(),
+          })
+        )
+      ),
     }),
     recommendations: v.array(v.string()),
   },
   handler: async (ctx, args) => {
     const auditId = `audit-${Date.now()}`
 
-    return await ctx.db.insert("biasAudits", {
+    return await ctx.db.insert('biasAudits', {
       auditId,
       jobId: args.jobId,
       auditDate: new Date().toISOString(),
@@ -362,7 +372,7 @@ export const createBiasAudit = mutation({
       },
       metrics: args.metrics,
       recommendations: args.recommendations,
-      status: "draft",
+      status: 'draft',
     })
   },
 })
@@ -370,22 +380,19 @@ export const createBiasAudit = mutation({
 // Get the latest bias audit
 export const getLatestAudit = query({
   args: {
-    jobId: v.optional(v.id("jobs")),
+    jobId: v.optional(v.id('jobs')),
   },
   handler: async (ctx, args) => {
     let audit
 
     if (args.jobId !== undefined) {
       audit = await ctx.db
-        .query("biasAudits")
-        .withIndex("by_job", (q) => q.eq("jobId", args.jobId!))
-        .order("desc")
+        .query('biasAudits')
+        .withIndex('by_job', (q) => q.eq('jobId', args.jobId!))
+        .order('desc')
         .first()
     } else {
-      audit = await ctx.db
-        .query("biasAudits")
-        .order("desc")
-        .first()
+      audit = await ctx.db.query('biasAudits').order('desc').first()
     }
 
     if (audit && audit.jobId) {
@@ -406,18 +413,18 @@ export const updateComplianceSettings = mutation({
     settingKey: v.string(),
     value: v.any(),
     category: v.union(
-      v.literal("eeo"),
-      v.literal("ofccp"),
-      v.literal("state"),
-      v.literal("ai_governance")
+      v.literal('eeo'),
+      v.literal('ofccp'),
+      v.literal('state'),
+      v.literal('ai_governance')
     ),
     description: v.string(),
     updatedBy: v.string(),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
-      .query("complianceSettings")
-      .withIndex("by_key", (q) => q.eq("settingKey", args.settingKey))
+      .query('complianceSettings')
+      .withIndex('by_key', (q) => q.eq('settingKey', args.settingKey))
       .first()
 
     if (existing) {
@@ -427,7 +434,7 @@ export const updateComplianceSettings = mutation({
         updatedBy: args.updatedBy,
       })
     } else {
-      return await ctx.db.insert("complianceSettings", {
+      return await ctx.db.insert('complianceSettings', {
         ...args,
         lastUpdated: new Date().toISOString(),
       })
@@ -438,23 +445,18 @@ export const updateComplianceSettings = mutation({
 // Get compliance settings
 export const getComplianceSettings = query({
   args: {
-    category: v.optional(v.union(
-      v.literal("eeo"),
-      v.literal("ofccp"),
-      v.literal("state"),
-      v.literal("ai_governance")
-    )),
+    category: v.optional(
+      v.union(v.literal('eeo'), v.literal('ofccp'), v.literal('state'), v.literal('ai_governance'))
+    ),
   },
   handler: async (ctx, args) => {
     if (args.category !== undefined) {
       return await ctx.db
-        .query("complianceSettings")
-        .withIndex("by_category", (q) => q.eq("category", args.category!))
+        .query('complianceSettings')
+        .withIndex('by_category', (q) => q.eq('category', args.category!))
         .collect()
     } else {
-      return await ctx.db
-        .query("complianceSettings")
-        .collect()
+      return await ctx.db.query('complianceSettings').collect()
     }
   },
 })

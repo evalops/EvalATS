@@ -1,29 +1,28 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useQuery } from 'convex/react'
+import {
+  BarChart3,
+  Bell,
+  Briefcase,
+  Calendar,
+  ChevronDown,
+  LayoutGrid,
+  LogOut,
+  Menu,
+  Moon,
+  Search,
+  Settings,
+  Sun,
+  Users,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
-import { useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
-import {
-  Briefcase,
-  Users,
-  Calendar,
-  LayoutGrid,
-  Settings,
-  Menu,
-  X,
-  Bell,
-  Search,
-  Moon,
-  Sun,
-  ChevronDown,
-  LogOut,
-  BarChart3,
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
+import { cn } from '@/lib/utils'
+import { api } from '../../../convex/_generated/api'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutGrid },
@@ -60,10 +59,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       />
 
       {/* Sidebar - Mobile & Desktop */}
-      <aside className={cn(
-        'fixed top-0 left-0 z-50 h-full w-64 bg-card border-r border-border transition-transform lg:translate-x-0',
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      )}>
+      <aside
+        className={cn(
+          'fixed top-0 left-0 z-50 h-full w-64 bg-card border-r border-border transition-transform lg:translate-x-0',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between px-6 border-b border-border">
@@ -84,10 +85,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={cn(
-                    'sidebar-item',
-                    isActive && 'sidebar-item-active'
-                  )}
+                  className={cn('sidebar-item', isActive && 'sidebar-item-active')}
                 >
                   <item.icon className="h-4 w-4" />
                   {item.name}
@@ -107,7 +105,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     className="h-full w-full rounded-full object-cover"
                   />
                 ) : (
-                  currentUser?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U'
+                  currentUser?.name
+                    ?.split(' ')
+                    .map((n) => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2) || 'U'
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -178,7 +181,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         className="h-full w-full rounded-full object-cover"
                       />
                     ) : (
-                      currentUser?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U'
+                      currentUser?.name
+                        ?.split(' ')
+                        .map((n) => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2) || 'U'
                     )}
                   </div>
                   <ChevronDown className="h-4 w-4 hidden sm:block" />
@@ -187,7 +195,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 {userMenuOpen && (
                   <div className="absolute right-0 mt-2 w-56 rounded-md bg-popover border border-border shadow-lg animate-in">
                     <div className="py-1">
-                      <a href="#" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-accent">
+                      <a
+                        href="#"
+                        className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-accent"
+                      >
                         <Settings className="h-4 w-4" />
                         Settings
                       </a>
@@ -205,9 +216,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page content */}
-        <main className="min-h-[calc(100vh-4rem)]">
-          {children}
-        </main>
+        <main className="min-h-[calc(100vh-4rem)]">{children}</main>
       </div>
     </div>
   )

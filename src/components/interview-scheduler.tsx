@@ -1,21 +1,37 @@
 'use client'
 
+import { useMutation, useQuery } from 'convex/react'
+import {
+  addDays,
+  addHours,
+  format,
+  isAfter,
+  isBefore,
+  isSameDay,
+  parseISO,
+  startOfWeek,
+} from 'date-fns'
+import {
+  Building2,
+  CalendarDays,
+  Calendar as CalendarIcon,
+  Check,
+  Clock,
+  Link2,
+  MapPin,
+  Phone,
+  Send,
+  User,
+  Users,
+  Video,
+} from 'lucide-react'
 import { useState } from 'react'
-import { useQuery, useMutation } from 'convex/react'
-import { api } from '../../convex/_generated/api'
-import { Id } from '../../convex/_generated/dataModel'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { toast } from '@/components/ui/use-toast'
 import {
   Dialog,
   DialogContent,
@@ -25,29 +41,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
-  CalendarDays,
-  Clock,
-  MapPin,
-  Users,
-  Video,
-  Phone,
-  Building2,
-  Plus,
-  Check,
-  X,
-  AlertCircle,
-  Send,
-  ChevronLeft,
-  ChevronRight,
-  User,
-  Mail,
-  Calendar as CalendarIcon,
-  Link2,
-  FileText
-} from 'lucide-react'
-import { format, addDays, startOfWeek, addHours, isSameDay, isAfter, isBefore, parseISO } from 'date-fns'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
+import { toast } from '@/components/ui/use-toast'
 import { cn } from '@/lib/utils'
+import { api } from '../../convex/_generated/api'
+import type { Id } from '../../convex/_generated/dataModel'
 
 interface InterviewSchedulerProps {
   candidateId: Id<'candidates'>
@@ -82,9 +90,9 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
 
   // Mutations
   const scheduleInterview = useMutation(api.interviews.schedule)
-  const updateInterview = useMutation(api.interviews.update)
-  const cancelInterview = useMutation(api.interviews.cancel)
-  const sendInvite = useMutation(api.interviews.sendInvite)
+  const _updateInterview = useMutation(api.interviews.update)
+  const _cancelInterview = useMutation(api.interviews.cancel)
+  const _sendInvite = useMutation(api.interviews.sendInvite)
 
   // Generate time slots for selected date
   const generateTimeSlots = (date: Date): TimeSlot[] => {
@@ -100,15 +108,15 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
       slotEnd.setMinutes(slotStart.getMinutes() + 30)
 
       // Check if slot conflicts with existing interviews
-      const hasConflict = interviews?.some(interview => {
-        const interviewStart = parseISO(interview.date + 'T' + interview.time)
-        const interviewEnd = addHours(interviewStart, parseInt(interview.duration) / 60)
+      const hasConflict = interviews?.some((interview) => {
+        const interviewStart = parseISO(`${interview.date}T${interview.time}`)
+        const interviewEnd = addHours(interviewStart, parseInt(interview.duration, 10) / 60)
 
         return (
           (isAfter(slotStart, interviewStart) && isBefore(slotStart, interviewEnd)) ||
           (isAfter(slotEnd, interviewStart) && isBefore(slotEnd, interviewEnd)) ||
           (isSameDay(slotStart, interviewStart) &&
-           slotStart.getHours() === interviewStart.getHours())
+            slotStart.getHours() === interviewStart.getHours())
         )
       })
 
@@ -125,9 +133,9 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
       const slotEnd30 = new Date(slotStart30)
       slotEnd30.setMinutes(slotStart30.getMinutes() + 30)
 
-      const hasConflict30 = interviews?.some(interview => {
-        const interviewStart = parseISO(interview.date + 'T' + interview.time)
-        const interviewEnd = addHours(interviewStart, parseInt(interview.duration) / 60)
+      const hasConflict30 = interviews?.some((interview) => {
+        const interviewStart = parseISO(`${interview.date}T${interview.time}`)
+        const interviewEnd = addHours(interviewStart, parseInt(interview.duration, 10) / 60)
 
         return (
           (isAfter(slotStart30, interviewStart) && isBefore(slotStart30, interviewEnd)) ||
@@ -151,23 +159,23 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
   const handleSchedule = async () => {
     if (!selectedDate || !selectedTime || selectedInterviewers.length === 0) {
       toast({
-        title: "Missing information",
-        description: "Please select date, time, and interviewers",
-        variant: "destructive",
+        title: 'Missing information',
+        description: 'Please select date, time, and interviewers',
+        variant: 'destructive',
       })
       return
     }
 
     try {
-      const interviewId = await scheduleInterview({
+      const _interviewId = await scheduleInterview({
         candidateId,
         jobId,
         type: interviewType,
         date: format(selectedDate, 'yyyy-MM-dd'),
         time: selectedTime,
         duration: duration.toString(),
-        interviewers: selectedInterviewers.map(id => {
-          const member = hiringTeam?.find(m => m.teamMemberId === id)
+        interviewers: selectedInterviewers.map((id) => {
+          const member = hiringTeam?.find((m) => m.teamMemberId === id)
           return member?.member?.name || 'Unknown'
         }),
         location: interviewType === 'video' ? meetingLink : location,
@@ -175,17 +183,17 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
       })
 
       toast({
-        title: "Interview scheduled",
-        description: "Calendar invites will be sent to all participants",
+        title: 'Interview scheduled',
+        description: 'Calendar invites will be sent to all participants',
       })
 
       setShowConfirmDialog(false)
       onScheduled?.()
-    } catch (error) {
+    } catch (_error) {
       toast({
-        title: "Failed to schedule interview",
-        description: "Please try again",
-        variant: "destructive",
+        title: 'Failed to schedule interview',
+        description: 'Please try again',
+        variant: 'destructive',
       })
     }
   }
@@ -253,7 +261,9 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
                   selected={selectedDate}
                   onSelect={setSelectedDate}
                   className="rounded-md border mt-2"
-                  disabled={(date) => date < new Date() || date.getDay() === 0 || date.getDay() === 6}
+                  disabled={(date) =>
+                    date < new Date() || date.getDay() === 0 || date.getDay() === 6
+                  }
                 />
               </div>
 
@@ -284,7 +294,7 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
                 {Array.from({ length: 5 }, (_, i) => {
                   const date = addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), i)
                   const slots = generateTimeSlots(date)
-                  const availableSlots = slots.filter(s => s.available)
+                  const availableSlots = slots.filter((s) => s.available)
 
                   return (
                     <div key={i} className="text-center">
@@ -330,18 +340,18 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
               <div
                 key={member.teamMemberId}
                 className={cn(
-                  "flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors",
+                  'flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors',
                   selectedInterviewers.includes(member.teamMemberId)
-                    ? "bg-primary/10 border-primary"
-                    : "hover:bg-muted/50"
+                    ? 'bg-primary/10 border-primary'
+                    : 'hover:bg-muted/50'
                 )}
                 onClick={() => {
                   if (selectedInterviewers.includes(member.teamMemberId)) {
-                    setSelectedInterviewers(prev =>
-                      prev.filter(id => id !== member.teamMemberId)
+                    setSelectedInterviewers((prev) =>
+                      prev.filter((id) => id !== member.teamMemberId)
                     )
                   } else {
-                    setSelectedInterviewers(prev => [...prev, member.teamMemberId])
+                    setSelectedInterviewers((prev) => [...prev, member.teamMemberId])
                   }
                 }}
               >
@@ -349,7 +359,10 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={member.member?.avatar} />
                     <AvatarFallback>
-                      {member.member?.name?.split(' ').map(n => n[0]).join('')}
+                      {member.member?.name
+                        ?.split(' ')
+                        .map((n) => n[0])
+                        .join('')}
                     </AvatarFallback>
                   </Avatar>
                   <div>
@@ -367,9 +380,7 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
 
         {/* Location/Meeting Details */}
         <div className="space-y-3">
-          <Label>
-            {interviewType === 'video' ? 'Meeting Link' : 'Location'}
-          </Label>
+          <Label>{interviewType === 'video' ? 'Meeting Link' : 'Location'}</Label>
           {interviewType === 'video' ? (
             <div className="space-y-2">
               <Input
@@ -407,7 +418,7 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
         {/* Duration */}
         <div className="space-y-3">
           <Label>Duration (minutes)</Label>
-          <Select value={duration.toString()} onValueChange={(v) => setDuration(parseInt(v))}>
+          <Select value={duration.toString()} onValueChange={(v) => setDuration(parseInt(v, 10))}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -438,10 +449,14 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
           <Alert>
             <CalendarIcon className="h-4 w-4" />
             <AlertDescription>
-              <strong>Interview Summary:</strong><br />
-              {format(selectedDate, 'EEEE, MMMM d, yyyy')} at {selectedTime}<br />
-              Type: {interviewTypes.find(t => t.value === interviewType)?.label}<br />
-              Duration: {duration} minutes<br />
+              <strong>Interview Summary:</strong>
+              <br />
+              {format(selectedDate, 'EEEE, MMMM d, yyyy')} at {selectedTime}
+              <br />
+              Type: {interviewTypes.find((t) => t.value === interviewType)?.label}
+              <br />
+              Duration: {duration} minutes
+              <br />
               Interviewers: {selectedInterviewers.length} selected
             </AlertDescription>
           </Alert>
@@ -506,9 +521,7 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
                 <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
                   Back
                 </Button>
-                <Button onClick={handleSchedule}>
-                  Confirm & Send Invites
-                </Button>
+                <Button onClick={handleSchedule}>Confirm & Send Invites</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -529,9 +542,7 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
                       <CalendarDays className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">
-                        {interview.type} Interview
-                      </p>
+                      <p className="text-sm font-medium">{interview.type} Interview</p>
                       <p className="text-xs text-muted-foreground">
                         {format(parseISO(interview.date), 'MMM d, yyyy')} at {interview.time}
                       </p>
@@ -539,10 +550,13 @@ export function InterviewScheduler({ candidateId, jobId, onScheduled }: Intervie
                   </div>
                   <Badge
                     variant={
-                      interview.status === 'scheduled' ? 'default' :
-                      interview.status === 'completed' ? 'success' :
-                      interview.status === 'cancelled' ? 'destructive' :
-                      'secondary'
+                      interview.status === 'scheduled'
+                        ? 'default'
+                        : interview.status === 'completed'
+                          ? 'success'
+                          : interview.status === 'cancelled'
+                            ? 'destructive'
+                            : 'secondary'
                     }
                   >
                     {interview.status}

@@ -1,7 +1,7 @@
-import yaml from 'js-yaml'
 import fs from 'fs'
-import path from 'path'
+import yaml from 'js-yaml'
 import merge from 'lodash/merge'
+import path from 'path'
 import { z } from 'zod'
 
 const logoSchema = z.object({

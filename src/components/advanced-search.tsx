@@ -1,26 +1,42 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useCallback } from "react"
-import { useQuery, useMutation } from "convex/react"
-import { api } from "../../convex/_generated/api"
-import { Id } from "../../convex/_generated/dataModel"
-import { Search, Filter, X, Save, History, Download, ChevronDown, User, Briefcase, Calendar, Mail, FileText, Building } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Slider } from "@/components/ui/slider"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Checkbox } from "@/components/ui/checkbox"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { debounce } from "lodash"
+import { useMutation, useQuery } from 'convex/react'
+import { debounce } from 'lodash'
+import {
+  Briefcase,
+  Calendar,
+  ChevronDown,
+  Download,
+  Filter,
+  History,
+  Save,
+  Search,
+  User,
+  X,
+} from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Slider } from '@/components/ui/slider'
+import { Switch } from '@/components/ui/switch'
+import { api } from '../../convex/_generated/api'
+import type { Id } from '../../convex/_generated/dataModel'
 
-type SearchEntity = "candidates" | "jobs" | "interviews" | "all"
-type SortBy = "relevance" | "date" | "name" | "salary" | "experience"
+type SearchEntity = 'candidates' | 'jobs' | 'interviews' | 'all'
+type SortBy = 'relevance' | 'date' | 'name' | 'salary' | 'experience'
 
 interface SearchFilters {
   status?: string[]
@@ -39,7 +55,7 @@ interface SearchFilters {
 
 interface SearchResult {
   id: string
-  type: "candidate" | "job" | "interview"
+  type: 'candidate' | 'job' | 'interview'
   title: string
   subtitle: string
   description: string
@@ -50,7 +66,7 @@ interface SearchResult {
 }
 
 interface SavedSearch {
-  _id: Id<"savedSearches">
+  _id: Id<'savedSearches'>
   name: string
   query: string
   filters: SearchFilters
@@ -59,15 +75,15 @@ interface SavedSearch {
 }
 
 export function AdvancedSearch() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [entity, setEntity] = useState<SearchEntity>("all")
+  const [searchQuery, setSearchQuery] = useState('')
+  const [entity, setEntity] = useState<SearchEntity>('all')
   const [filters, setFilters] = useState<SearchFilters>({})
-  const [sortBy, setSortBy] = useState<SortBy>("relevance")
+  const [sortBy, setSortBy] = useState<SortBy>('relevance')
   const [showFilters, setShowFilters] = useState(false)
   const [showSavedSearches, setShowSavedSearches] = useState(false)
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
-  const [saveSearchName, setSaveSearchName] = useState("")
+  const [saveSearchName, setSaveSearchName] = useState('')
 
   // Convex queries
   const candidates = useQuery(api.candidates.list, {}) || []
@@ -86,9 +102,9 @@ export function AdvancedSearch() {
         name,
         query: searchQuery,
         filters,
-        entity: selectedEntity,
+        entity: entity,
       })
-      setSaveSearchName("")
+      setSaveSearchName('')
       // Show success message or handle UI update
     } catch (error) {
       console.error('Failed to save search:', error)
@@ -111,10 +127,10 @@ export function AdvancedSearch() {
       // Add to search history
       if (query) {
         try {
-          await addToSearchHistory({ 
-            query, 
-            entity: entityType, 
-            filters: searchFilters 
+          await addToSearchHistory({
+            query,
+            entity: entityType,
+            filters: searchFilters,
           })
         } catch (error) {
           console.error('Failed to add to search history:', error)
@@ -124,86 +140,92 @@ export function AdvancedSearch() {
       // Simulate search with local data - replace with actual search API
       const results: SearchResult[] = []
 
-      if (entityType === "all" || entityType === "candidates") {
+      if (entityType === 'all' || entityType === 'candidates') {
         candidates
           .filter((c: any) => {
-            const matchesQuery = !query ||
+            const matchesQuery =
+              !query ||
               c.name.toLowerCase().includes(query.toLowerCase()) ||
               c.email.toLowerCase().includes(query.toLowerCase()) ||
               c.skills?.some((s: string) => s.toLowerCase().includes(query.toLowerCase()))
 
-            const matchesStatus = !searchFilters.status?.length ||
-              searchFilters.status.includes(c.status)
+            const matchesStatus =
+              !searchFilters.status?.length || searchFilters.status.includes(c.status)
 
-            const matchesLocation = !searchFilters.location?.length ||
-              searchFilters.location.includes(c.location)
+            const matchesLocation =
+              !searchFilters.location?.length || searchFilters.location.includes(c.location)
 
             return matchesQuery && matchesStatus && matchesLocation
           })
           .forEach((c: any) => {
             results.push({
               id: c._id,
-              type: "candidate",
+              type: 'candidate',
               title: c.name,
               subtitle: `${c.role} • ${c.location}`,
-              description: c.summary || "",
+              description: c.summary || '',
               tags: c.skills || [],
               status: c.status,
               date: c.appliedDate,
-              score: Math.random() * 100 // Mock relevance score
+              score: Math.random() * 100, // Mock relevance score
             })
           })
       }
 
-      if (entityType === "all" || entityType === "jobs") {
+      if (entityType === 'all' || entityType === 'jobs') {
         jobs
           .filter((j: any) => {
-            const matchesQuery = !query ||
+            const matchesQuery =
+              !query ||
               j.title.toLowerCase().includes(query.toLowerCase()) ||
               j.department.toLowerCase().includes(query.toLowerCase()) ||
               j.description?.toLowerCase().includes(query.toLowerCase())
 
-            const matchesStatus = !searchFilters.status?.length ||
-              searchFilters.status.includes(j.status)
+            const matchesStatus =
+              !searchFilters.status?.length || searchFilters.status.includes(j.status)
 
-            const matchesDepartment = !searchFilters.department?.length ||
-              searchFilters.department.includes(j.department)
+            const matchesDepartment =
+              !searchFilters.department?.length || searchFilters.department.includes(j.department)
 
-            const matchesLocation = !searchFilters.location?.length ||
-              searchFilters.location.includes(j.location)
+            const matchesLocation =
+              !searchFilters.location?.length || searchFilters.location.includes(j.location)
 
-            const matchesType = !searchFilters.jobType?.length ||
-              searchFilters.jobType.includes(j.type)
+            const matchesType =
+              !searchFilters.jobType?.length || searchFilters.jobType.includes(j.type)
 
-            return matchesQuery && matchesStatus && matchesDepartment && matchesLocation && matchesType
+            return (
+              matchesQuery && matchesStatus && matchesDepartment && matchesLocation && matchesType
+            )
           })
           .forEach((j: any) => {
             results.push({
               id: j._id,
-              type: "job",
+              type: 'job',
               title: j.title,
               subtitle: `${j.department} • ${j.location}`,
-              description: j.description || "",
+              description: j.description || '',
               tags: j.requirements || [],
               status: j.status,
               date: j.postedDate,
-              score: Math.random() * 100
+              score: Math.random() * 100,
             })
           })
       }
 
-      if (entityType === "all" || entityType === "interviews") {
+      if (entityType === 'all' || entityType === 'interviews') {
         interviews
           .filter((i: any) => {
-            const matchesQuery = !query ||
+            const matchesQuery =
+              !query ||
               i.candidateName?.toLowerCase().includes(query.toLowerCase()) ||
               i.position?.toLowerCase().includes(query.toLowerCase()) ||
               i.type.toLowerCase().includes(query.toLowerCase())
 
-            const matchesStatus = !searchFilters.status?.length ||
-              searchFilters.status.includes(i.status)
+            const matchesStatus =
+              !searchFilters.status?.length || searchFilters.status.includes(i.status)
 
-            const matchesDateRange = !searchFilters.dateRange ||
+            const matchesDateRange =
+              !searchFilters.dateRange ||
               (i.date >= searchFilters.dateRange.from && i.date <= searchFilters.dateRange.to)
 
             return matchesQuery && matchesStatus && matchesDateRange
@@ -211,14 +233,14 @@ export function AdvancedSearch() {
           .forEach((i: any) => {
             results.push({
               id: i._id,
-              type: "interview",
+              type: 'interview',
               title: `${i.type} Interview`,
               subtitle: `${i.candidateName} for ${i.position}`,
               description: `${i.date} at ${i.time} • ${i.location}`,
               tags: i.interviewers || [],
               status: i.status,
               date: i.date,
-              score: Math.random() * 100
+              score: Math.random() * 100,
             })
           })
       }
@@ -226,11 +248,11 @@ export function AdvancedSearch() {
       // Sort results
       results.sort((a, b) => {
         switch (sortBy) {
-          case "relevance":
+          case 'relevance':
             return (b.score || 0) - (a.score || 0)
-          case "date":
-            return (b.date || "").localeCompare(a.date || "")
-          case "name":
+          case 'date':
+            return (b.date || '').localeCompare(a.date || '')
+          case 'name':
             return a.title.localeCompare(b.title)
           default:
             return 0
@@ -240,7 +262,7 @@ export function AdvancedSearch() {
       setSearchResults(results)
       setIsSearching(false)
     }, 300),
-    [candidates, jobs, interviews, sortBy, addToSearchHistory]
+    []
   )
 
   useEffect(() => {
@@ -253,36 +275,38 @@ export function AdvancedSearch() {
     await saveSearch(saveSearchName, {
       query: searchQuery,
       filters,
-      entity
+      entity,
     })
 
-    setSaveSearchName("")
+    setSaveSearchName('')
     setShowSavedSearches(true)
   }
 
-  const loadSavedSearch = (search: SavedSearch) => {
+  const loadSavedSearch = (search: any) => {
     setSearchQuery(search.query)
     setFilters(search.filters)
-    setEntity(search.entity)
+    setEntity(search.entity as SearchEntity)
     setShowSavedSearches(false)
   }
 
   const exportResults = () => {
     const csv = [
-      ["Type", "Title", "Subtitle", "Status", "Tags", "Date"],
-      ...searchResults.map(r => [
+      ['Type', 'Title', 'Subtitle', 'Status', 'Tags', 'Date'],
+      ...searchResults.map((r) => [
         r.type,
         r.title,
         r.subtitle,
         r.status,
-        r.tags.join(", "),
-        r.date || ""
-      ])
-    ].map(row => row.join(",")).join("\n")
+        r.tags.join(', '),
+        r.date || '',
+      ]),
+    ]
+      .map((row) => row.join(','))
+      .join('\n')
 
-    const blob = new Blob([csv], { type: "text/csv" })
+    const blob = new Blob([csv], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
+    const a = document.createElement('a')
     a.href = url
     a.download = `search-results-${new Date().toISOString().split('T')[0]}.csv`
     a.click()
@@ -290,11 +314,11 @@ export function AdvancedSearch() {
 
   const getEntityIcon = (type: string) => {
     switch (type) {
-      case "candidate":
+      case 'candidate':
         return <User className="h-4 w-4" />
-      case "job":
+      case 'job':
         return <Briefcase className="h-4 w-4" />
-      case "interview":
+      case 'interview':
         return <Calendar className="h-4 w-4" />
       default:
         return null
@@ -303,18 +327,18 @@ export function AdvancedSearch() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      active: "bg-green-500",
-      new: "bg-blue-500",
-      reviewing: "bg-yellow-500",
-      scheduled: "bg-purple-500",
-      completed: "bg-gray-500",
-      rejected: "bg-red-500",
-      hired: "bg-green-600",
-      open: "bg-blue-500",
-      closed: "bg-gray-500",
-      draft: "bg-gray-400"
+      active: 'bg-green-500',
+      new: 'bg-blue-500',
+      reviewing: 'bg-yellow-500',
+      scheduled: 'bg-purple-500',
+      completed: 'bg-gray-500',
+      rejected: 'bg-red-500',
+      hired: 'bg-green-600',
+      open: 'bg-blue-500',
+      closed: 'bg-gray-500',
+      draft: 'bg-gray-400',
     }
-    return colors[status] || "bg-gray-400"
+    return colors[status] || 'bg-gray-400'
   }
 
   return (
@@ -325,10 +349,7 @@ export function AdvancedSearch() {
           <p className="text-gray-600">Search across candidates, jobs, and interviews</p>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setShowSavedSearches(!showSavedSearches)}
-          >
+          <Button variant="outline" onClick={() => setShowSavedSearches(!showSavedSearches)}>
             <History className="h-4 w-4 mr-2" />
             Saved Searches
           </Button>
@@ -367,7 +388,7 @@ export function AdvancedSearch() {
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
-                className={showFilters ? "bg-blue-50" : ""}
+                className={showFilters ? 'bg-blue-50' : ''}
               >
                 <Filter className="h-4 w-4 mr-2" />
                 Filters
@@ -388,26 +409,33 @@ export function AdvancedSearch() {
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className="w-full justify-between">
-                            {filters.status?.length ? `${filters.status.length} selected` : "Any"}
+                            {filters.status?.length ? `${filters.status.length} selected` : 'Any'}
                             <ChevronDown className="h-4 w-4" />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[200px]">
                           <ScrollArea className="h-[200px]">
-                            {["new", "reviewing", "scheduled", "completed", "hired", "rejected"].map(status => (
+                            {[
+                              'new',
+                              'reviewing',
+                              'scheduled',
+                              'completed',
+                              'hired',
+                              'rejected',
+                            ].map((status) => (
                               <div key={status} className="flex items-center space-x-2 py-2">
                                 <Checkbox
                                   checked={filters.status?.includes(status)}
                                   onCheckedChange={(checked) => {
                                     if (checked) {
-                                      setFilters(prev => ({
+                                      setFilters((prev) => ({
                                         ...prev,
-                                        status: [...(prev.status || []), status]
+                                        status: [...(prev.status || []), status],
                                       }))
                                     } else {
-                                      setFilters(prev => ({
+                                      setFilters((prev) => ({
                                         ...prev,
-                                        status: prev.status?.filter(s => s !== status)
+                                        status: prev.status?.filter((s) => s !== status),
                                       }))
                                     }
                                   }}
@@ -426,26 +454,36 @@ export function AdvancedSearch() {
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className="w-full justify-between">
-                            {filters.department?.length ? `${filters.department.length} selected` : "Any"}
+                            {filters.department?.length
+                              ? `${filters.department.length} selected`
+                              : 'Any'}
                             <ChevronDown className="h-4 w-4" />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[200px]">
                           <ScrollArea className="h-[200px]">
-                            {["Engineering", "Design", "Product", "Sales", "Marketing", "HR", "Finance"].map(dept => (
+                            {[
+                              'Engineering',
+                              'Design',
+                              'Product',
+                              'Sales',
+                              'Marketing',
+                              'HR',
+                              'Finance',
+                            ].map((dept) => (
                               <div key={dept} className="flex items-center space-x-2 py-2">
                                 <Checkbox
                                   checked={filters.department?.includes(dept)}
                                   onCheckedChange={(checked) => {
                                     if (checked) {
-                                      setFilters(prev => ({
+                                      setFilters((prev) => ({
                                         ...prev,
-                                        department: [...(prev.department || []), dept]
+                                        department: [...(prev.department || []), dept],
                                       }))
                                     } else {
-                                      setFilters(prev => ({
+                                      setFilters((prev) => ({
                                         ...prev,
-                                        department: prev.department?.filter(d => d !== dept)
+                                        department: prev.department?.filter((d) => d !== dept),
                                       }))
                                     }
                                   }}
@@ -464,26 +502,35 @@ export function AdvancedSearch() {
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className="w-full justify-between">
-                            {filters.location?.length ? `${filters.location.length} selected` : "Any"}
+                            {filters.location?.length
+                              ? `${filters.location.length} selected`
+                              : 'Any'}
                             <ChevronDown className="h-4 w-4" />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[200px]">
                           <ScrollArea className="h-[200px]">
-                            {["Remote", "New York", "San Francisco", "London", "Berlin", "Tokyo"].map(loc => (
+                            {[
+                              'Remote',
+                              'New York',
+                              'San Francisco',
+                              'London',
+                              'Berlin',
+                              'Tokyo',
+                            ].map((loc) => (
                               <div key={loc} className="flex items-center space-x-2 py-2">
                                 <Checkbox
                                   checked={filters.location?.includes(loc)}
                                   onCheckedChange={(checked) => {
                                     if (checked) {
-                                      setFilters(prev => ({
+                                      setFilters((prev) => ({
                                         ...prev,
-                                        location: [...(prev.location || []), loc]
+                                        location: [...(prev.location || []), loc],
                                       }))
                                     } else {
-                                      setFilters(prev => ({
+                                      setFilters((prev) => ({
                                         ...prev,
-                                        location: prev.location?.filter(l => l !== loc)
+                                        location: prev.location?.filter((l) => l !== loc),
                                       }))
                                     }
                                   }}
@@ -502,32 +549,34 @@ export function AdvancedSearch() {
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className="w-full justify-between">
-                            {filters.jobType?.length ? `${filters.jobType.length} selected` : "Any"}
+                            {filters.jobType?.length ? `${filters.jobType.length} selected` : 'Any'}
                             <ChevronDown className="h-4 w-4" />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[200px]">
-                          {["Full-time", "Part-time", "Contract", "Internship", "Freelance"].map(type => (
-                            <div key={type} className="flex items-center space-x-2 py-2">
-                              <Checkbox
-                                checked={filters.jobType?.includes(type)}
-                                onCheckedChange={(checked) => {
-                                  if (checked) {
-                                    setFilters(prev => ({
-                                      ...prev,
-                                      jobType: [...(prev.jobType || []), type]
-                                    }))
-                                  } else {
-                                    setFilters(prev => ({
-                                      ...prev,
-                                      jobType: prev.jobType?.filter(t => t !== type)
-                                    }))
-                                  }
-                                }}
-                              />
-                              <Label>{type}</Label>
-                            </div>
-                          ))}
+                          {['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'].map(
+                            (type) => (
+                              <div key={type} className="flex items-center space-x-2 py-2">
+                                <Checkbox
+                                  checked={filters.jobType?.includes(type)}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      setFilters((prev) => ({
+                                        ...prev,
+                                        jobType: [...(prev.jobType || []), type],
+                                      }))
+                                    } else {
+                                      setFilters((prev) => ({
+                                        ...prev,
+                                        jobType: prev.jobType?.filter((t) => t !== type),
+                                      }))
+                                    }
+                                  }}
+                                />
+                                <Label>{type}</Label>
+                              </div>
+                            )
+                          )}
                         </PopoverContent>
                       </Popover>
                     </div>
@@ -541,10 +590,12 @@ export function AdvancedSearch() {
                           max={20}
                           step={1}
                           value={filters.experienceRange || [0, 20]}
-                          onValueChange={(value) => setFilters(prev => ({
-                            ...prev,
-                            experienceRange: value as [number, number]
-                          }))}
+                          onValueChange={(value) =>
+                            setFilters((prev) => ({
+                              ...prev,
+                              experienceRange: value as [number, number],
+                            }))
+                          }
                         />
                         <div className="flex justify-between text-sm text-gray-500 mt-1">
                           <span>{filters.experienceRange?.[0] || 0}</span>
@@ -562,10 +613,12 @@ export function AdvancedSearch() {
                           max={300}
                           step={10}
                           value={filters.salaryRange || [0, 300]}
-                          onValueChange={(value) => setFilters(prev => ({
-                            ...prev,
-                            salaryRange: value as [number, number]
-                          }))}
+                          onValueChange={(value) =>
+                            setFilters((prev) => ({
+                              ...prev,
+                              salaryRange: value as [number, number],
+                            }))
+                          }
                         />
                         <div className="flex justify-between text-sm text-gray-500 mt-1">
                           <span>${filters.salaryRange?.[0] || 0}k</span>
@@ -582,30 +635,36 @@ export function AdvancedSearch() {
                           <Label className="text-sm font-normal">Has Resume</Label>
                           <Switch
                             checked={filters.hasResume || false}
-                            onCheckedChange={(checked) => setFilters(prev => ({
-                              ...prev,
-                              hasResume: checked
-                            }))}
+                            onCheckedChange={(checked) =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                hasResume: checked,
+                              }))
+                            }
                           />
                         </div>
                         <div className="flex items-center justify-between">
                           <Label className="text-sm font-normal">Has Interview</Label>
                           <Switch
                             checked={filters.hasInterview || false}
-                            onCheckedChange={(checked) => setFilters(prev => ({
-                              ...prev,
-                              hasInterview: checked
-                            }))}
+                            onCheckedChange={(checked) =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                hasInterview: checked,
+                              }))
+                            }
                           />
                         </div>
                         <div className="flex items-center justify-between">
                           <Label className="text-sm font-normal">Has Offer</Label>
                           <Switch
                             checked={filters.hasOffer || false}
-                            onCheckedChange={(checked) => setFilters(prev => ({
-                              ...prev,
-                              hasOffer: checked
-                            }))}
+                            onCheckedChange={(checked) =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                hasOffer: checked,
+                              }))
+                            }
                           />
                         </div>
                       </div>
@@ -613,11 +672,7 @@ export function AdvancedSearch() {
 
                     {/* Clear Filters */}
                     <div className="flex items-end">
-                      <Button
-                        variant="ghost"
-                        onClick={() => setFilters({})}
-                        className="w-full"
-                      >
+                      <Button variant="ghost" onClick={() => setFilters({})} className="w-full">
                         Clear All
                       </Button>
                     </div>
@@ -662,22 +717,15 @@ export function AdvancedSearch() {
                   <div className="flex-1">
                     <p className="font-medium">{search.name}</p>
                     <p className="text-sm text-gray-600">
-                      {search.entity} • "{search.query}" • {Object.keys(search.filters).length} filters
+                      {search.entity} • "{search.query}" • {Object.keys(search.filters).length}{' '}
+                      filters
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => loadSavedSearch(search)}
-                    >
+                    <Button size="sm" variant="ghost" onClick={() => loadSavedSearch(search)}>
                       Load
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => deleteSearch(search._id)}
-                    >
+                    <Button size="sm" variant="ghost" onClick={() => deleteSearch(search._id)}>
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
@@ -695,7 +743,7 @@ export function AdvancedSearch() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <p className="text-gray-600">
-            {isSearching ? "Searching..." : `${searchResults.length} results found`}
+            {isSearching ? 'Searching...' : `${searchResults.length} results found`}
           </p>
           <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortBy)}>
             <SelectTrigger className="w-[150px]">
@@ -744,9 +792,7 @@ export function AdvancedSearch() {
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   {result.score && (
-                    <div className="text-sm text-gray-500">
-                      {Math.round(result.score)}% match
-                    </div>
+                    <div className="text-sm text-gray-500">{Math.round(result.score)}% match</div>
                   )}
                   {result.date && (
                     <div className="text-sm text-gray-500">

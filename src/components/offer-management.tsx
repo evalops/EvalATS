@@ -1,63 +1,51 @@
 'use client'
 
-import { useState } from 'react'
-import { useQuery, useMutation } from 'convex/react'
-import { api } from '../../convex/_generated/api'
-import { Id } from '../../convex/_generated/dataModel'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Progress } from '@/components/ui/progress'
-import { Separator } from '@/components/ui/separator'
-import { Checkbox } from '@/components/ui/checkbox'
-import { toast } from '@/components/ui/use-toast'
+import { useMutation, useQuery } from 'convex/react'
+import { addDays, format } from 'date-fns'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import {
-  DollarSign,
-  Calendar,
-  MapPin,
-  Briefcase,
-  Gift,
-  FileText,
-  Send,
+  ArrowRight,
   Check,
-  X,
+  CheckCircle2,
   Clock,
-  AlertCircle,
-  Eye,
   Download,
   Edit,
-  Users,
-  Building,
-  TrendingUp,
+  Eye,
+  FileText,
+  Send,
   Shield,
-  Mail,
-  Phone,
-  User,
-  CheckCircle2,
-  XCircle,
   Timer,
-  History,
-  ArrowRight,
-  PlusCircle
+  X,
+  XCircle,
 } from 'lucide-react'
-import { format, addDays } from 'date-fns'
-import { cn } from '@/lib/utils'
+import { useState } from 'react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
+import { toast } from '@/components/ui/use-toast'
+import { api } from '../../convex/_generated/api'
+import type { Id } from '../../convex/_generated/dataModel'
 
 interface OfferManagementProps {
   candidateId: Id<'candidates'>
@@ -94,7 +82,7 @@ const standardBenefits = [
   'Stock Options',
   'Bonus Plan',
   'Relocation Assistance',
-  'Tuition Reimbursement'
+  'Tuition Reimbursement',
 ]
 
 const employmentTypes = [
@@ -102,7 +90,7 @@ const employmentTypes = [
   { value: 'part-time', label: 'Part-Time' },
   { value: 'contract', label: 'Contract' },
   { value: 'temporary', label: 'Temporary' },
-  { value: 'internship', label: 'Internship' }
+  { value: 'internship', label: 'Internship' },
 ]
 
 export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagementProps) {
@@ -115,11 +103,11 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
     startDate: format(addDays(new Date(), 14), 'yyyy-MM-dd'),
     location: '',
     employmentType: 'full-time',
-    benefits: []
+    benefits: [],
   })
   const [customTerms, setCustomTerms] = useState('')
   const [selectedBenefits, setSelectedBenefits] = useState<string[]>([])
-  const [showPreview, setShowPreview] = useState(false)
+  const [_showPreview, _setShowPreview] = useState(false)
   const [sendingOffer, setSendingOffer] = useState(false)
 
   // Get data from Convex
@@ -147,9 +135,9 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
   const handleSaveOffer = async () => {
     if (!currentUser) {
       toast({
-        title: "Error",
-        description: "Unable to identify current user",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Unable to identify current user',
+        variant: 'destructive',
       })
       return
     }
@@ -160,22 +148,22 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
         jobId,
         details: {
           ...offerDetails,
-          benefits: selectedBenefits
+          benefits: selectedBenefits,
         },
         customTerms,
         expiresAt: format(addDays(new Date(), 7), 'yyyy-MM-dd'),
-        createdBy: currentUser.teamMemberId
+        createdBy: currentUser.teamMemberId,
       })
 
       toast({
-        title: "Offer saved",
-        description: "The offer has been saved as a draft"
+        title: 'Offer saved',
+        description: 'The offer has been saved as a draft',
       })
-    } catch (error) {
+    } catch (_error) {
       toast({
-        title: "Error",
-        description: "Failed to save offer",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to save offer',
+        variant: 'destructive',
       })
     }
   }
@@ -184,18 +172,18 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
   const handleSendOffer = async () => {
     if (!offer) {
       toast({
-        title: "Error",
-        description: "Please save the offer first",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Please save the offer first',
+        variant: 'destructive',
       })
       return
     }
 
     if (offer?.status !== 'approved') {
       toast({
-        title: "Approval required",
-        description: "The offer must be approved before sending",
-        variant: "destructive"
+        title: 'Approval required',
+        description: 'The offer must be approved before sending',
+        variant: 'destructive',
       })
       return
     }
@@ -207,20 +195,20 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
 
       await sendOffer({
         offerId: offer?._id,
-        letterUrl
+        letterUrl,
       })
 
       toast({
-        title: "Offer sent!",
-        description: `Offer has been sent to ${candidate?.email}`
+        title: 'Offer sent!',
+        description: `Offer has been sent to ${candidate?.email}`,
       })
 
       onComplete?.()
-    } catch (error) {
+    } catch (_error) {
       toast({
-        title: "Error",
-        description: "Failed to send offer",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to send offer',
+        variant: 'destructive',
       })
     } finally {
       setSendingOffer(false)
@@ -236,20 +224,20 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
         offerId: offer?._id,
         approverId: currentUser.teamMemberId,
         status: approved ? 'approved' : 'rejected',
-        comments: approved ? 'Approved' : 'Changes required'
+        comments: approved ? 'Approved' : 'Changes required',
       })
 
       toast({
-        title: approved ? "Offer approved" : "Offer rejected",
+        title: approved ? 'Offer approved' : 'Offer rejected',
         description: approved
-          ? "The offer is now ready to send"
-          : "Please make the necessary changes"
+          ? 'The offer is now ready to send'
+          : 'Please make the necessary changes',
       })
-    } catch (error) {
+    } catch (_error) {
       toast({
-        title: "Error",
-        description: "Failed to update approval status",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to update approval status',
+        variant: 'destructive',
       })
     }
   }
@@ -265,7 +253,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
       accepted: { variant: 'success', icon: Check },
       declined: { variant: 'destructive', icon: X },
       expired: { variant: 'destructive', icon: Timer },
-      withdrawn: { variant: 'outline', icon: X }
+      withdrawn: { variant: 'outline', icon: X },
     }
 
     const config = variants[status] || variants.draft
@@ -274,7 +262,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
     return (
       <Badge variant={config.variant} className="gap-1">
         <Icon className="h-3 w-3" />
-        {status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+        {status.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
       </Badge>
     )
   }
@@ -397,7 +385,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                   <div className="flex gap-2">
                     <Select
                       value={offerDetails.currency}
-                      onValueChange={(v) => setOfferDetails({...offerDetails, currency: v})}
+                      onValueChange={(v) => setOfferDetails({ ...offerDetails, currency: v })}
                     >
                       <SelectTrigger className="w-24">
                         <SelectValue />
@@ -415,10 +403,12 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                       type="number"
                       placeholder="120000"
                       value={offerDetails.salary || ''}
-                      onChange={(e) => setOfferDetails({
-                        ...offerDetails,
-                        salary: parseInt(e.target.value) || 0
-                      })}
+                      onChange={(e) =>
+                        setOfferDetails({
+                          ...offerDetails,
+                          salary: parseInt(e.target.value, 10) || 0,
+                        })
+                      }
                       className="flex-1"
                     />
                   </div>
@@ -431,10 +421,12 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                     type="number"
                     placeholder="20000"
                     value={offerDetails.bonus || ''}
-                    onChange={(e) => setOfferDetails({
-                      ...offerDetails,
-                      bonus: parseInt(e.target.value) || undefined
-                    })}
+                    onChange={(e) =>
+                      setOfferDetails({
+                        ...offerDetails,
+                        bonus: parseInt(e.target.value, 10) || undefined,
+                      })
+                    }
                   />
                 </div>
               </div>
@@ -446,10 +438,12 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                   id="equity"
                   placeholder="e.g., 10,000 stock options over 4 years"
                   value={offerDetails.equity || ''}
-                  onChange={(e) => setOfferDetails({
-                    ...offerDetails,
-                    equity: e.target.value || undefined
-                  })}
+                  onChange={(e) =>
+                    setOfferDetails({
+                      ...offerDetails,
+                      equity: e.target.value || undefined,
+                    })
+                  }
                 />
               </div>
 
@@ -459,13 +453,13 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                   <Label>Employment Type</Label>
                   <Select
                     value={offerDetails.employmentType}
-                    onValueChange={(v) => setOfferDetails({...offerDetails, employmentType: v})}
+                    onValueChange={(v) => setOfferDetails({ ...offerDetails, employmentType: v })}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {employmentTypes.map(type => (
+                      {employmentTypes.map((type) => (
                         <SelectItem key={type.value} value={type.value}>
                           {type.label}
                         </SelectItem>
@@ -480,10 +474,12 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                     id="startDate"
                     type="date"
                     value={offerDetails.startDate}
-                    onChange={(e) => setOfferDetails({
-                      ...offerDetails,
-                      startDate: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setOfferDetails({
+                        ...offerDetails,
+                        startDate: e.target.value,
+                      })
+                    }
                   />
                 </div>
               </div>
@@ -495,10 +491,12 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                   id="location"
                   placeholder="e.g., San Francisco, CA / Remote"
                   value={offerDetails.location}
-                  onChange={(e) => setOfferDetails({
-                    ...offerDetails,
-                    location: e.target.value
-                  })}
+                  onChange={(e) =>
+                    setOfferDetails({
+                      ...offerDetails,
+                      location: e.target.value,
+                    })
+                  }
                 />
               </div>
 
@@ -561,13 +559,11 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
           <Card>
             <CardHeader>
               <CardTitle>Benefits Package</CardTitle>
-              <CardDescription>
-                Select the benefits included in this offer
-              </CardDescription>
+              <CardDescription>Select the benefits included in this offer</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {standardBenefits.map(benefit => (
+                {standardBenefits.map((benefit) => (
                   <div key={benefit} className="flex items-center space-x-2">
                     <Checkbox
                       id={benefit}
@@ -576,14 +572,11 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                         if (checked) {
                           setSelectedBenefits([...selectedBenefits, benefit])
                         } else {
-                          setSelectedBenefits(selectedBenefits.filter(b => b !== benefit))
+                          setSelectedBenefits(selectedBenefits.filter((b) => b !== benefit))
                         }
                       }}
                     />
-                    <Label
-                      htmlFor={benefit}
-                      className="text-sm font-normal cursor-pointer"
-                    >
+                    <Label htmlFor={benefit} className="text-sm font-normal cursor-pointer">
                       {benefit}
                     </Label>
                   </div>
@@ -591,9 +584,11 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
               </div>
 
               <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-                <p className="text-sm font-medium mb-2">Selected Benefits ({selectedBenefits.length})</p>
+                <p className="text-sm font-medium mb-2">
+                  Selected Benefits ({selectedBenefits.length})
+                </p>
                 <div className="flex flex-wrap gap-2">
-                  {selectedBenefits.map(benefit => (
+                  {selectedBenefits.map((benefit) => (
                     <Badge key={benefit} variant="secondary">
                       {benefit}
                     </Badge>
@@ -617,9 +612,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
           <Card>
             <CardHeader>
               <CardTitle>Approval Process</CardTitle>
-              <CardDescription>
-                Review and approve the offer before sending
-              </CardDescription>
+              <CardDescription>Review and approve the offer before sending</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Approval Requirements */}
@@ -627,7 +620,8 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                 <Shield className="h-4 w-4" />
                 <AlertTitle>Approval Requirements</AlertTitle>
                 <AlertDescription>
-                  This offer requires approval from the hiring manager and HR before it can be sent to the candidate.
+                  This offer requires approval from the hiring manager and HR before it can be sent
+                  to the candidate.
                 </AlertDescription>
               </Alert>
 
@@ -637,14 +631,22 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                 {offer?.approvals && offer?.approvals.length > 0 ? (
                   <div className="space-y-2">
                     {offer?.approvals.map((approval: any, idx: number) => {
-                      const approver = hiringTeam?.find(m => m.teamMemberId === approval.approverId)
+                      const approver = hiringTeam?.find(
+                        (m) => m.teamMemberId === approval.approverId
+                      )
                       return (
-                        <div key={idx} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-3 border rounded-lg"
+                        >
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8">
                               <AvatarImage src={approver?.member?.avatar} />
                               <AvatarFallback>
-                                {approver?.member?.name?.split(' ').map(n => n[0]).join('')}
+                                {approver?.member?.name
+                                  ?.split(' ')
+                                  .map((n) => n[0])
+                                  .join('')}
                               </AvatarFallback>
                             </Avatar>
                             <div>
@@ -681,28 +683,34 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {hiringTeam?.filter(m =>
-                      m.role === 'hiring_manager' || m.role === 'recruiter'
-                    ).map(member => (
-                      <div key={member.teamMemberId} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={member.member?.avatar} />
-                            <AvatarFallback>
-                              {member.member?.name?.split(' ').map(n => n[0]).join('')}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-medium">{member.member?.name}</p>
-                            <p className="text-xs text-muted-foreground">{member.role}</p>
+                    {hiringTeam
+                      ?.filter((m) => m.role === 'hiring_manager' || m.role === 'recruiter')
+                      .map((member) => (
+                        <div
+                          key={member.teamMemberId}
+                          className="flex items-center justify-between p-3 border rounded-lg"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={member.member?.avatar} />
+                              <AvatarFallback>
+                                {member.member?.name
+                                  ?.split(' ')
+                                  .map((n) => n[0])
+                                  .join('')}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="text-sm font-medium">{member.member?.name}</p>
+                              <p className="text-xs text-muted-foreground">{member.role}</p>
+                            </div>
                           </div>
+                          <Badge variant="outline" className="gap-1">
+                            <Clock className="h-3 w-3" />
+                            Pending
+                          </Badge>
                         </div>
-                        <Badge variant="outline" className="gap-1">
-                          <Clock className="h-3 w-3" />
-                          Pending
-                        </Badge>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 )}
               </div>
@@ -710,11 +718,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
               {/* Approval Actions */}
               {offer && offer?.status === 'draft' && (
                 <div className="flex gap-3">
-                  <Button
-                    onClick={() => handleApproval(true)}
-                    className="flex-1"
-                    variant="default"
-                  >
+                  <Button onClick={() => handleApproval(true)} className="flex-1" variant="default">
                     <CheckCircle2 className="h-4 w-4 mr-2" />
                     Approve Offer
                   </Button>
@@ -746,9 +750,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
           <Card>
             <CardHeader>
               <CardTitle>Offer Letter Preview</CardTitle>
-              <CardDescription>
-                Review the offer letter before sending
-              </CardDescription>
+              <CardDescription>Review the offer letter before sending</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="border rounded-lg p-6 space-y-4 bg-white">
@@ -772,8 +774,9 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                   <p>Dear {candidate?.name},</p>
 
                   <p>
-                    We are pleased to offer you the position of <strong>{job?.title}</strong> at our company.
-                    We believe your skills and experience will be valuable assets to our team.
+                    We are pleased to offer you the position of <strong>{job?.title}</strong> at our
+                    company. We believe your skills and experience will be valuable assets to our
+                    team.
                   </p>
 
                   <div className="space-y-2">
@@ -782,7 +785,9 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                       <li>Position: {job?.title}</li>
                       <li>Department: {job?.department}</li>
                       <li>Employment Type: {offerDetails.employmentType}</li>
-                      <li>Start Date: {format(new Date(offerDetails.startDate), 'MMMM d, yyyy')}</li>
+                      <li>
+                        Start Date: {format(new Date(offerDetails.startDate), 'MMMM d, yyyy')}
+                      </li>
                       <li>Location: {offerDetails.location}</li>
                     </ul>
                   </div>
@@ -790,13 +795,17 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                   <div className="space-y-2">
                     <p className="font-medium">Compensation:</p>
                     <ul className="list-disc pl-6 space-y-1">
-                      <li>Base Salary: {offerDetails.currency} {offerDetails.salary.toLocaleString()} per year</li>
+                      <li>
+                        Base Salary: {offerDetails.currency} {offerDetails.salary.toLocaleString()}{' '}
+                        per year
+                      </li>
                       {offerDetails.bonus && (
-                        <li>Signing/Annual Bonus: {offerDetails.currency} {offerDetails.bonus.toLocaleString()}</li>
+                        <li>
+                          Signing/Annual Bonus: {offerDetails.currency}{' '}
+                          {offerDetails.bonus.toLocaleString()}
+                        </li>
                       )}
-                      {offerDetails.equity && (
-                        <li>Equity: {offerDetails.equity}</li>
-                      )}
+                      {offerDetails.equity && <li>Equity: {offerDetails.equity}</li>}
                     </ul>
                   </div>
 
@@ -804,7 +813,7 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                     <div className="space-y-2">
                       <p className="font-medium">Benefits:</p>
                       <ul className="list-disc pl-6 space-y-1">
-                        {selectedBenefits.slice(0, 6).map(benefit => (
+                        {selectedBenefits.slice(0, 6).map((benefit) => (
                           <li key={benefit}>{benefit}</li>
                         ))}
                         {selectedBenefits.length > 6 && (
@@ -822,17 +831,16 @@ export function OfferManagement({ candidateId, jobId, onComplete }: OfferManagem
                   )}
 
                   <p>
-                    This offer is contingent upon successful completion of our standard background check and reference verification process.
+                    This offer is contingent upon successful completion of our standard background
+                    check and reference verification process.
                   </p>
 
                   <p>
-                    Please indicate your acceptance of this offer by signing and returning this letter by{' '}
-                    <strong>{format(addDays(new Date(), 7), 'MMMM d, yyyy')}</strong>.
+                    Please indicate your acceptance of this offer by signing and returning this
+                    letter by <strong>{format(addDays(new Date(), 7), 'MMMM d, yyyy')}</strong>.
                   </p>
 
-                  <p>
-                    We look forward to welcoming you to our team!
-                  </p>
+                  <p>We look forward to welcoming you to our team!</p>
 
                   <div className="mt-6">
                     <p>Sincerely,</p>

@@ -8,7 +8,7 @@ export default {
   providers: [
     {
       domain: clerkJwtIssuerDomain,
-      applicationID: "convex",
+      applicationID: 'convex',
     },
   ],
 }

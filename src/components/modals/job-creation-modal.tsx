@@ -1,11 +1,11 @@
 'use client'
 
+import { useMutation } from 'convex/react'
+import { Clock, DollarSign, MapPin } from 'lucide-react'
 import { useState } from 'react'
 import { Modal } from '@/components/ui/modal'
 import { useToast } from '@/hooks/use-toast'
-import { useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
-import { MapPin, Clock, DollarSign, Users, Building, Calendar } from 'lucide-react'
 
 interface JobCreationModalProps {
   isOpen: boolean
@@ -87,8 +87,8 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
       newErrors.description = 'Job description is required'
     }
     if (formData.salaryMin && formData.salaryMax) {
-      const min = parseInt(formData.salaryMin.replace(/,/g, ''))
-      const max = parseInt(formData.salaryMax.replace(/,/g, ''))
+      const min = parseInt(formData.salaryMin.replace(/,/g, ''), 10)
+      const max = parseInt(formData.salaryMax.replace(/,/g, ''), 10)
       if (min >= max) {
         newErrors.salaryMin = 'Minimum salary must be less than maximum'
       }
@@ -109,11 +109,15 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
 
     try {
       // Filter out empty requirements
-      const requirements = formData.requirements.filter(req => req.trim() !== '')
+      const requirements = formData.requirements.filter((req) => req.trim() !== '')
 
       // Convert salary strings to numbers
-      const salaryMin = formData.salaryMin ? parseInt(formData.salaryMin.replace(/,/g, '')) : undefined
-      const salaryMax = formData.salaryMax ? parseInt(formData.salaryMax.replace(/,/g, '')) : undefined
+      const salaryMin = formData.salaryMin
+        ? parseInt(formData.salaryMin.replace(/,/g, ''), 10)
+        : undefined
+      const salaryMax = formData.salaryMax
+        ? parseInt(formData.salaryMax.replace(/,/g, ''), 10)
+        : undefined
 
       await createJob({
         title: formData.title.trim(),
@@ -148,7 +152,7 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
       })
 
       onClose()
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: 'Error Creating Job',
         description: 'There was an error creating the job posting. Please try again.',
@@ -168,7 +172,7 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
   const addRequirement = () => {
     setFormData({
       ...formData,
-      requirements: [...formData.requirements, '']
+      requirements: [...formData.requirements, ''],
     })
   }
 
@@ -209,9 +213,7 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
                 className={`input-clean ${errors.title ? 'border-red-500' : ''}`}
                 placeholder="e.g. Senior Frontend Engineer"
               />
-              {errors.title && (
-                <p className="text-sm text-red-500 mt-1">{errors.title}</p>
-              )}
+              {errors.title && <p className="text-sm text-red-500 mt-1">{errors.title}</p>}
             </div>
 
             <div>
@@ -225,7 +227,9 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
               >
                 <option value="">Select Department</option>
                 {departments.map((dept) => (
-                  <option key={dept} value={dept}>{dept}</option>
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
                 ))}
               </select>
               {errors.department && (
@@ -247,9 +251,7 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
                 className={`input-clean ${errors.location ? 'border-red-500' : ''}`}
                 placeholder="e.g. San Francisco, CA or Remote"
               />
-              {errors.location && (
-                <p className="text-sm text-red-500 mt-1">{errors.location}</p>
-              )}
+              {errors.location && <p className="text-sm text-red-500 mt-1">{errors.location}</p>}
             </div>
 
             <div>
@@ -259,11 +261,18 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
               </label>
               <select
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as 'full-time' | 'part-time' | 'contract' })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    type: e.target.value as 'full-time' | 'part-time' | 'contract',
+                  })
+                }
                 className="input-clean"
               >
                 {jobTypes.map((type) => (
-                  <option key={type.value} value={type.value}>{type.label}</option>
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -278,7 +287,9 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
                 className="input-clean"
               >
                 {urgencyLevels.map((level) => (
-                  <option key={level.value} value={level.value}>{level.label}</option>
+                  <option key={level.value} value={level.value}>
+                    {level.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -300,13 +311,13 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
               <input
                 type="text"
                 value={formData.salaryMin}
-                onChange={(e) => setFormData({ ...formData, salaryMin: formatSalary(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({ ...formData, salaryMin: formatSalary(e.target.value) })
+                }
                 className={`input-clean ${errors.salaryMin ? 'border-red-500' : ''}`}
                 placeholder="80,000"
               />
-              {errors.salaryMin && (
-                <p className="text-sm text-red-500 mt-1">{errors.salaryMin}</p>
-              )}
+              {errors.salaryMin && <p className="text-sm text-red-500 mt-1">{errors.salaryMin}</p>}
             </div>
 
             <div>
@@ -316,7 +327,9 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
               <input
                 type="text"
                 value={formData.salaryMax}
-                onChange={(e) => setFormData({ ...formData, salaryMax: formatSalary(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({ ...formData, salaryMax: formatSalary(e.target.value) })
+                }
                 className="input-clean"
                 placeholder="120,000"
               />
@@ -370,11 +383,7 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
             </div>
           ))}
 
-          <button
-            type="button"
-            onClick={addRequirement}
-            className="btn-secondary text-sm"
-          >
+          <button type="button" onClick={addRequirement} className="btn-secondary text-sm">
             Add Requirement
           </button>
         </div>
@@ -389,11 +398,7 @@ export function JobCreationModal({ isOpen, onClose }: JobCreationModalProps) {
           >
             Cancel
           </button>
-          <button
-            type="submit"
-            className="btn-primary flex-1"
-            disabled={isLoading}
-          >
+          <button type="submit" className="btn-primary flex-1" disabled={isLoading}>
             {isLoading ? 'Creating Job...' : 'Post Job'}
           </button>
         </div>

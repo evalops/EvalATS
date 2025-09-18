@@ -1,8 +1,8 @@
 'use client'
 
-import { createPortal } from 'react-dom'
-import { useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 
 interface ModalProps {
   isOpen: boolean
@@ -129,9 +129,7 @@ export function Modal({
         )}
 
         {/* Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
-          {children}
-        </div>
+        <div className="overflow-y-auto max-h-[calc(90vh-100px)]">{children}</div>
       </div>
     </div>
   )

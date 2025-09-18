@@ -1,16 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { useQuery, useMutation } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
-import { Id } from '../../../convex/_generated/dataModel'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useMutation, useQuery } from 'convex/react'
 import { formatDistanceToNow } from 'date-fns'
 import { MessageSquare, Send } from 'lucide-react'
+import { useState } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Textarea } from '@/components/ui/textarea'
+import { api } from '../../../convex/_generated/api'
 
 interface NotesModalProps {
   isOpen: boolean
@@ -26,10 +25,11 @@ export function NotesModal({ isOpen, onClose, entityType, entityId, entityName }
 
   // Get current user and comments
   const currentUser = useQuery(api.users.getCurrentUser)
-  const comments = useQuery(api.teams.getComments, { 
-    entityType, 
-    entityId 
-  }) || []
+  const comments =
+    useQuery(api.teams.getComments, {
+      entityType,
+      entityId,
+    }) || []
 
   // Mutations
   const addComment = useMutation(api.teams.addComment)
@@ -42,7 +42,7 @@ export function NotesModal({ isOpen, onClose, entityType, entityId, entityName }
       await addComment({
         entityType,
         entityId,
-        authorId: currentUser._id,
+        authorId: currentUser._id as any,
         content: newNote.trim(),
       })
       setNewNote('')
@@ -73,7 +73,7 @@ export function NotesModal({ isOpen, onClose, entityType, entityId, entityName }
               className="min-h-[100px]"
             />
             <div className="flex justify-end">
-              <Button 
+              <Button
                 onClick={handleSubmitNote}
                 disabled={!newNote.trim() || isSubmitting}
                 className="flex items-center gap-2"
@@ -96,9 +96,7 @@ export function NotesModal({ isOpen, onClose, entityType, entityId, entityName }
                   <div key={comment._id} className="flex gap-3 p-4 border rounded-lg">
                     <Avatar className="h-8 w-8 flex-shrink-0">
                       <AvatarImage src={comment.author?.avatar} />
-                      <AvatarFallback>
-                        {comment.author?.name?.charAt(0) || 'U'}
-                      </AvatarFallback>
+                      <AvatarFallback>{comment.author?.name?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center gap-2 text-sm">

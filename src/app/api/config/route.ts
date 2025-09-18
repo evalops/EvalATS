@@ -7,9 +7,6 @@ export async function GET() {
     return NextResponse.json(config)
   } catch (error) {
     console.error('Error loading company config:', error)
-    return NextResponse.json(
-      { error: 'Failed to load configuration' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to load configuration' }, { status: 500 })
   }
 }

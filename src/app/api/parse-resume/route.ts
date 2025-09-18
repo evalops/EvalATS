@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import ResumeParser from '@/lib/resume-parser'
 
 export async function POST(request: NextRequest) {
@@ -7,18 +7,12 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File
 
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
     // Check file size (5MB limit)
     if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: 'File size exceeds 5MB limit' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'File size exceeds 5MB limit' }, { status: 400 })
     }
 
     let resumeText = ''
@@ -63,12 +57,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: parsedResume,
-      rawText: resumeText.substring(0, 500) + '...' // Include preview of raw text
+      rawText: `${resumeText.substring(0, 500)}...`, // Include preview of raw text
     })
   } catch (error) {
     console.error('Resume parsing error:', error)
     return NextResponse.json(
-      { error: 'Failed to parse resume', details: error instanceof Error ? error.message : 'Unknown error' },
+      {
+        error: 'Failed to parse resume',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 }
     )
   }
@@ -81,6 +78,6 @@ export async function GET() {
     aiEnabled: hasOpenAI,
     message: hasOpenAI
       ? 'AI resume parsing is enabled'
-      : 'AI parsing not configured. Using basic parser. Add OPENAI_API_KEY to enable AI parsing.'
+      : 'AI parsing not configured. Using basic parser. Add OPENAI_API_KEY to enable AI parsing.',
   })
 }

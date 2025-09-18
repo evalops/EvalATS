@@ -1,5 +1,5 @@
 import { ai, ax } from '@ax-llm/ax'
-import { ParsedResume } from './resume-parser'
+import type { ParsedResume } from './resume-parser'
 
 // EEOC-compliant AI matcher using Ax
 // This service ensures fair and unbiased candidate matching
@@ -77,7 +77,7 @@ export class AIMatcherService {
         config: {
           model: 'gpt-4o-mini' as any, // Temporary fix for model type
           temperature: 0.1, // Low temperature for consistency
-        }
+        },
       })
     }
   }
@@ -105,25 +105,25 @@ export class AIMatcherService {
         resume: {
           technical: maskedResume.skills.technical,
           certifications: maskedResume.skills.certifications,
-          keywords: maskedResume.keywords
+          keywords: maskedResume.keywords,
         },
         requirements: {
           required: jobRequirements.requiredSkills,
-          preferred: jobRequirements.preferredSkills
-        }
+          preferred: jobRequirements.preferredSkills,
+        },
       })
 
       // Experience matching
       const experienceMatch = await experienceMatcher.forward(this.llm, {
         yearsOfExperience: maskedResume.yearsOfExperience,
         requiredExperience: jobRequirements.experience.minimum,
-        preferredExperience: jobRequirements.experience.preferred
+        preferredExperience: jobRequirements.experience.preferred,
       })
 
       // Education matching
       const educationMatch = await educationMatcher.forward(this.llm, {
         candidateEducation: maskedResume.education,
-        requiredEducation: jobRequirements.education
+        requiredEducation: jobRequirements.education,
       })
 
       // Calculate overall score (weighted average)
@@ -138,10 +138,7 @@ export class AIMatcherService {
       const recommendation = this.getRecommendation(overallScore)
 
       // Extract strengths and gaps
-      const { strengths, gaps } = await this.analyzeStrengthsAndGaps(
-        maskedResume,
-        jobRequirements
-      )
+      const { strengths, gaps } = await this.analyzeStrengthsAndGaps(maskedResume, jobRequirements)
 
       const match: CandidateMatch = {
         candidateId,
@@ -150,16 +147,16 @@ export class AIMatcherService {
           skillMatch: {
             required: skillMatch.match.requiredScore,
             preferred: skillMatch.match.preferredScore,
-            details: skillMatch.match.details
+            details: skillMatch.match.details,
           },
           experienceMatch: {
             score: experienceMatch.score,
-            details: experienceMatch.reasoning
+            details: experienceMatch.reasoning,
           },
           educationMatch: {
             score: educationMatch.score,
-            details: educationMatch.reasoning
-          }
+            details: educationMatch.reasoning,
+          },
         },
         strengths,
         gaps,
@@ -170,9 +167,9 @@ export class AIMatcherService {
           'Years of Experience',
           'Education Level',
           'Relevant Certifications',
-          'Industry Experience'
+          'Industry Experience',
         ],
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
 
       // Log for audit trail
@@ -202,10 +199,10 @@ export class AIMatcherService {
         location: this.generalizeLocation(resume.personalInfo.location),
         linkedin: resume.personalInfo.linkedin,
         github: resume.personalInfo.github,
-        portfolio: resume.personalInfo.portfolio
+        portfolio: resume.personalInfo.portfolio,
       },
       // Remove dates that could indicate age
-      education: resume.education.map(edu => ({
+      education: resume.education.map((edu) => ({
         ...edu,
         startDate: '',
         endDate: '',
@@ -213,8 +210,8 @@ export class AIMatcherService {
         institution: edu.institution,
         degree: edu.degree,
         field: edu.field,
-        gpa: edu.gpa
-      }))
+        gpa: edu.gpa,
+      })),
     }
   }
 
@@ -223,7 +220,7 @@ export class AIMatcherService {
    */
   private generalizeLocation(location: string): string {
     // Extract only state/country level information
-    const parts = location.split(',').map(s => s.trim())
+    const parts = location.split(',').map((s) => s.trim())
     if (parts.length >= 2) {
       return parts[parts.length - 1] // Return only country/state
     }
@@ -244,7 +241,7 @@ export class AIMatcherService {
       requiredSkills: 0.4,
       preferredSkills: 0.2,
       experience: 0.25,
-      education: 0.15
+      education: 0.15,
     }
 
     const score =
@@ -272,13 +269,13 @@ export class AIMatcherService {
   private async analyzeStrengthsAndGaps(
     resume: ParsedResume,
     requirements: JobRequirements
-  ): Promise<{ strengths: string[], gaps: string[] }> {
+  ): Promise<{ strengths: string[]; gaps: string[] }> {
     const strengths: string[] = []
     const gaps: string[] = []
 
     // Check required skills
-    requirements.requiredSkills.forEach(skill => {
-      const hasSkill = resume.skills.technical.some(s =>
+    requirements.requiredSkills.forEach((skill) => {
+      const hasSkill = resume.skills.technical.some((s) =>
         s.toLowerCase().includes(skill.toLowerCase())
       )
       if (hasSkill) {
@@ -294,7 +291,9 @@ export class AIMatcherService {
     } else if (resume.yearsOfExperience >= requirements.experience.minimum) {
       strengths.push(`Meets experience requirement (${resume.yearsOfExperience} years)`)
     } else {
-      gaps.push(`Below minimum experience (has ${resume.yearsOfExperience}, needs ${requirements.experience.minimum})`)
+      gaps.push(
+        `Below minimum experience (has ${resume.yearsOfExperience}, needs ${requirements.experience.minimum})`
+      )
     }
 
     return { strengths, gaps }
@@ -312,33 +311,32 @@ export class AIMatcherService {
     let requiredMatches = 0
     let preferredMatches = 0
 
-    requirements.requiredSkills.forEach(skill => {
-      if (resume.skills.technical.some(s =>
-        s.toLowerCase().includes(skill.toLowerCase())
-      )) {
+    requirements.requiredSkills.forEach((skill) => {
+      if (resume.skills.technical.some((s) => s.toLowerCase().includes(skill.toLowerCase()))) {
         requiredMatches++
       }
     })
 
-    requirements.preferredSkills.forEach(skill => {
-      if (resume.skills.technical.some(s =>
-        s.toLowerCase().includes(skill.toLowerCase())
-      )) {
+    requirements.preferredSkills.forEach((skill) => {
+      if (resume.skills.technical.some((s) => s.toLowerCase().includes(skill.toLowerCase()))) {
         preferredMatches++
       }
     })
 
-    const requiredScore = requirements.requiredSkills.length > 0
-      ? (requiredMatches / requirements.requiredSkills.length) * 100
-      : 100
+    const requiredScore =
+      requirements.requiredSkills.length > 0
+        ? (requiredMatches / requirements.requiredSkills.length) * 100
+        : 100
 
-    const preferredScore = requirements.preferredSkills.length > 0
-      ? (preferredMatches / requirements.preferredSkills.length) * 100
-      : 100
+    const preferredScore =
+      requirements.preferredSkills.length > 0
+        ? (preferredMatches / requirements.preferredSkills.length) * 100
+        : 100
 
-    const experienceScore = resume.yearsOfExperience >= requirements.experience.minimum
-      ? 100
-      : (resume.yearsOfExperience / requirements.experience.minimum) * 100
+    const experienceScore =
+      resume.yearsOfExperience >= requirements.experience.minimum
+        ? 100
+        : (resume.yearsOfExperience / requirements.experience.minimum) * 100
 
     const score = this.calculateOverallScore(
       requiredScore,
@@ -354,27 +352,30 @@ export class AIMatcherService {
         skillMatch: {
           required: requiredScore,
           preferred: preferredScore,
-          details: [`Matched ${requiredMatches} of ${requirements.requiredSkills.length} required skills`]
+          details: [
+            `Matched ${requiredMatches} of ${requirements.requiredSkills.length} required skills`,
+          ],
         },
         experienceMatch: {
           score: experienceScore,
-          details: `${resume.yearsOfExperience} years of experience`
+          details: `${resume.yearsOfExperience} years of experience`,
         },
         educationMatch: {
           score: 80,
-          details: 'Education evaluation'
-        }
+          details: 'Education evaluation',
+        },
       },
       strengths: [`Matched ${requiredMatches} required skills`],
       gaps: requirements.requiredSkills
-        .filter(skill => !resume.skills.technical.some(s =>
-          s.toLowerCase().includes(skill.toLowerCase())
-        ))
-        .map(skill => `Missing: ${skill}`),
+        .filter(
+          (skill) =>
+            !resume.skills.technical.some((s) => s.toLowerCase().includes(skill.toLowerCase()))
+        )
+        .map((skill) => `Missing: ${skill}`),
       recommendation: this.getRecommendation(score),
       protected_attributes_masked: true,
       evaluation_criteria: ['Skills', 'Experience', 'Education'],
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
   }
 
@@ -390,7 +391,7 @@ export class AIMatcherService {
       timestamp: new Date().toISOString(),
       modelUsed: 'gpt-4o-mini',
       modelVersion: '2024-01',
-      protected_attributes_masked: true
+      protected_attributes_masked: true,
     })
   }
 
@@ -398,19 +399,19 @@ export class AIMatcherService {
    * Calculate bias metrics for Four-Fifths Rule compliance
    */
   calculateBiasMetrics(
-    selections: Array<{ candidateId: string, selected: boolean, group?: string }>
+    selections: Array<{ candidateId: string; selected: boolean; group?: string }>
   ): BiasAuditMetrics {
     const totalCount = selections.length
-    const selectedCount = selections.filter(s => s.selected).length
+    const selectedCount = selections.filter((s) => s.selected).length
     const overallRate = selectedCount / totalCount
 
     // Calculate rates by group
     const groupRates = new Map<string, number>()
-    const groups = new Set(selections.map(s => s.group || 'unknown'))
+    const groups = new Set(selections.map((s) => s.group || 'unknown'))
 
-    groups.forEach(group => {
-      const groupSelections = selections.filter(s => s.group === group)
-      const groupSelected = groupSelections.filter(s => s.selected).length
+    groups.forEach((group) => {
+      const groupSelections = selections.filter((s) => s.group === group)
+      const groupSelected = groupSelections.filter((s) => s.selected).length
       const rate = groupSelected / groupSelections.length
       groupRates.set(group, rate)
     })
@@ -432,7 +433,7 @@ export class AIMatcherService {
       selectionRate: overallRate,
       groupRates,
       fourFifthsCompliance,
-      disparateImpact
+      disparateImpact,
     }
   }
 

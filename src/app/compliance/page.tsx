@@ -1,10 +1,10 @@
 'use client'
 
 import { useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
 import { ComplianceDashboard } from '@/components/compliance-dashboard'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { api } from '../../../convex/_generated/api'
 
 export default function CompliancePage() {
   // Get latest audit data from Convex
@@ -14,17 +14,18 @@ export default function CompliancePage() {
   const aiDecisions = useQuery(api.compliance.getAIDecisions, { limit: 20 })
 
   // Format AI decisions for the dashboard
-  const formattedAIDecisions = aiDecisions?.map((decision: any) => ({
-    id: decision._id,
-    timestamp: decision.timestamp,
-    decisionType: decision.decisionType
-      .split('_')
-      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' '),
-    candidateName: decision.candidateName,
-    score: decision.score || 0,
-    humanReview: decision.humanReview
-  })) || []
+  const formattedAIDecisions =
+    aiDecisions?.map((decision: any) => ({
+      id: decision._id,
+      timestamp: decision.timestamp,
+      decisionType: decision.decisionType
+        .split('_')
+        .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' '),
+      candidateName: decision.candidateName,
+      score: decision.score || 0,
+      humanReview: decision.humanReview,
+    })) || []
 
   if (!auditData && !aiDecisions) {
     return (
@@ -70,10 +71,7 @@ export default function CompliancePage() {
 
   return (
     <div className="container mx-auto p-6">
-      <ComplianceDashboard
-        auditData={auditData || undefined}
-        aiDecisions={formattedAIDecisions}
-      />
+      <ComplianceDashboard auditData={auditData || undefined} aiDecisions={formattedAIDecisions} />
     </div>
   )
 }

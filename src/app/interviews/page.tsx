@@ -1,13 +1,24 @@
 'use client'
 
+import { useQuery } from 'convex/react'
+import {
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+  MessageSquare,
+  Plus,
+  Search,
+  Star,
+  User,
+  Video,
+} from 'lucide-react'
 import { useState } from 'react'
 import { AppShell } from '@/components/layout/app-shell'
-import { Calendar as CalendarIcon, Clock, Video, MapPin, User, ChevronLeft, ChevronRight, Plus, Search, Star, MessageSquare } from 'lucide-react'
-import { useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
-import { InterviewSchedulingModal } from '@/components/modals/interview-scheduling-modal'
 import { InterviewFeedbackModal } from '@/components/modals/interview-feedback-modal'
-import { Id } from '../../../convex/_generated/dataModel'
+import { InterviewSchedulingModal } from '@/components/modals/interview-scheduling-modal'
+import { api } from '../../../convex/_generated/api'
+import type { Id } from '../../../convex/_generated/dataModel'
 
 const statusColors = {
   scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
@@ -21,20 +32,21 @@ export default function InterviewsPage() {
   const [selectedStatus, setSelectedStatus] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
-  const [feedbackInterviewId, setFeedbackInterviewId] = useState<Id<"interviews"> | null>(null)
+  const [feedbackInterviewId, setFeedbackInterviewId] = useState<Id<'interviews'> | null>(null)
 
   // Fetch interviews from Convex
-  const interviews = useQuery(api.interviews.list, {
-    status: selectedStatus === 'all' ? undefined : selectedStatus,
-    date: currentDate,
-    search: searchQuery || undefined,
-  }) || []
+  const interviews =
+    useQuery(api.interviews.list, {
+      status: selectedStatus === 'all' ? undefined : selectedStatus,
+      date: currentDate,
+      search: searchQuery || undefined,
+    }) || []
 
   const formatTime = (time: string) => {
     return new Date(`2000-01-01 ${time}`).toLocaleTimeString([], {
       hour: 'numeric',
       minute: '2-digit',
-      hour12: true
+      hour12: true,
     })
   }
 
@@ -53,9 +65,7 @@ export default function InterviewsPage() {
               </div>
 
               <div className="flex gap-2">
-                <button className="btn-secondary">
-                  Calendar View
-                </button>
+                <button className="btn-secondary">Calendar View</button>
                 <button
                   onClick={() => setIsScheduleModalOpen(true)}
                   className="btn-primary inline-flex items-center gap-2"
@@ -81,12 +91,14 @@ export default function InterviewsPage() {
                 </button>
                 <div className="flex items-center gap-2 text-sm font-medium min-w-0">
                   <CalendarIcon className="h-4 w-4" />
-                  <span>{new Date(currentDate).toLocaleDateString([], {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}</span>
+                  <span>
+                    {new Date(currentDate).toLocaleDateString([], {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </span>
                 </div>
                 <button
                   onClick={() => {
@@ -153,7 +165,9 @@ export default function InterviewsPage() {
                           <h3 className="font-medium">{interview.candidateName}</h3>
                           <p className="text-sm text-muted-foreground">{interview.position}</p>
                         </div>
-                        <span className={`badge-clean ${statusColors[interview.status as keyof typeof statusColors]}`}>
+                        <span
+                          className={`badge-clean ${statusColors[interview.status as keyof typeof statusColors]}`}
+                        >
                           {interview.status}
                         </span>
                       </div>
@@ -184,41 +198,34 @@ export default function InterviewsPage() {
                         <div className="flex gap-2">
                           {interview.status === 'scheduled' && (
                             <>
-                              <button className="btn-secondary text-sm">
-                                Reschedule
-                              </button>
-                              <button className="btn-primary text-sm">
-                                Join Meeting
-                              </button>
+                              <button className="btn-secondary text-sm">Reschedule</button>
+                              <button className="btn-primary text-sm">Join Meeting</button>
                             </>
                           )}
-                          {interview.status === 'completed' && (
-                            <>
-                              {interview.feedback ? (
-                                <>
-                                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                    <span>{interview.rating}/5</span>
-                                  </div>
-                                  <button
-                                    onClick={() => setFeedbackInterviewId(interview._id)}
-                                    className="btn-secondary text-sm inline-flex items-center gap-1"
-                                  >
-                                    <MessageSquare className="h-3 w-3" />
-                                    View Feedback
-                                  </button>
-                                </>
-                              ) : (
+                          {interview.status === 'completed' &&
+                            (interview.feedback ? (
+                              <>
+                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                  <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                  <span>{interview.rating}/5</span>
+                                </div>
                                 <button
                                   onClick={() => setFeedbackInterviewId(interview._id)}
-                                  className="btn-primary text-sm inline-flex items-center gap-1"
+                                  className="btn-secondary text-sm inline-flex items-center gap-1"
                                 >
                                   <MessageSquare className="h-3 w-3" />
-                                  Add Feedback
+                                  View Feedback
                                 </button>
-                              )}
-                            </>
-                          )}
+                              </>
+                            ) : (
+                              <button
+                                onClick={() => setFeedbackInterviewId(interview._id)}
+                                className="btn-primary text-sm inline-flex items-center gap-1"
+                              >
+                                <MessageSquare className="h-3 w-3" />
+                                Add Feedback
+                              </button>
+                            ))}
                         </div>
                       </div>
                     </div>

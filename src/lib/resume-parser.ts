@@ -165,7 +165,10 @@ class ResumeParser {
 
   private basicParse(text: string): ParsedResume {
     // Basic regex-based parsing as fallback
-    const lines = text.split('\n').map(line => line.trim()).filter(line => line)
+    const lines = text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line)
 
     // Extract email
     const emailMatch = text.match(/[\w.-]+@[\w.-]+\.\w+/)
@@ -191,12 +194,28 @@ class ResumeParser {
 
     // Extract skills (look for common programming languages and tools)
     const skillPatterns = [
-      'JavaScript', 'TypeScript', 'Python', 'Java', 'C\\+\\+', 'React', 'Node\\.js',
-      'AWS', 'Docker', 'Kubernetes', 'SQL', 'MongoDB', 'Git', 'CI/CD',
-      'Machine Learning', 'Data Science', 'DevOps', 'Agile', 'Scrum'
+      'JavaScript',
+      'TypeScript',
+      'Python',
+      'Java',
+      'C\\+\\+',
+      'React',
+      'Node\\.js',
+      'AWS',
+      'Docker',
+      'Kubernetes',
+      'SQL',
+      'MongoDB',
+      'Git',
+      'CI/CD',
+      'Machine Learning',
+      'Data Science',
+      'DevOps',
+      'Agile',
+      'Scrum',
     ]
     const skills: string[] = []
-    skillPatterns.forEach(pattern => {
+    skillPatterns.forEach((pattern) => {
       if (new RegExp(pattern, 'i').test(text)) {
         skills.push(pattern.replace('\\', ''))
       }
@@ -260,15 +279,12 @@ class ResumeParser {
 export default ResumeParser
 
 // Utility function to score how well a resume matches a job
-export function calculateMatchScore(
-  resume: ParsedResume,
-  jobRequirements: string[]
-): number {
+export function calculateMatchScore(resume: ParsedResume, jobRequirements: string[]): number {
   const resumeText = JSON.stringify(resume).toLowerCase()
   let matches = 0
-  let totalRequirements = jobRequirements.length
+  const totalRequirements = jobRequirements.length
 
-  jobRequirements.forEach(requirement => {
+  jobRequirements.forEach((requirement) => {
     if (resumeText.includes(requirement.toLowerCase())) {
       matches++
     }

@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import { useAuth } from "@clerk/nextjs"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useAuth } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 interface AuthGuardProps {
   children: React.ReactNode
   redirectTo?: string
 }
 
-export function AuthGuard({ children, redirectTo = "/sign-in" }: AuthGuardProps) {
+export function AuthGuard({ children, redirectTo = '/sign-in' }: AuthGuardProps) {
   const { isLoaded, isSignedIn } = useAuth()
   const router = useRouter()
 

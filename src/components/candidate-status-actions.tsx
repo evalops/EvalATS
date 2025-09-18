@@ -1,27 +1,27 @@
 'use client'
 
-import { useState } from 'react'
 import { useMutation, useQuery } from 'convex/react'
-import { api } from '../../convex/_generated/api'
-import { useToast } from '@/hooks/use-toast'
-import { ConfirmationModal } from '@/components/ui/modal'
-import { EmailComposeModal } from '@/components/modals/email-compose-modal'
-import { NotesModal } from '@/components/modals/notes-modal'
 import {
-  CheckCircle,
   ArrowRight,
-  XCircle,
   Calendar,
+  CheckCircle,
+  Mail,
   MessageSquare,
   MoreHorizontal,
-  User,
   Phone,
-  Mail
+  User,
+  XCircle,
 } from 'lucide-react'
-import { Id } from '../../convex/_generated/dataModel'
+import { useState } from 'react'
+import { EmailComposeModal } from '@/components/modals/email-compose-modal'
+import { NotesModal } from '@/components/modals/notes-modal'
+import { ConfirmationModal } from '@/components/ui/modal'
+import { useToast } from '@/hooks/use-toast'
+import { api } from '../../convex/_generated/api'
+import type { Id } from '../../convex/_generated/dataModel'
 
 interface CandidateStatusActionsProps {
-  candidateId: Id<"candidates">
+  candidateId: Id<'candidates'>
   currentStatus: string
   candidateName: string
   compact?: boolean
@@ -51,7 +51,7 @@ export function CandidateStatusActions({
   candidateId,
   currentStatus,
   candidateName,
-  compact = false
+  compact = false,
 }: CandidateStatusActionsProps) {
   const { toast } = useToast()
   const updateStatus = useMutation(api.candidates.updateStatus)
@@ -76,7 +76,7 @@ export function CandidateStatusActions({
         title: `${action} Successful`,
         description: `${candidateName} has been moved to ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}.`,
       })
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: 'Update Failed',
         description: 'There was an error updating the candidate status. Please try again.',
@@ -169,32 +169,32 @@ export function CandidateStatusActions({
                   Send Email
                 </button>
                 <button
-                onClick={() => {
-                setShowDropdown(false)
-                // Simple implementation - open phone dialer on mobile or show phone number
-                if (candidate?.phone) {
-                window.location.href = `tel:${candidate.phone}`
-                } else {
-                  toast({
-                      title: 'No Phone Number',
-                      description: 'This candidate has no phone number on file.',
+                  onClick={() => {
+                    setShowDropdown(false)
+                    // Simple implementation - open phone dialer on mobile or show phone number
+                    if (candidate?.phone) {
+                      window.location.href = `tel:${candidate.phone}`
+                    } else {
+                      toast({
+                        title: 'No Phone Number',
+                        description: 'This candidate has no phone number on file.',
                       })
-                  }
-                }}
+                    }
+                  }}
                   className="w-full text-left px-4 py-2 text-sm hover:bg-accent flex items-center gap-2"
-                 >
-                   <Phone className="h-4 w-4" />
-                   Call Candidate
-                 </button>
-                <button
-                onClick={() => {
-                setShowDropdown(false)
-                setShowNotesModal(true)
-                }}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-accent flex items-center gap-2"
                 >
-                <MessageSquare className="h-4 w-4" />
-                Add Note
+                  <Phone className="h-4 w-4" />
+                  Call Candidate
+                </button>
+                <button
+                  onClick={() => {
+                    setShowDropdown(false)
+                    setShowNotesModal(true)
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-accent flex items-center gap-2"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  Add Note
                 </button>
 
                 {currentStatus !== 'rejected' && currentStatus !== 'withdrawn' && (
@@ -250,12 +250,7 @@ export function CandidateStatusActions({
       />
 
       {/* Click outside to close dropdown */}
-      {showDropdown && (
-        <div
-          className="fixed inset-0 z-0"
-          onClick={() => setShowDropdown(false)}
-        />
-      )}
+      {showDropdown && <div className="fixed inset-0 z-0" onClick={() => setShowDropdown(false)} />}
     </>
   )
 }

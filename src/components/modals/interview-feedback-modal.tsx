@@ -1,17 +1,17 @@
 'use client'
 
+import { useMutation, useQuery } from 'convex/react'
+import { Calendar, Clock, Star, User } from 'lucide-react'
 import { useState } from 'react'
 import { Modal } from '@/components/ui/modal'
 import { useToast } from '@/hooks/use-toast'
-import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
-import { Star, User, Clock, Calendar } from 'lucide-react'
-import { Id } from '../../../convex/_generated/dataModel'
+import type { Id } from '../../../convex/_generated/dataModel'
 
 interface InterviewFeedbackModalProps {
   isOpen: boolean
   onClose: () => void
-  interviewId: Id<"interviews">
+  interviewId: Id<'interviews'>
 }
 
 interface FeedbackFormData {
@@ -29,16 +29,32 @@ interface FeedbackFormData {
 }
 
 const recommendationOptions = [
-  { value: 'strong_hire', label: 'Strong Hire', color: 'text-green-700 bg-green-100 dark:bg-green-900/20 dark:text-green-400' },
-  { value: 'hire', label: 'Hire', color: 'text-blue-700 bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400' },
-  { value: 'no_hire', label: 'No Hire', color: 'text-orange-700 bg-orange-100 dark:bg-orange-900/20 dark:text-orange-400' },
-  { value: 'strong_no_hire', label: 'Strong No Hire', color: 'text-red-700 bg-red-100 dark:bg-red-900/20 dark:text-red-400' },
+  {
+    value: 'strong_hire',
+    label: 'Strong Hire',
+    color: 'text-green-700 bg-green-100 dark:bg-green-900/20 dark:text-green-400',
+  },
+  {
+    value: 'hire',
+    label: 'Hire',
+    color: 'text-blue-700 bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400',
+  },
+  {
+    value: 'no_hire',
+    label: 'No Hire',
+    color: 'text-orange-700 bg-orange-100 dark:bg-orange-900/20 dark:text-orange-400',
+  },
+  {
+    value: 'strong_no_hire',
+    label: 'Strong No Hire',
+    color: 'text-red-700 bg-red-100 dark:bg-red-900/20 dark:text-red-400',
+  },
 ]
 
 export function InterviewFeedbackModal({
   isOpen,
   onClose,
-  interviewId
+  interviewId,
 }: InterviewFeedbackModalProps) {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
@@ -111,7 +127,7 @@ export function InterviewFeedbackModal({
       })
 
       onClose()
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: 'Error Submitting Feedback',
         description: 'There was an error saving the feedback. Please try again.',
@@ -126,7 +142,7 @@ export function InterviewFeedbackModal({
     value,
     onChange,
     label,
-    error
+    error,
   }: {
     value: number
     onChange: (rating: number) => void
@@ -134,9 +150,7 @@ export function InterviewFeedbackModal({
     error?: string
   }) => (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-muted-foreground">
-        {label}
-      </label>
+      <label className="block text-sm font-medium text-muted-foreground">{label}</label>
       <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
@@ -192,9 +206,7 @@ export function InterviewFeedbackModal({
               <Clock className="h-3 w-3" />
               {interview.time}
             </div>
-            <div className="flex items-center gap-1">
-              {interview.duration}
-            </div>
+            <div className="flex items-center gap-1">{interview.duration}</div>
           </div>
         </div>
 
@@ -267,9 +279,7 @@ export function InterviewFeedbackModal({
               className={`input-clean min-h-[80px] ${errors.strengths ? 'border-red-500' : ''}`}
               placeholder="What are the candidate's main strengths?"
             />
-            {errors.strengths && (
-              <p className="text-sm text-red-500 mt-1">{errors.strengths}</p>
-            )}
+            {errors.strengths && <p className="text-sm text-red-500 mt-1">{errors.strengths}</p>}
           </div>
 
           <div>
@@ -335,11 +345,7 @@ export function InterviewFeedbackModal({
           >
             Cancel
           </button>
-          <button
-            type="submit"
-            className="btn-primary flex-1"
-            disabled={isLoading}
-          >
+          <button type="submit" className="btn-primary flex-1" disabled={isLoading}>
             {isLoading ? 'Saving...' : 'Submit Feedback'}
           </button>
         </div>

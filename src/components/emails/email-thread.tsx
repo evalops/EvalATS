@@ -1,48 +1,37 @@
 'use client'
 
-import { useState } from 'react'
 import { useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
-import { Id } from '../../../convex/_generated/dataModel'
+import { AlertCircle, Check, Clock, Forward, Mail, MoreVertical, Reply, Send } from 'lucide-react'
+import { useState } from 'react'
+import { EmailComposeModal } from '@/components/modals/email-compose-modal'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { EmailComposeModal } from '@/components/modals/email-compose-modal'
-import {
-  Mail,
-  Reply,
-  ReplyAll,
-  Forward,
-  MoreVertical,
-  Clock,
-  Check,
-  CheckCheck,
-  Send,
-  AlertCircle
-} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { api } from '../../../convex/_generated/api'
+import type { Id } from '../../../convex/_generated/dataModel'
 
 interface EmailThreadProps {
-  candidateId: Id<"candidates">
+  candidateId: Id<'candidates'>
   candidateName: string
   candidateEmail: string
-  jobId?: Id<"jobs">
+  jobId?: Id<'jobs'>
   jobTitle?: string
 }
 
 interface EmailItemProps {
   email: {
-    _id: Id<"emails">
+    _id: Id<'emails'>
     from: string
     to: string
     subject: string
     content: string
-    status: "draft" | "sent" | "delivered" | "failed"
+    status: 'draft' | 'sent' | 'delivered' | 'failed'
     sentAt?: string
     deliveredAt?: string
     readAt?: string
@@ -50,15 +39,23 @@ interface EmailItemProps {
     createdAt: string
     threadId?: string
   }
-  candidateId: Id<"candidates">
+  candidateId: Id<'candidates'>
   candidateName: string
   candidateEmail: string
-  jobId?: Id<"jobs">
+  jobId?: Id<'jobs'>
   jobTitle?: string
-  onReply: (emailId: Id<"emails">, threadId?: string) => void
+  onReply: (emailId: Id<'emails'>, threadId?: string) => void
 }
 
-function EmailItem({ email, candidateId, candidateName, candidateEmail, jobId, jobTitle, onReply }: EmailItemProps) {
+function EmailItem({
+  email,
+  candidateId,
+  candidateName,
+  candidateEmail,
+  jobId,
+  jobTitle,
+  onReply,
+}: EmailItemProps) {
   const getStatusIcon = () => {
     switch (email.status) {
       case 'draft':
@@ -106,9 +103,7 @@ function EmailItem({ email, candidateId, candidateName, candidateEmail, jobId, j
                 <span className="font-medium">{email.sender}</span>
                 <span className="text-sm text-muted-foreground">({email.from})</span>
               </div>
-              <div className="text-sm text-muted-foreground">
-                to {email.to}
-              </div>
+              <div className="text-sm text-muted-foreground">to {email.to}</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -143,9 +138,7 @@ function EmailItem({ email, candidateId, candidateName, candidateEmail, jobId, j
         <div className="space-y-3">
           <div className="font-medium text-lg">{email.subject}</div>
           <div className="prose prose-sm max-w-none">
-            <div className="whitespace-pre-wrap text-sm leading-relaxed">
-              {email.content}
-            </div>
+            <div className="whitespace-pre-wrap text-sm leading-relaxed">{email.content}</div>
           </div>
         </div>
       </CardContent>
@@ -153,14 +146,20 @@ function EmailItem({ email, candidateId, candidateName, candidateEmail, jobId, j
   )
 }
 
-export function EmailThread({ candidateId, candidateName, candidateEmail, jobId, jobTitle }: EmailThreadProps) {
+export function EmailThread({
+  candidateId,
+  candidateName,
+  candidateEmail,
+  jobId,
+  jobTitle,
+}: EmailThreadProps) {
   const [isComposeOpen, setIsComposeOpen] = useState(false)
-  const [replyToId, setReplyToId] = useState<Id<"emails"> | undefined>()
+  const [replyToId, setReplyToId] = useState<Id<'emails'> | undefined>()
   const [threadId, setThreadId] = useState<string | undefined>()
 
   const emails = useQuery(api.emails.getEmailsByCandidate, { candidateId })
 
-  const handleReply = (emailId: Id<"emails">, emailThreadId?: string) => {
+  const handleReply = (emailId: Id<'emails'>, emailThreadId?: string) => {
     setReplyToId(emailId)
     setThreadId(emailThreadId)
     setIsComposeOpen(true)
@@ -184,9 +183,7 @@ export function EmailThread({ candidateId, candidateName, candidateEmail, jobId,
         <div className="flex items-center gap-2">
           <Mail className="h-5 w-5" />
           <h3 className="text-lg font-semibold">Email Communications</h3>
-          <Badge variant="secondary">
-            {emails?.length || 0} emails
-          </Badge>
+          <Badge variant="secondary">{emails?.length || 0} emails</Badge>
         </div>
         <Button onClick={handleComposeNew}>
           <Mail className="h-4 w-4 mr-2" />

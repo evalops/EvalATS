@@ -1,18 +1,18 @@
 'use client'
 
-import { useState } from 'react'
-import { Modal } from '@/components/ui/modal'
-import { FileUpload } from '@/components/ui/file-upload'
-import { useToast } from '@/hooks/use-toast'
 import { useMutation, useQuery } from 'convex/react'
+import { Download, FileText } from 'lucide-react'
+import { useState } from 'react'
+import { FileUpload } from '@/components/ui/file-upload'
+import { Modal } from '@/components/ui/modal'
+import { useToast } from '@/hooks/use-toast'
 import { api } from '../../../convex/_generated/api'
-import { FileText, Download, Eye } from 'lucide-react'
-import { Id } from '../../../convex/_generated/dataModel'
+import type { Id } from '../../../convex/_generated/dataModel'
 
 interface CandidateFileModalProps {
   isOpen: boolean
   onClose: () => void
-  candidateId: Id<"candidates">
+  candidateId: Id<'candidates'>
   candidateName: string
 }
 
@@ -20,7 +20,7 @@ export function CandidateFileModal({
   isOpen,
   onClose,
   candidateId,
-  candidateName
+  candidateName,
 }: CandidateFileModalProps) {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
@@ -47,7 +47,7 @@ export function CandidateFileModal({
         title: 'Resume Deleted',
         description: 'Resume has been successfully deleted',
       })
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: 'Error',
         description: 'Failed to delete resume. Please try again.',
@@ -74,7 +74,7 @@ export function CandidateFileModal({
         title: 'Cover Letter Deleted',
         description: 'Cover letter has been successfully deleted',
       })
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: 'Error',
         description: 'Failed to delete cover letter. Please try again.',
@@ -85,7 +85,7 @@ export function CandidateFileModal({
     }
   }
 
-  const handleDownloadFile = async (storageId: Id<"_storage">, filename: string) => {
+  const handleDownloadFile = async (storageId: Id<'_storage'>, filename: string) => {
     try {
       const url = await fetch(`/api/files/download/${storageId}`)
       const blob = await url.blob()
@@ -99,7 +99,7 @@ export function CandidateFileModal({
       link.click()
       document.body.removeChild(link)
       window.URL.revokeObjectURL(downloadUrl)
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: 'Download Failed',
         description: 'Failed to download file. Please try again.',
@@ -131,7 +131,9 @@ export function CandidateFileModal({
             {candidate.resumeUrl && candidate.resumeFilename && (
               <div className="flex gap-2">
                 <button
-                  onClick={() => handleDownloadFile(candidate.resumeUrl!, candidate.resumeFilename!)}
+                  onClick={() =>
+                    handleDownloadFile(candidate.resumeUrl!, candidate.resumeFilename!)
+                  }
                   className="btn-secondary text-sm inline-flex items-center gap-2"
                   disabled={isLoading}
                 >
@@ -147,7 +149,7 @@ export function CandidateFileModal({
             candidateId={candidateId}
             currentFileId={candidate.resumeUrl}
             currentFileName={candidate.resumeFilename}
-            onUploadComplete={(storageId, filename) => {
+            onUploadComplete={(_storageId, _filename) => {
               toast({
                 title: 'Resume Updated',
                 description: 'Resume has been successfully uploaded',
@@ -170,7 +172,9 @@ export function CandidateFileModal({
             {candidate.coverLetter && candidate.coverLetterFilename && (
               <div className="flex gap-2">
                 <button
-                  onClick={() => handleDownloadFile(candidate.coverLetter!, candidate.coverLetterFilename!)}
+                  onClick={() =>
+                    handleDownloadFile(candidate.coverLetter!, candidate.coverLetterFilename!)
+                  }
                   className="btn-secondary text-sm inline-flex items-center gap-2"
                   disabled={isLoading}
                 >
@@ -186,7 +190,7 @@ export function CandidateFileModal({
             candidateId={candidateId}
             currentFileId={candidate.coverLetter}
             currentFileName={candidate.coverLetterFilename}
-            onUploadComplete={(storageId, filename) => {
+            onUploadComplete={(_storageId, _filename) => {
               toast({
                 title: 'Cover Letter Updated',
                 description: 'Cover letter has been successfully uploaded',
@@ -201,11 +205,7 @@ export function CandidateFileModal({
 
         {/* Actions */}
         <div className="flex justify-end pt-4 border-t border-border">
-          <button
-            onClick={onClose}
-            className="btn-secondary"
-            disabled={isLoading}
-          >
+          <button onClick={onClose} className="btn-secondary" disabled={isLoading}>
             Close
           </button>
         </div>

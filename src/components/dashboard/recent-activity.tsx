@@ -1,11 +1,7 @@
 'use client'
 
-import { useMemo } from 'react'
 import { useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
+import { formatDistanceToNow } from 'date-fns'
 import {
   Activity as ActivityIcon,
   Bell,
@@ -16,7 +12,11 @@ import {
   UserPlus,
   XCircle,
 } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
+import { useMemo } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { api } from '../../../convex/_generated/api'
 
 type ActivityEntry = {
   _id: string
@@ -49,12 +49,9 @@ const ACTIVITY_DISPLAY_MAP: Record<string, ActivityDisplay> = {
   candidate_applied: {
     icon: Send,
     colorClass: 'text-blue-500',
-    getTitle: (activity) =>
-      `${activity.target?.name ?? 'A candidate'} applied`,
+    getTitle: (activity) => `${activity.target?.name ?? 'A candidate'} applied`,
     getDescription: (activity) =>
-      activity.actor?.name
-        ? `Reviewed by ${activity.actor.name}`
-        : 'New application received',
+      activity.actor?.name ? `Reviewed by ${activity.actor.name}` : 'New application received',
   },
   status_changed: {
     icon: ActivityIcon,
@@ -69,42 +66,30 @@ const ACTIVITY_DISPLAY_MAP: Record<string, ActivityDisplay> = {
   interview_scheduled: {
     icon: Calendar,
     colorClass: 'text-yellow-500',
-    getTitle: (activity) =>
-      `${activity.actor?.name ?? 'Someone'} scheduled an interview`,
+    getTitle: (activity) => `${activity.actor?.name ?? 'Someone'} scheduled an interview`,
     getDescription: (activity) =>
-      activity.target?.name
-        ? `For ${activity.target.name}`
-        : 'Interview added to the calendar',
+      activity.target?.name ? `For ${activity.target.name}` : 'Interview added to the calendar',
   },
   feedback_submitted: {
     icon: CheckCircle,
     colorClass: 'text-green-500',
-    getTitle: (activity) =>
-      `${activity.actor?.name ?? 'An interviewer'} submitted feedback`,
+    getTitle: (activity) => `${activity.actor?.name ?? 'An interviewer'} submitted feedback`,
     getDescription: (activity) =>
-      activity.target?.name
-        ? `Feedback for ${activity.target.name}`
-        : undefined,
+      activity.target?.name ? `Feedback for ${activity.target.name}` : undefined,
   },
   comment_added: {
     icon: MessageSquare,
     colorClass: 'text-purple-500',
-    getTitle: (activity) =>
-      `${activity.actor?.name ?? 'A teammate'} left a comment`,
+    getTitle: (activity) => `${activity.actor?.name ?? 'A teammate'} left a comment`,
     getDescription: (activity) =>
-      activity.target?.name
-        ? `On ${activity.target.name}`
-        : undefined,
+      activity.target?.name ? `On ${activity.target.name}` : undefined,
   },
   offer_sent: {
     icon: Send,
     colorClass: 'text-emerald-500',
-    getTitle: (activity) =>
-      `${activity.actor?.name ?? 'Someone'} sent an offer`,
+    getTitle: (activity) => `${activity.actor?.name ?? 'Someone'} sent an offer`,
     getDescription: (activity) =>
-      activity.target?.name
-        ? `Offer for ${activity.target.name}`
-        : 'Offer communication sent',
+      activity.target?.name ? `Offer for ${activity.target.name}` : 'Offer communication sent',
   },
   candidate_rejected: {
     icon: XCircle,
@@ -115,22 +100,16 @@ const ACTIVITY_DISPLAY_MAP: Record<string, ActivityDisplay> = {
   task_completed: {
     icon: CheckCircle,
     colorClass: 'text-green-500',
-    getTitle: (activity) =>
-      `${activity.actor?.name ?? 'A teammate'} completed a task`,
+    getTitle: (activity) => `${activity.actor?.name ?? 'A teammate'} completed a task`,
     getDescription: (activity) =>
-      activity.target?.name
-        ? `Related to ${activity.target.name}`
-        : undefined,
+      activity.target?.name ? `Related to ${activity.target.name}` : undefined,
   },
   team_member_added: {
     icon: UserPlus,
     colorClass: 'text-sky-500',
-    getTitle: (activity) =>
-      `${activity.actor?.name ?? 'A teammate'} joined the hiring team`,
+    getTitle: (activity) => `${activity.actor?.name ?? 'A teammate'} joined the hiring team`,
     getDescription: (activity) =>
-      activity.target?.name
-        ? `Job: ${activity.target.name}`
-        : undefined,
+      activity.target?.name ? `Job: ${activity.target.name}` : undefined,
   },
   notification: {
     icon: Bell,
@@ -138,19 +117,14 @@ const ACTIVITY_DISPLAY_MAP: Record<string, ActivityDisplay> = {
     getTitle: () => 'Workflow notification',
     getDescription: (activity) =>
       activity.metadata?.message ??
-      (activity.target?.name
-        ? `Update for ${activity.target.name}`
-        : 'Automated workflow update'),
+      (activity.target?.name ? `Update for ${activity.target.name}` : 'Automated workflow update'),
   },
 }
 
 export function RecentActivity() {
   // Get current user to ensure proper authorization
   const currentUser = useQuery(api.users.getCurrentUser)
-  const activities = useQuery(
-    api.teams.getActivityFeed, 
-    currentUser ? { limit: 10 } : "skip"
-  )
+  const activities = useQuery(api.teams.getActivityFeed, currentUser ? { limit: 10 } : 'skip')
 
   const isLoading = activities === undefined || currentUser === undefined
   const normalizedActivities = useMemo(
@@ -202,14 +176,8 @@ export function RecentActivity() {
                     <Icon className="h-4 w-4" />
                   </div>
                   <div className="flex-1 space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {display.getTitle(activity)}
-                    </p>
-                    {description && (
-                      <p className="text-sm text-muted-foreground">
-                        {description}
-                      </p>
-                    )}
+                    <p className="text-sm font-medium leading-none">{display.getTitle(activity)}</p>
+                    {description && <p className="text-sm text-muted-foreground">{description}</p>}
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span>{timeAgo}</span>
                       {activity.target?.type && (
@@ -221,7 +189,10 @@ export function RecentActivity() {
                   </div>
                   <Avatar className="h-8 w-8">
                     {activity.actor?.avatar ? (
-                      <AvatarImage src={activity.actor.avatar} alt={activity.actor?.name ?? 'Team member'} />
+                      <AvatarImage
+                        src={activity.actor.avatar}
+                        alt={activity.actor?.name ?? 'Team member'}
+                      />
                     ) : (
                       <AvatarFallback>
                         {getInitials(activity.actor?.name ?? 'Team Member')}
@@ -252,18 +223,18 @@ function defaultDescription(activity: ActivityEntry) {
 }
 
 function humanize(value: string) {
-  return value
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase())
+  return value.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
 function getInitials(name: string) {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .map((part) => part[0]?.toUpperCase())
-    .join('')
-    .slice(0, 2) || 'TM'
+  return (
+    name
+      .split(' ')
+      .filter(Boolean)
+      .map((part) => part[0]?.toUpperCase())
+      .join('')
+      .slice(0, 2) || 'TM'
+  )
 }
 
 function formatTimestamp(timestamp?: string) {

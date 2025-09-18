@@ -1,5 +1,5 @@
-import { v } from "convex/values"
-import { query, mutation } from "./_generated/server"
+import { v } from 'convex/values'
+import { mutation, query } from './_generated/server'
 
 // Get current user profile from teamMembers table
 export const getCurrentUser = query({
@@ -12,8 +12,8 @@ export const getCurrentUser = query({
 
     // Look up user in teamMembers table
     const teamMember = await ctx.db
-      .query("teamMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .query('teamMembers')
+      .withIndex('by_userId', (q) => q.eq('userId', identity.subject))
       .first()
 
     if (!teamMember) {
@@ -21,10 +21,10 @@ export const getCurrentUser = query({
       return {
         _id: identity.subject,
         userId: identity.subject,
-        name: identity.name || identity.email?.split('@')[0] || "User",
-        email: identity.email || "",
-        avatar: identity.picture || "",
-        role: "admin", // Default role
+        name: identity.name || identity.email?.split('@')[0] || 'User',
+        email: identity.email || '',
+        avatar: identity.picture || '',
+        role: 'admin', // Default role
         isActive: true,
         createdAt: new Date().toISOString(),
         permissions: [],
@@ -42,20 +42,22 @@ export const createOrUpdateTeamMember = mutation({
     name: v.string(),
     email: v.string(),
     avatar: v.optional(v.string()),
-    role: v.optional(v.union(
-      v.literal("admin"),
-      v.literal("hiring_manager"),
-      v.literal("recruiter"),
-      v.literal("interviewer"),
-      v.literal("coordinator"),
-      v.literal("viewer")
-    )),
+    role: v.optional(
+      v.union(
+        v.literal('admin'),
+        v.literal('hiring_manager'),
+        v.literal('recruiter'),
+        v.literal('interviewer'),
+        v.literal('coordinator'),
+        v.literal('viewer')
+      )
+    ),
     department: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
-      .query("teamMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .query('teamMembers')
+      .withIndex('by_userId', (q) => q.eq('userId', args.userId))
       .first()
 
     if (existing) {
@@ -69,16 +71,16 @@ export const createOrUpdateTeamMember = mutation({
       })
     } else {
       // Create new team member
-      return await ctx.db.insert("teamMembers", {
+      return await ctx.db.insert('teamMembers', {
         userId: args.userId,
         name: args.name,
         email: args.email,
-        avatar: args.avatar || "",
-        role: args.role || "admin",
+        avatar: args.avatar || '',
+        role: args.role || 'admin',
         department: args.department,
         isActive: true,
         createdAt: new Date().toISOString(),
-        permissions: ["read", "write"], // Default permissions
+        permissions: ['read', 'write'], // Default permissions
       })
     }
   },
@@ -95,16 +97,16 @@ export const updateCurrentUserProfile = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
-      throw new Error("Not authenticated")
+      throw new Error('Not authenticated')
     }
 
     const teamMember = await ctx.db
-      .query("teamMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .query('teamMembers')
+      .withIndex('by_userId', (q) => q.eq('userId', identity.subject))
       .first()
 
     if (!teamMember) {
-      throw new Error("Team member not found")
+      throw new Error('Team member not found')
     }
 
     return await ctx.db.patch(teamMember._id, {

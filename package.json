@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint . --fix",
+    "format": "biome format . --write",
+    "check": "biome check .",
+    "check:fix": "biome check . --fix",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -68,6 +72,7 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.2.4",
     "@tanstack/react-query-devtools": "^5.12.2",
     "@types/node": "^20",
     "@types/pdf-parse": "^1.1.5",

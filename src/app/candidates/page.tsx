@@ -1,14 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { AppShell } from '@/components/layout/app-shell'
-import { Search, Filter, Star, Mail, Calendar, Download, MoreVertical, MapPin, Briefcase } from 'lucide-react'
-import Link from 'next/link'
 import { useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
+import { Briefcase, Download, MapPin, Search } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
 import { CandidateStatusActions } from '@/components/candidate-status-actions'
+import { AppShell } from '@/components/layout/app-shell'
+import { api } from '../../../convex/_generated/api'
 
-const statusColors = {
+const _statusColors = {
   screening: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
   interview: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
   offer: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
@@ -22,10 +22,11 @@ export default function CandidatesPage() {
   const [selectedStatus, setSelectedStatus] = useState('all')
 
   // Fetch candidates from Convex
-  const candidates = useQuery(api.candidates.list, {
-    status: selectedStatus === 'all' ? undefined : selectedStatus,
-    search: searchQuery || undefined,
-  }) || []
+  const candidates =
+    useQuery(api.candidates.list, {
+      status: selectedStatus === 'all' ? undefined : selectedStatus,
+      search: searchQuery || undefined,
+    }) || []
 
   return (
     <AppShell>
@@ -84,18 +85,17 @@ export default function CandidatesPage() {
           <div className="container-max">
             <div className="space-y-4">
               {candidates.map((candidate) => (
-                <Link
-                  key={candidate._id}
-                  href={`/candidates/${candidate._id}`}
-                  className="block"
-                >
+                <Link key={candidate._id} href={`/candidates/${candidate._id}`} className="block">
                   <div className="card-clean hover:shadow-md transition-all cursor-pointer">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start gap-4">
                           {/* Avatar */}
                           <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-sm font-medium shrink-0">
-                            {candidate.name.split(' ').map(n => n[0]).join('')}
+                            {candidate.name
+                              .split(' ')
+                              .map((n) => n[0])
+                              .join('')}
                           </div>
 
                           <div className="flex-1">
@@ -109,7 +109,9 @@ export default function CandidatesPage() {
 
                               {/* Evaluation score */}
                               <div className="text-right">
-                                <div className="text-2xl font-semibold">{candidate.evaluation.overall}%</div>
+                                <div className="text-2xl font-semibold">
+                                  {candidate.evaluation.overall}%
+                                </div>
                                 <p className="text-xs text-muted-foreground">Eval Score</p>
                               </div>
                             </div>
@@ -123,9 +125,7 @@ export default function CandidatesPage() {
                                 <MapPin className="h-3 w-3" />
                                 {candidate.location}
                               </div>
-                              <div>
-                                {candidate.experience}
-                              </div>
+                              <div>{candidate.experience}</div>
                             </div>
 
                             {/* Skills */}
@@ -143,7 +143,8 @@ export default function CandidatesPage() {
                             </div>
 
                             {/* Status and Actions */}
-                            <div className="mt-4"
+                            <div
+                              className="mt-4"
                               onClick={(e) => {
                                 e.preventDefault()
                                 e.stopPropagation()

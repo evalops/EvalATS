@@ -1,12 +1,12 @@
 'use client'
 
+import { useQuery } from 'convex/react'
+import { Clock, Filter, MapPin, MoreVertical, Plus, Search, Users } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import { AppShell } from '@/components/layout/app-shell'
-import { Plus, Search, Filter, MoreVertical, Users, Clock, MapPin } from 'lucide-react'
-import { useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
-import Link from 'next/link'
 import { JobCreationModal } from '@/components/modals/job-creation-modal'
+import { api } from '../../../convex/_generated/api'
 
 const statusColors = {
   active: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
@@ -26,10 +26,11 @@ export default function JobsPage() {
   const [isJobModalOpen, setIsJobModalOpen] = useState(false)
 
   // Fetch jobs from Convex
-  const jobs = useQuery(api.jobs.list, {
-    status: selectedStatus === 'all' ? undefined : selectedStatus,
-    search: searchQuery || undefined,
-  }) || []
+  const jobs =
+    useQuery(api.jobs.list, {
+      status: selectedStatus === 'all' ? undefined : selectedStatus,
+      search: searchQuery || undefined,
+    }) || []
 
   return (
     <AppShell>
@@ -108,7 +109,9 @@ export default function JobsPage() {
                           <p className="text-sm text-muted-foreground">{job.department}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className={`badge-clean ${statusColors[job.status as keyof typeof statusColors]}`}>
+                          <span
+                            className={`badge-clean ${statusColors[job.status as keyof typeof statusColors]}`}
+                          >
                             {job.status}
                           </span>
                           <button className="p-2 rounded-md hover:bg-accent">
@@ -155,9 +158,7 @@ export default function JobsPage() {
 
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-4">
-                          <span className="text-muted-foreground">
-                            Posted {job.postedDate}
-                          </span>
+                          <span className="text-muted-foreground">Posted {job.postedDate}</span>
                           {job.salaryMin && job.salaryMax && (
                             <span className="font-medium">
                               ${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()}
@@ -168,9 +169,7 @@ export default function JobsPage() {
                           <Link href={`/jobs/${job._id}`} className="btn-secondary text-sm">
                             View Applications
                           </Link>
-                          <button className="btn-primary text-sm">
-                            Edit Job
-                          </button>
+                          <button className="btn-primary text-sm">Edit Job</button>
                         </div>
                       </div>
                     </div>
@@ -189,10 +188,7 @@ export default function JobsPage() {
       </div>
 
       {/* Job Creation Modal */}
-      <JobCreationModal
-        isOpen={isJobModalOpen}
-        onClose={() => setIsJobModalOpen(false)}
-      />
+      <JobCreationModal isOpen={isJobModalOpen} onClose={() => setIsJobModalOpen(false)} />
     </AppShell>
   )
 }

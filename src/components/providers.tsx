@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import { AuthProvider } from '@/providers/auth-provider'
@@ -30,9 +30,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return (
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
-          <div className="min-h-screen bg-background">
-            {children}
-          </div>
+          <div className="min-h-screen bg-background">{children}</div>
         </QueryClientProvider>
       </AuthProvider>
     )

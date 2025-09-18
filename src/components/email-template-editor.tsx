@@ -1,32 +1,47 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { useQuery, useMutation } from "convex/react"
-import { api } from "../../convex/_generated/api"
-import { Id } from "../../convex/_generated/dataModel"
+import { useMutation, useQuery } from 'convex/react'
 import {
-  Mail, Plus, Trash2, Edit, Save, X, Eye, Send,
-  Code, Copy, FileText, Users, Calendar, Package,
-  ChevronDown, Tag, Sparkles, Link, Image, List,
-  Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight,
-  AlertCircle
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
-import { toast } from "sonner"
+  AlertCircle,
+  Calendar,
+  Code,
+  Copy,
+  Edit,
+  FileText,
+  Mail,
+  Package,
+  Plus,
+  Save,
+  Send,
+  Tag,
+  Trash2,
+  X,
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
+import { Switch } from '@/components/ui/switch'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
+import { api } from '../../convex/_generated/api'
+import type { Id } from '../../convex/_generated/dataModel'
 
-type TemplateCategory = "application" | "interview" | "offer" | "rejection" | "general"
+type TemplateCategory = 'application' | 'interview' | 'offer' | 'rejection' | 'general'
 type TemplateVariable = {
   key: string
   label: string
@@ -34,7 +49,7 @@ type TemplateVariable = {
 }
 
 interface EmailTemplate {
-  _id?: Id<"emailTemplates">
+  _id?: Id<'emailTemplates'>
   name: string
   category: TemplateCategory
   subject: string
@@ -47,30 +62,30 @@ interface EmailTemplate {
 }
 
 const templateVariables: TemplateVariable[] = [
-  { key: "{{candidate_name}}", label: "Candidate Name", example: "Jonathan Haas" },
-  { key: "{{candidate_first}}", label: "First Name", example: "John" },
-  { key: "{{candidate_email}}", label: "Candidate Email", example: "john@example.com" },
-  { key: "{{position}}", label: "Position", example: "Senior Software Engineer" },
-  { key: "{{department}}", label: "Department", example: "Engineering" },
-  { key: "{{company}}", label: "Company Name", example: "Acme Corp" },
-  { key: "{{interview_date}}", label: "Interview Date", example: "March 15, 2024" },
-  { key: "{{interview_time}}", label: "Interview Time", example: "2:00 PM PST" },
-  { key: "{{interview_type}}", label: "Interview Type", example: "Technical Interview" },
-  { key: "{{interview_location}}", label: "Location/Link", example: "Zoom Meeting" },
-  { key: "{{interviewers}}", label: "Interviewers", example: "Jane Smith, Bob Johnson" },
-  { key: "{{salary}}", label: "Salary", example: "$150,000" },
-  { key: "{{start_date}}", label: "Start Date", example: "April 1, 2024" },
-  { key: "{{deadline}}", label: "Deadline", example: "March 20, 2024" },
-  { key: "{{recruiter_name}}", label: "Recruiter Name", example: "Sarah Wilson" },
-  { key: "{{recruiter_email}}", label: "Recruiter Email", example: "sarah@company.com" },
-  { key: "{{recruiter_phone}}", label: "Recruiter Phone", example: "(555) 123-4567" },
+  { key: '{{candidate_name}}', label: 'Candidate Name', example: 'Jonathan Haas' },
+  { key: '{{candidate_first}}', label: 'First Name', example: 'John' },
+  { key: '{{candidate_email}}', label: 'Candidate Email', example: 'john@example.com' },
+  { key: '{{position}}', label: 'Position', example: 'Senior Software Engineer' },
+  { key: '{{department}}', label: 'Department', example: 'Engineering' },
+  { key: '{{company}}', label: 'Company Name', example: 'Acme Corp' },
+  { key: '{{interview_date}}', label: 'Interview Date', example: 'March 15, 2024' },
+  { key: '{{interview_time}}', label: 'Interview Time', example: '2:00 PM PST' },
+  { key: '{{interview_type}}', label: 'Interview Type', example: 'Technical Interview' },
+  { key: '{{interview_location}}', label: 'Location/Link', example: 'Zoom Meeting' },
+  { key: '{{interviewers}}', label: 'Interviewers', example: 'Jane Smith, Bob Johnson' },
+  { key: '{{salary}}', label: 'Salary', example: '$150,000' },
+  { key: '{{start_date}}', label: 'Start Date', example: 'April 1, 2024' },
+  { key: '{{deadline}}', label: 'Deadline', example: 'March 20, 2024' },
+  { key: '{{recruiter_name}}', label: 'Recruiter Name', example: 'Sarah Wilson' },
+  { key: '{{recruiter_email}}', label: 'Recruiter Email', example: 'sarah@company.com' },
+  { key: '{{recruiter_phone}}', label: 'Recruiter Phone', example: '(555) 123-4567' },
 ]
 
-const defaultTemplates: Omit<EmailTemplate, "_id">[] = [
+const defaultTemplates: Omit<EmailTemplate, '_id'>[] = [
   {
-    name: "Application Received",
-    category: "application",
-    subject: "Application Received - {{position}} at {{company}}",
+    name: 'Application Received',
+    category: 'application',
+    subject: 'Application Received - {{position}} at {{company}}',
     content: `Dear {{candidate_name}},
 
 Thank you for your interest in the {{position}} position at {{company}}. We have received your application and are currently reviewing it.
@@ -82,15 +97,15 @@ In the meantime, feel free to learn more about our company culture and values on
 Best regards,
 {{recruiter_name}}
 {{company}} Talent Acquisition Team`,
-    variables: ["candidate_name", "position", "company", "recruiter_name"],
-    tags: ["application", "acknowledgment"],
+    variables: ['candidate_name', 'position', 'company', 'recruiter_name'],
+    tags: ['application', 'acknowledgment'],
     isActive: true,
-    useCount: 0
+    useCount: 0,
   },
   {
-    name: "Interview Invitation",
-    category: "interview",
-    subject: "Interview Invitation - {{position}} at {{company}}",
+    name: 'Interview Invitation',
+    category: 'interview',
+    subject: 'Interview Invitation - {{position}} at {{company}}',
     content: `Dear {{candidate_first}},
 
 We are pleased to inform you that you have been selected for an interview for the {{position}} position at {{company}}.
@@ -109,15 +124,26 @@ We look forward to speaking with you!
 Best regards,
 {{recruiter_name}}
 {{recruiter_email}}`,
-    variables: ["candidate_first", "position", "company", "interview_date", "interview_time", "interview_type", "interview_location", "interviewers", "recruiter_name", "recruiter_email"],
-    tags: ["interview", "invitation", "scheduling"],
+    variables: [
+      'candidate_first',
+      'position',
+      'company',
+      'interview_date',
+      'interview_time',
+      'interview_type',
+      'interview_location',
+      'interviewers',
+      'recruiter_name',
+      'recruiter_email',
+    ],
+    tags: ['interview', 'invitation', 'scheduling'],
     isActive: true,
-    useCount: 0
+    useCount: 0,
   },
   {
-    name: "Offer Letter",
-    category: "offer",
-    subject: "Job Offer - {{position}} at {{company}}",
+    name: 'Offer Letter',
+    category: 'offer',
+    subject: 'Job Offer - {{position}} at {{company}}',
     content: `Dear {{candidate_name}},
 
 Congratulations! We are excited to extend an offer for the {{position}} position at {{company}}.
@@ -139,15 +165,24 @@ Welcome to the team!
 Best regards,
 {{recruiter_name}}
 {{company}}`,
-    variables: ["candidate_name", "position", "company", "department", "salary", "start_date", "deadline", "recruiter_name"],
-    tags: ["offer", "compensation", "hiring"],
+    variables: [
+      'candidate_name',
+      'position',
+      'company',
+      'department',
+      'salary',
+      'start_date',
+      'deadline',
+      'recruiter_name',
+    ],
+    tags: ['offer', 'compensation', 'hiring'],
     isActive: true,
-    useCount: 0
+    useCount: 0,
   },
   {
-    name: "Rejection - After Interview",
-    category: "rejection",
-    subject: "Update on Your Application - {{position}} at {{company}}",
+    name: 'Rejection - After Interview',
+    category: 'rejection',
+    subject: 'Update on Your Application - {{position}} at {{company}}',
     content: `Dear {{candidate_name}},
 
 Thank you for taking the time to interview with us for the {{position}} position at {{company}}. We appreciate your interest in joining our team and the opportunity to learn about your background and experience.
@@ -161,19 +196,19 @@ We wish you the best in your job search and future endeavors.
 Sincerely,
 {{recruiter_name}}
 {{company}} Talent Acquisition Team`,
-    variables: ["candidate_name", "position", "company", "recruiter_name"],
-    tags: ["rejection", "post-interview"],
+    variables: ['candidate_name', 'position', 'company', 'recruiter_name'],
+    tags: ['rejection', 'post-interview'],
     isActive: true,
-    useCount: 0
-  }
+    useCount: 0,
+  },
 ]
 
 export function EmailTemplateEditor() {
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null)
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null)
-  const [showPreview, setShowPreview] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [categoryFilter, setCategoryFilter] = useState<TemplateCategory | "all">("all")
+  const [_showPreview, _setShowPreview] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState<TemplateCategory | 'all'>('all')
   const [isCreating, setIsCreating] = useState(false)
   const [testData, setTestData] = useState<Record<string, string>>({})
 
@@ -186,33 +221,34 @@ export function EmailTemplateEditor() {
   useEffect(() => {
     // Initialize test data with example values
     const data: Record<string, string> = {}
-    templateVariables.forEach(v => {
+    templateVariables.forEach((v) => {
       data[v.key] = v.example
     })
     setTestData(data)
   }, [])
 
-  const filteredTemplates = templates.filter(t => {
-    const matchesSearch = !searchQuery ||
+  const filteredTemplates = templates.filter((t) => {
+    const matchesSearch =
+      !searchQuery ||
       t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.content.toLowerCase().includes(searchQuery.toLowerCase())
 
-    const matchesCategory = categoryFilter === "all" || t.category === categoryFilter
+    const matchesCategory = categoryFilter === 'all' || t.category === categoryFilter
 
     return matchesSearch && matchesCategory
   })
 
   const handleCreateNew = () => {
     const newTemplate: EmailTemplate = {
-      name: "New Template",
-      category: "general",
-      subject: "",
-      content: "",
+      name: 'New Template',
+      category: 'general',
+      subject: '',
+      content: '',
       variables: [],
       tags: [],
       isActive: true,
-      useCount: 0
+      useCount: 0,
     }
     setEditingTemplate(newTemplate)
     setIsCreating(true)
@@ -223,31 +259,32 @@ export function EmailTemplateEditor() {
 
     try {
       // Extract variables from content and subject
-      const contentVars = (editingTemplate.content.match(/\{\{[^}]+\}\}/g) || [])
-      const subjectVars = (editingTemplate.subject.match(/\{\{[^}]+\}\}/g) || [])
-      const allVars = [...new Set([...contentVars, ...subjectVars])]
-        .map(v => v.replace(/[{}]/g, "").trim())
+      const contentVars = editingTemplate.content.match(/\{\{[^}]+\}\}/g) || []
+      const subjectVars = editingTemplate.subject.match(/\{\{[^}]+\}\}/g) || []
+      const allVars = [...new Set([...contentVars, ...subjectVars])].map((v) =>
+        v.replace(/[{}]/g, '').trim()
+      )
 
       await saveTemplate({
         ...editingTemplate,
-        variables: allVars
+        variables: allVars,
       })
 
       toast.success(`Template "${editingTemplate.name}" saved successfully`)
       setEditingTemplate(null)
       setIsCreating(false)
-    } catch (error) {
-      toast.error("Failed to save template")
+    } catch (_error) {
+      toast.error('Failed to save template')
     }
   }
 
-  const handleDeleteTemplate = async (id: Id<"emailTemplates">) => {
+  const handleDeleteTemplate = async (id: Id<'emailTemplates'>) => {
     try {
       await deleteTemplate({ id })
-      toast.success("Template deleted")
+      toast.success('Template deleted')
       setSelectedTemplate(null)
-    } catch (error) {
-      toast.error("Failed to delete template")
+    } catch (_error) {
+      toast.error('Failed to delete template')
     }
   }
 
@@ -255,18 +292,18 @@ export function EmailTemplateEditor() {
     try {
       await duplicateTemplate({
         id: template._id!,
-        name: `${template.name} (Copy)`
+        name: `${template.name} (Copy)`,
       })
-      toast.success("Template duplicated")
-    } catch (error) {
-      toast.error("Failed to duplicate template")
+      toast.success('Template duplicated')
+    } catch (_error) {
+      toast.error('Failed to duplicate template')
     }
   }
 
   const insertVariable = (variable: string) => {
     if (!editingTemplate) return
 
-    const textarea = document.getElementById("template-content") as HTMLTextAreaElement
+    const textarea = document.getElementById('template-content') as HTMLTextAreaElement
     if (!textarea) return
 
     const start = textarea.selectionStart
@@ -276,7 +313,7 @@ export function EmailTemplateEditor() {
 
     setEditingTemplate({
       ...editingTemplate,
-      content: newContent
+      content: newContent,
     })
 
     // Reset cursor position
@@ -293,7 +330,7 @@ export function EmailTemplateEditor() {
 
     // Replace variables with test data
     Object.entries(testData).forEach(([key, value]) => {
-      const regex = new RegExp(key.replace(/[{}]/g, "\\$&"), "g")
+      const regex = new RegExp(key.replace(/[{}]/g, '\\$&'), 'g')
       preview = preview.replace(regex, value)
       subject = subject.replace(regex, value)
     })
@@ -301,15 +338,15 @@ export function EmailTemplateEditor() {
     return { subject, content: preview }
   }
 
-  const getCategoryIcon = (category: TemplateCategory) => {
+  const _getCategoryIcon = (category: TemplateCategory) => {
     switch (category) {
-      case "application":
+      case 'application':
         return <FileText className="h-4 w-4" />
-      case "interview":
+      case 'interview':
         return <Calendar className="h-4 w-4" />
-      case "offer":
+      case 'offer':
         return <Package className="h-4 w-4" />
-      case "rejection":
+      case 'rejection':
         return <X className="h-4 w-4" />
       default:
         return <Mail className="h-4 w-4" />
@@ -318,16 +355,16 @@ export function EmailTemplateEditor() {
 
   const getCategoryColor = (category: TemplateCategory) => {
     switch (category) {
-      case "application":
-        return "bg-blue-500"
-      case "interview":
-        return "bg-purple-500"
-      case "offer":
-        return "bg-green-500"
-      case "rejection":
-        return "bg-red-500"
+      case 'application':
+        return 'bg-blue-500'
+      case 'interview':
+        return 'bg-purple-500'
+      case 'offer':
+        return 'bg-green-500'
+      case 'rejection':
+        return 'bg-red-500'
       default:
-        return "bg-gray-500"
+        return 'bg-gray-500'
     }
   }
 
@@ -336,7 +373,9 @@ export function EmailTemplateEditor() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">Email Templates</h1>
-          <p className="text-gray-600">Create and manage email templates for candidate communication</p>
+          <p className="text-gray-600">
+            Create and manage email templates for candidate communication
+          </p>
         </div>
         <Button onClick={handleCreateNew}>
           <Plus className="h-4 w-4 mr-2" />
@@ -378,17 +417,26 @@ export function EmailTemplateEditor() {
                     <div
                       key={'_id' in template ? template._id : template.name}
                       className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
-                        selectedTemplate && '_id' in selectedTemplate && '_id' in template && selectedTemplate._id === template._id ? "border-blue-500 bg-blue-50" : ""
+                        selectedTemplate &&
+                        '_id' in selectedTemplate &&
+                        '_id' in template &&
+                        selectedTemplate._id === template._id
+                          ? 'border-blue-500 bg-blue-50'
+                          : ''
                       }`}
                       onClick={() => setSelectedTemplate(template as EmailTemplate)}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <div className={`h-2 w-2 rounded-full ${getCategoryColor(template.category as TemplateCategory)}`} />
+                            <div
+                              className={`h-2 w-2 rounded-full ${getCategoryColor(template.category as TemplateCategory)}`}
+                            />
                             <p className="font-medium text-sm">{template.name}</p>
                           </div>
-                          <p className="text-xs text-gray-600 mt-1 line-clamp-1">{template.subject}</p>
+                          <p className="text-xs text-gray-600 mt-1 line-clamp-1">
+                            {template.subject}
+                          </p>
                           <div className="flex items-center gap-2 mt-2">
                             <Badge variant="secondary" className="text-xs">
                               {template.category}
@@ -420,9 +468,7 @@ export function EmailTemplateEditor() {
             <Card className="h-[calc(100vh-200px)]">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>
-                    {isCreating ? "Create New Template" : "Edit Template"}
-                  </CardTitle>
+                  <CardTitle>{isCreating ? 'Create New Template' : 'Edit Template'}</CardTitle>
                   <div className="flex gap-2">
                     <Button
                       variant="ghost"
@@ -448,10 +494,12 @@ export function EmailTemplateEditor() {
                       <Label>Template Name</Label>
                       <Input
                         value={editingTemplate.name}
-                        onChange={(e) => setEditingTemplate({
-                          ...editingTemplate,
-                          name: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setEditingTemplate({
+                            ...editingTemplate,
+                            name: e.target.value,
+                          })
+                        }
                         className="mt-1"
                       />
                     </div>
@@ -459,10 +507,12 @@ export function EmailTemplateEditor() {
                       <Label>Category</Label>
                       <Select
                         value={editingTemplate.category}
-                        onValueChange={(v) => setEditingTemplate({
-                          ...editingTemplate,
-                          category: v as TemplateCategory
-                        })}
+                        onValueChange={(v) =>
+                          setEditingTemplate({
+                            ...editingTemplate,
+                            category: v as TemplateCategory,
+                          })
+                        }
                       >
                         <SelectTrigger className="mt-1">
                           <SelectValue />
@@ -482,10 +532,12 @@ export function EmailTemplateEditor() {
                     <Label>Subject Line</Label>
                     <Input
                       value={editingTemplate.subject}
-                      onChange={(e) => setEditingTemplate({
-                        ...editingTemplate,
-                        subject: e.target.value
-                      })}
+                      onChange={(e) =>
+                        setEditingTemplate({
+                          ...editingTemplate,
+                          subject: e.target.value,
+                        })
+                      }
                       placeholder="Email subject..."
                       className="mt-1"
                     />
@@ -530,10 +582,12 @@ export function EmailTemplateEditor() {
                     <Textarea
                       id="template-content"
                       value={editingTemplate.content}
-                      onChange={(e) => setEditingTemplate({
-                        ...editingTemplate,
-                        content: e.target.value
-                      })}
+                      onChange={(e) =>
+                        setEditingTemplate({
+                          ...editingTemplate,
+                          content: e.target.value,
+                        })
+                      }
                       placeholder="Email content..."
                       className="min-h-[300px] font-mono text-sm"
                     />
@@ -542,11 +596,16 @@ export function EmailTemplateEditor() {
                   <div>
                     <Label>Tags (comma-separated)</Label>
                     <Input
-                      value={editingTemplate.tags.join(", ")}
-                      onChange={(e) => setEditingTemplate({
-                        ...editingTemplate,
-                        tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean)
-                      })}
+                      value={editingTemplate.tags.join(', ')}
+                      onChange={(e) =>
+                        setEditingTemplate({
+                          ...editingTemplate,
+                          tags: e.target.value
+                            .split(',')
+                            .map((t) => t.trim())
+                            .filter(Boolean),
+                        })
+                      }
                       placeholder="e.g., interview, technical, followup"
                       className="mt-1"
                     />
@@ -557,10 +616,12 @@ export function EmailTemplateEditor() {
                     <Switch
                       id="active"
                       checked={editingTemplate.isActive}
-                      onCheckedChange={(checked) => setEditingTemplate({
-                        ...editingTemplate,
-                        isActive: checked
-                      })}
+                      onCheckedChange={(checked) =>
+                        setEditingTemplate({
+                          ...editingTemplate,
+                          isActive: checked,
+                        })
+                      }
                     />
                   </div>
                 </div>
@@ -596,7 +657,9 @@ export function EmailTemplateEditor() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => selectedTemplate._id && handleDeleteTemplate(selectedTemplate._id)}
+                      onClick={() =>
+                        selectedTemplate._id && handleDeleteTemplate(selectedTemplate._id)
+                      }
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -614,13 +677,17 @@ export function EmailTemplateEditor() {
                   <TabsContent value="template" className="space-y-4">
                     <div>
                       <Label className="text-xs text-gray-500">Subject</Label>
-                      <p className="mt-1 p-2 bg-gray-50 rounded text-sm">{selectedTemplate.subject}</p>
+                      <p className="mt-1 p-2 bg-gray-50 rounded text-sm">
+                        {selectedTemplate.subject}
+                      </p>
                     </div>
 
                     <div>
                       <Label className="text-xs text-gray-500">Content</Label>
                       <div className="mt-1 p-4 bg-gray-50 rounded">
-                        <pre className="whitespace-pre-wrap text-sm font-sans">{selectedTemplate.content}</pre>
+                        <pre className="whitespace-pre-wrap text-sm font-sans">
+                          {selectedTemplate.content}
+                        </pre>
                       </div>
                     </div>
 
@@ -693,11 +760,7 @@ export function EmailTemplateEditor() {
                     <div className="space-y-4">
                       <div>
                         <Label>Test Email Address</Label>
-                        <Input
-                          type="email"
-                          placeholder="test@example.com"
-                          className="mt-1"
-                        />
+                        <Input type="email" placeholder="test@example.com" className="mt-1" />
                       </div>
 
                       <div>
@@ -706,16 +769,18 @@ export function EmailTemplateEditor() {
                           <div className="space-y-2">
                             {selectedTemplate.variables.map((variable) => {
                               const varKey = `{{${variable}}}`
-                              const varInfo = templateVariables.find(v => v.key === varKey)
+                              const varInfo = templateVariables.find((v) => v.key === varKey)
                               return (
                                 <div key={variable} className="grid grid-cols-2 gap-2 items-center">
                                   <Label className="text-sm">{varInfo?.label || variable}</Label>
                                   <Input
-                                    value={testData[varKey] || ""}
-                                    onChange={(e) => setTestData({
-                                      ...testData,
-                                      [varKey]: e.target.value
-                                    })}
+                                    value={testData[varKey] || ''}
+                                    onChange={(e) =>
+                                      setTestData({
+                                        ...testData,
+                                        [varKey]: e.target.value,
+                                      })
+                                    }
                                     className="h-8"
                                   />
                                 </div>

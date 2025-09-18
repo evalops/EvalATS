@@ -1,21 +1,21 @@
 'use client'
 
 import { useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
-import { AppShell } from '@/components/layout/app-shell'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
 import {
-  BarChart3,
-  Users,
-  Calendar,
-  TrendingUp,
-  Clock,
   Award,
+  BarChart3,
+  Calendar,
+  Clock,
+  MessageSquare,
   Target,
-  MessageSquare
+  TrendingUp,
+  Users,
 } from 'lucide-react'
+import { AppShell } from '@/components/layout/app-shell'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { api } from '../../../convex/_generated/api'
 
 export default function AnalyticsPage() {
   const metrics = useQuery(api.analytics.getHiringMetrics)
@@ -61,7 +61,6 @@ export default function AnalyticsPage() {
         {/* Main content */}
         <div className="section-padding py-8">
           <div className="container-max space-y-8">
-
             {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card>
@@ -71,9 +70,7 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{metrics.totalJobs}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {metrics.activeJobs} active
-                  </p>
+                  <p className="text-xs text-muted-foreground">{metrics.activeJobs} active</p>
                 </CardContent>
               </Card>
 
@@ -116,7 +113,6 @@ export default function AnalyticsPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
               {/* Hiring Funnel */}
               <Card>
                 <CardHeader>
@@ -124,12 +120,10 @@ export default function AnalyticsPage() {
                     <TrendingUp className="h-5 w-5" />
                     Hiring Funnel
                   </CardTitle>
-                  <CardDescription>
-                    Conversion rates through your hiring process
-                  </CardDescription>
+                  <CardDescription>Conversion rates through your hiring process</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {funnelData.map((stage, index) => (
+                  {funnelData.map((stage, _index) => (
                     <div key={stage.stage} className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <span className="font-medium">{stage.stage}</span>
@@ -143,9 +137,11 @@ export default function AnalyticsPage() {
                       <Progress
                         value={stage.conversionRate}
                         className="h-2"
-                        style={{
-                          '--progress-background': stage.color
-                        } as React.CSSProperties}
+                        style={
+                          {
+                            '--progress-background': stage.color,
+                          } as React.CSSProperties
+                        }
                       />
                     </div>
                   ))}
@@ -159,9 +155,7 @@ export default function AnalyticsPage() {
                     <Target className="h-5 w-5" />
                     Source Effectiveness
                   </CardTitle>
-                  <CardDescription>
-                    Performance by candidate source
-                  </CardDescription>
+                  <CardDescription>Performance by candidate source</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -173,9 +167,7 @@ export default function AnalyticsPage() {
                             <div className="text-xs text-muted-foreground">
                               {source.totalApplications} applications
                             </div>
-                            <div className="text-xs">
-                              {source.hireRate}% hire rate
-                            </div>
+                            <div className="text-xs">{source.hireRate}% hire rate</div>
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
@@ -201,9 +193,7 @@ export default function AnalyticsPage() {
                     <MessageSquare className="h-5 w-5" />
                     Interview Performance
                   </CardTitle>
-                  <CardDescription>
-                    Feedback and rating analysis
-                  </CardDescription>
+                  <CardDescription>Feedback and rating analysis</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -221,7 +211,9 @@ export default function AnalyticsPage() {
                     <div className="text-sm font-medium">Rating Distribution</div>
                     {interviewMetrics.ratingDistribution.map((rating) => (
                       <div key={rating.rating} className="flex items-center gap-2">
-                        <span className="text-xs w-12">{rating.rating} star{rating.rating !== 1 ? 's' : ''}</span>
+                        <span className="text-xs w-12">
+                          {rating.rating} star{rating.rating !== 1 ? 's' : ''}
+                        </span>
                         <Progress
                           value={(rating.count / interviewMetrics.totalInterviews) * 100}
                           className="flex-1 h-2"
@@ -261,9 +253,7 @@ export default function AnalyticsPage() {
                     <Award className="h-5 w-5" />
                     Recent Hires
                   </CardTitle>
-                  <CardDescription>
-                    Latest successful hires and time to hire
-                  </CardDescription>
+                  <CardDescription>Latest successful hires and time to hire</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -273,7 +263,10 @@ export default function AnalyticsPage() {
                       </p>
                     ) : (
                       timeToHire.recentHires.map((hire) => (
-                        <div key={hire.candidateId} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+                        <div
+                          key={hire.candidateId}
+                          className="flex items-center justify-between py-2 border-b border-border/50 last:border-0"
+                        >
                           <div>
                             <div className="font-medium text-sm">{hire.candidateName}</div>
                             <div className="text-xs text-muted-foreground">{hire.jobTitle}</div>
@@ -293,9 +286,7 @@ export default function AnalyticsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Candidate Status Distribution</CardTitle>
-                <CardDescription>
-                  Current state of all candidates in your pipeline
-                </CardDescription>
+                <CardDescription>Current state of all candidates in your pipeline</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">

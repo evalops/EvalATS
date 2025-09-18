@@ -1,19 +1,31 @@
 'use client'
 
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
-import { AppShell } from '@/components/layout/app-shell'
-import Link from 'next/link'
-import {
-  ArrowLeft, Mail, Phone, MapPin, Linkedin, Github, Globe,
-  Download, Calendar, Clock, Star, FileText, Video,
-  CheckCircle, XCircle, AlertCircle, ChevronRight, Upload
-} from 'lucide-react'
 import { useQuery } from 'convex/react'
-import { api } from '../../../../convex/_generated/api'
-import { Id } from '../../../../convex/_generated/dataModel'
-import { CandidateFileModal } from '@/components/modals/candidate-file-modal'
+import {
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle,
+  Download,
+  FileText,
+  Github,
+  Globe,
+  Linkedin,
+  Mail,
+  MapPin,
+  Phone,
+  Star,
+  Upload,
+  Video,
+  XCircle,
+} from 'lucide-react'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import { useState } from 'react'
 import { EmailThread } from '@/components/emails/email-thread'
+import { AppShell } from '@/components/layout/app-shell'
+import { CandidateFileModal } from '@/components/modals/candidate-file-modal'
+import { api } from '../../../../convex/_generated/api'
+import type { Id } from '../../../../convex/_generated/dataModel'
 
 const statusColors = {
   screening: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
@@ -35,7 +47,7 @@ const timelineIcons = {
 
 export default function CandidatePage() {
   const params = useParams()
-  const candidateId = params.id as Id<"candidates">
+  const candidateId = params.id as Id<'candidates'>
   const [activeTab, setActiveTab] = useState('timeline')
   const [isFileModalOpen, setIsFileModalOpen] = useState(false)
 
@@ -63,10 +75,7 @@ export default function CandidatePage() {
           <div className="container-max">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-4">
-                <Link
-                  href="/candidates"
-                  className="p-2 rounded-md hover:bg-accent"
-                >
+                <Link href="/candidates" className="p-2 rounded-md hover:bg-accent">
                   <ArrowLeft className="h-4 w-4" />
                 </Link>
                 <div>
@@ -76,15 +85,13 @@ export default function CandidatePage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className={`badge-clean ${statusColors[candidate.status as keyof typeof statusColors]}`}>
+                <span
+                  className={`badge-clean ${statusColors[candidate.status as keyof typeof statusColors]}`}
+                >
                   {candidate.status}
                 </span>
-                <button className="btn-secondary">
-                  Schedule Interview
-                </button>
-                <button className="btn-primary">
-                  Move to Next Stage
-                </button>
+                <button className="btn-secondary">Schedule Interview</button>
+                <button className="btn-primary">Move to Next Stage</button>
               </div>
             </div>
           </div>
@@ -99,7 +106,10 @@ export default function CandidatePage() {
                 <div className="card-clean">
                   <div className="flex items-start gap-4">
                     <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center text-xl font-medium">
-                      {candidate.name.split(' ').map(n => n[0]).join('')}
+                      {candidate.name
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')}
                     </div>
                     <div className="flex-1">
                       <h2 className="text-xl font-semibold">{candidate.name}</h2>
@@ -266,17 +276,20 @@ export default function CandidatePage() {
                   <div className="space-y-4">
                     {candidate.timeline && candidate.timeline.length > 0 ? (
                       candidate.timeline.map((event, index) => {
-                        const Icon = timelineIcons[event.type as keyof typeof timelineIcons] || CheckCircle
+                        const Icon =
+                          timelineIcons[event.type as keyof typeof timelineIcons] || CheckCircle
                         return (
                           <div key={index} className="flex gap-4">
                             <div className="relative">
-                              <div className={`p-2 rounded-full ${
-                                event.status === 'completed'
-                                  ? 'bg-primary/10 text-primary'
-                                  : event.status === 'scheduled'
-                                  ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
-                                  : 'bg-muted text-muted-foreground'
-                              }`}>
+                              <div
+                                className={`p-2 rounded-full ${
+                                  event.status === 'completed'
+                                    ? 'bg-primary/10 text-primary'
+                                    : event.status === 'scheduled'
+                                      ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
+                                      : 'bg-muted text-muted-foreground'
+                                }`}
+                              >
                                 <Icon className="h-4 w-4" />
                               </div>
                               {index < candidate.timeline.length - 1 && (
@@ -288,15 +301,21 @@ export default function CandidatePage() {
                                 <div className="flex items-start justify-between">
                                   <div>
                                     <h4 className="font-medium">{event.title}</h4>
-                                    <p className="text-sm text-muted-foreground mt-1">{event.description}</p>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                      {event.description}
+                                    </p>
                                   </div>
-                                  <span className="text-xs text-muted-foreground">{event.date}</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {event.date}
+                                  </span>
                                 </div>
                                 {(event as any).interviewer && (
                                   <div className="mt-3 pt-3 border-t border-border">
                                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                       <span>Interviewer: {(event as any).interviewer}</span>
-                                      {(event as any).duration && <span>Duration: {(event as any).duration}</span>}
+                                      {(event as any).duration && (
+                                        <span>Duration: {(event as any).duration}</span>
+                                      )}
                                     </div>
                                     {(event as any).feedback && (
                                       <p className="mt-2 text-sm">{(event as any).feedback}</p>
@@ -347,14 +366,18 @@ export default function CandidatePage() {
                             </div>
                             <div className="text-right">
                               <div className="text-2xl font-semibold">{assessment.score}</div>
-                              <p className="text-xs text-muted-foreground">out of {assessment.maxScore}</p>
+                              <p className="text-xs text-muted-foreground">
+                                out of {assessment.maxScore}
+                              </p>
                             </div>
                           </div>
                           <div className="mt-4">
                             <div className="w-full bg-muted rounded-full h-2">
                               <div
                                 className="bg-primary rounded-full h-2 transition-all"
-                                style={{ width: `${(assessment.score / assessment.maxScore) * 100}%` }}
+                                style={{
+                                  width: `${(assessment.score / assessment.maxScore) * 100}%`,
+                                }}
                               />
                             </div>
                           </div>
@@ -397,9 +420,7 @@ export default function CandidatePage() {
                             placeholder="Type your note here..."
                             className="input-clean min-h-[100px]"
                           />
-                          <button className="btn-primary mt-3">
-                            Add Note
-                          </button>
+                          <button className="btn-primary mt-3">Add Note</button>
                         </div>
                       </>
                     ) : (
@@ -411,9 +432,7 @@ export default function CandidatePage() {
                             placeholder="Type your note here..."
                             className="input-clean min-h-[100px]"
                           />
-                          <button className="btn-primary mt-3">
-                            Add Note
-                          </button>
+                          <button className="btn-primary mt-3">Add Note</button>
                         </div>
                       </div>
                     )}
@@ -426,7 +445,9 @@ export default function CandidatePage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-lg font-medium">Documents</h3>
-                        <p className="text-sm text-muted-foreground">Manage candidate files and documents</p>
+                        <p className="text-sm text-muted-foreground">
+                          Manage candidate files and documents
+                        </p>
                       </div>
                       <button
                         onClick={() => setIsFileModalOpen(true)}
@@ -459,7 +480,9 @@ export default function CandidatePage() {
                         </div>
                         {candidate.resumeUrl && candidate.resumeFilename && (
                           <button
-                            onClick={() => window.open(`/api/files/download/${candidate.resumeUrl}`, '_blank')}
+                            onClick={() =>
+                              window.open(`/api/files/download/${candidate.resumeUrl}`, '_blank')
+                            }
                             className="btn-secondary inline-flex items-center gap-2"
                           >
                             <Download className="h-4 w-4" />
@@ -491,7 +514,9 @@ export default function CandidatePage() {
                         </div>
                         {candidate.coverLetter && candidate.coverLetterFilename && (
                           <button
-                            onClick={() => window.open(`/api/files/download/${candidate.coverLetter}`, '_blank')}
+                            onClick={() =>
+                              window.open(`/api/files/download/${candidate.coverLetter}`, '_blank')
+                            }
                             className="btn-secondary inline-flex items-center gap-2"
                           >
                             <Download className="h-4 w-4" />

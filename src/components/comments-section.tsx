@@ -1,33 +1,29 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { useQuery, useMutation } from 'convex/react'
-import { api } from '../../convex/_generated/api'
-import { Id } from '../../convex/_generated/dataModel'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import {
-  MessageSquare,
-  Send,
-  Reply,
-  Edit2,
-  Trash2,
-  MoreVertical,
-  AtSign,
-  Smile,
-  Paperclip,
-  ThumbsUp,
-  Heart,
-  Star,
-  Flag
-} from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
-import { cn } from '@/lib/utils'
 import { useUser } from '@clerk/nextjs'
+import { useMutation, useQuery } from 'convex/react'
+import { formatDistanceToNow } from 'date-fns'
+import {
+  AtSign,
+  Edit2,
+  MessageSquare,
+  MoreVertical,
+  Paperclip,
+  Reply,
+  Send,
+  Smile,
+  Trash2,
+} from 'lucide-react'
+import { useRef, useState } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
+import { api } from '../../convex/_generated/api'
+import type { Id } from '../../convex/_generated/dataModel'
 
 interface CommentsSectionProps {
   entityType: 'candidate' | 'job' | 'interview'
@@ -99,7 +95,7 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
 
   // Get current team member
   const teamMembers = useQuery(api.teams.getTeamMembers)
-  const currentMember = teamMembers?.find(m => m.userId === user?.id)
+  const currentMember = teamMembers?.find((m) => m.userId === user?.id)
 
   // Get comments for this entity
   const comments = useQuery(api.teams.getComments, {
@@ -122,12 +118,12 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
     const rootComments: Comment[] = []
 
     // First pass: create map
-    comments.forEach(comment => {
+    comments.forEach((comment) => {
       commentMap.set(comment._id, { ...comment, replies: [] })
     })
 
     // Second pass: build tree
-    comments.forEach(comment => {
+    comments.forEach((comment) => {
       const mappedComment = commentMap.get(comment._id)!
       if (comment.parentId) {
         const parent = commentMap.get(comment.parentId)
@@ -183,10 +179,11 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
 
     // Extract mentions
     const mentionRegex = /@(\w+\s?\w*)/g
-    const mentionedNames = [...newComment.matchAll(mentionRegex)].map(match => match[1])
-    const mentionedMembers = teamMembers?.filter(m =>
-      mentionedNames.some(name => m.name.toLowerCase().includes(name.toLowerCase()))
-    ) || []
+    const mentionedNames = [...newComment.matchAll(mentionRegex)].map((match) => match[1])
+    const mentionedMembers =
+      teamMembers?.filter((m) =>
+        mentionedNames.some((name) => m.name.toLowerCase().includes(name.toLowerCase()))
+      ) || []
 
     await addComment({
       entityType,
@@ -194,7 +191,7 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
       authorId: currentMember._id,
       content: newComment,
       parentId: replyingTo || undefined,
-      mentions: mentionedMembers.map(m => m._id),
+      mentions: mentionedMembers.map((m) => m._id),
     })
 
     setNewComment('')
@@ -225,9 +222,9 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
   const toggleReaction = async (commentId: Id<'comments'>, emoji: string) => {
     if (!currentMember) return
 
-    const comment = comments?.find(c => c._id === commentId)
+    const comment = comments?.find((c) => c._id === commentId)
     const existingReaction = comment?.reactions?.find(
-      r => r.userId === currentMember._id && r.emoji === emoji
+      (r) => r.userId === currentMember._id && r.emoji === emoji
     )
 
     if (existingReaction) {
@@ -248,16 +245,17 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
           <Avatar className="h-8 w-8 flex-shrink-0">
             <AvatarImage src={comment.author?.avatar} />
             <AvatarFallback>
-              {comment.author?.name?.split(' ').map(n => n[0]).join('') || '?'}
+              {comment.author?.name
+                ?.split(' ')
+                .map((n) => n[0])
+                .join('') || '?'}
             </AvatarFallback>
           </Avatar>
 
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-sm">
-                  {comment.author?.name}
-                </span>
+                <span className="font-medium text-sm">{comment.author?.name}</span>
                 <Badge variant="outline" className="text-xs">
                   {comment.author?.role}
                 </Badge>
@@ -318,10 +316,7 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
                   autoFocus
                 />
                 <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => handleEdit(comment._id)}
-                  >
+                  <Button size="sm" onClick={() => handleEdit(comment._id)}>
                     Save
                   </Button>
                   <Button
@@ -341,14 +336,16 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
                 <p className="text-sm mt-1 whitespace-pre-wrap">
                   {comment.content.split(/(@\w+\s?\w*)/g).map((part, i) => {
                     if (part.startsWith('@')) {
-                      const mentionedUser = comment.mentionedUsers?.find(u =>
-                        u && part.includes(u.name)
+                      const mentionedUser = comment.mentionedUsers?.find(
+                        (u) => u && part.includes(u.name)
                       )
                       return mentionedUser ? (
                         <span key={i} className="text-blue-600 font-medium">
                           {part}
                         </span>
-                      ) : part
+                      ) : (
+                        part
+                      )
                     }
                     return part
                   })}
@@ -358,8 +355,8 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
                   {/* Reactions */}
                   <div className="flex items-center gap-1">
                     {reactionEmojis.map(({ emoji, label }) => {
-                      const reactions = comment.reactions?.filter(r => r.emoji === emoji) || []
-                      const hasReacted = reactions.some(r => r.userId === currentMember?._id)
+                      const reactions = comment.reactions?.filter((r) => r.emoji === emoji) || []
+                      const hasReacted = reactions.some((r) => r.userId === currentMember?._id)
 
                       return reactions.length > 0 || hasReacted ? (
                         <Button
@@ -421,7 +418,7 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
             {/* Replies */}
             {comment.replies && comment.replies.length > 0 && (
               <div className="mt-3">
-                {comment.replies.map(reply => (
+                {comment.replies.map((reply) => (
                   <CommentItem key={reply._id} comment={reply} depth={depth + 1} />
                 ))}
               </div>
@@ -481,7 +478,8 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
             <Avatar className="h-8 w-8">
               <AvatarImage src={user?.imageUrl} />
               <AvatarFallback>
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
+                {user?.firstName?.[0]}
+                {user?.lastName?.[0]}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
@@ -504,9 +502,9 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
                   <div className="text-xs text-muted-foreground mb-1">Team Members</div>
                   <div className="space-y-1 max-h-48 overflow-y-auto">
                     {teamMembers
-                      .filter(m => m.name.toLowerCase().includes(mentionSearch.toLowerCase()))
+                      .filter((m) => m.name.toLowerCase().includes(mentionSearch.toLowerCase()))
                       .slice(0, 5)
-                      .map(member => (
+                      .map((member) => (
                         <Button
                           key={member._id}
                           variant="ghost"
@@ -517,7 +515,10 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
                           <Avatar className="h-5 w-5 mr-2">
                             <AvatarImage src={member.avatar} />
                             <AvatarFallback>
-                              {member.name.split(' ').map(n => n[0]).join('')}
+                              {member.name
+                                .split(' ')
+                                .map((n) => n[0])
+                                .join('')}
                             </AvatarFallback>
                           </Avatar>
                           <span className="text-sm">{member.name}</span>
@@ -539,11 +540,7 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
                     <AtSign className="h-4 w-4" />
                   </Button>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={handleSubmit}
-                  disabled={!newComment.trim()}
-                >
+                <Button size="sm" onClick={handleSubmit} disabled={!newComment.trim()}>
                   <Send className="h-4 w-4 mr-1" />
                   Comment
                 </Button>
@@ -555,9 +552,7 @@ export function CommentsSection({ entityType, entityId, className }: CommentsSec
         {/* Comments list */}
         <div className="space-y-4">
           {threadedComments.length > 0 ? (
-            threadedComments.map(comment => (
-              <CommentItem key={comment._id} comment={comment} />
-            ))
+            threadedComments.map((comment) => <CommentItem key={comment._id} comment={comment} />)
           ) : (
             <div className="text-center py-8 text-muted-foreground">
               <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-20" />

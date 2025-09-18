@@ -1,6 +1,6 @@
-import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
-import { Id } from "./_generated/dataModel"
+import { v } from 'convex/values'
+import type { Id } from './_generated/dataModel'
+import { mutation, query } from './_generated/server'
 
 // Create or update team member
 export const upsertTeamMember = mutation({
@@ -9,12 +9,12 @@ export const upsertTeamMember = mutation({
     email: v.string(),
     name: v.string(),
     role: v.union(
-      v.literal("admin"),
-      v.literal("hiring_manager"),
-      v.literal("recruiter"),
-      v.literal("interviewer"),
-      v.literal("coordinator"),
-      v.literal("viewer")
+      v.literal('admin'),
+      v.literal('hiring_manager'),
+      v.literal('recruiter'),
+      v.literal('interviewer'),
+      v.literal('coordinator'),
+      v.literal('viewer')
     ),
     department: v.optional(v.string()),
     avatar: v.optional(v.string()),
@@ -23,8 +23,8 @@ export const upsertTeamMember = mutation({
   handler: async (ctx, args) => {
     // Check if member already exists
     const existing = await ctx.db
-      .query("teamMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .query('teamMembers')
+      .withIndex('by_userId', (q) => q.eq('userId', args.userId))
       .first()
 
     if (existing) {
@@ -34,7 +34,7 @@ export const upsertTeamMember = mutation({
       })
     }
 
-    return await ctx.db.insert("teamMembers", {
+    return await ctx.db.insert('teamMembers', {
       ...args,
       isActive: true,
       createdAt: new Date().toISOString(),
@@ -46,33 +46,26 @@ export const upsertTeamMember = mutation({
 // Get default permissions for a role
 function getDefaultPermissions(role: string): string[] {
   const permissions: Record<string, string[]> = {
-    admin: ["all"],
+    admin: ['all'],
     hiring_manager: [
-      "view_candidates",
-      "edit_candidates",
-      "schedule_interviews",
-      "provide_feedback",
-      "make_decisions",
-      "view_analytics",
+      'view_candidates',
+      'edit_candidates',
+      'schedule_interviews',
+      'provide_feedback',
+      'make_decisions',
+      'view_analytics',
     ],
     recruiter: [
-      "view_candidates",
-      "edit_candidates",
-      "schedule_interviews",
-      "provide_feedback",
-      "send_emails",
-      "manage_pipeline",
+      'view_candidates',
+      'edit_candidates',
+      'schedule_interviews',
+      'provide_feedback',
+      'send_emails',
+      'manage_pipeline',
     ],
-    interviewer: [
-      "view_assigned_candidates",
-      "provide_feedback",
-    ],
-    coordinator: [
-      "view_candidates",
-      "schedule_interviews",
-      "send_emails",
-    ],
-    viewer: ["view_candidates", "view_analytics"],
+    interviewer: ['view_assigned_candidates', 'provide_feedback'],
+    coordinator: ['view_candidates', 'schedule_interviews', 'send_emails'],
+    viewer: ['view_candidates', 'view_analytics'],
   }
   return permissions[role] || []
 }
@@ -80,13 +73,13 @@ function getDefaultPermissions(role: string): string[] {
 // Add team member to a job
 export const addToHiringTeam = mutation({
   args: {
-    jobId: v.id("jobs"),
-    teamMemberId: v.id("teamMembers"),
+    jobId: v.id('jobs'),
+    teamMemberId: v.id('teamMembers'),
     role: v.union(
-      v.literal("hiring_manager"),
-      v.literal("recruiter"),
-      v.literal("interviewer"),
-      v.literal("coordinator")
+      v.literal('hiring_manager'),
+      v.literal('recruiter'),
+      v.literal('interviewer'),
+      v.literal('coordinator')
     ),
     isPrimary: v.boolean(),
     addedBy: v.string(),
@@ -94,9 +87,9 @@ export const addToHiringTeam = mutation({
   handler: async (ctx, args) => {
     // Check if already on team
     const existing = await ctx.db
-      .query("hiringTeams")
-      .withIndex("by_job", (q) => q.eq("jobId", args.jobId))
-      .filter((q) => q.eq(q.field("teamMemberId"), args.teamMemberId))
+      .query('hiringTeams')
+      .withIndex('by_job', (q) => q.eq('jobId', args.jobId))
+      .filter((q) => q.eq(q.field('teamMemberId'), args.teamMemberId))
       .first()
 
     if (existing) {
@@ -106,16 +99,16 @@ export const addToHiringTeam = mutation({
       })
     }
 
-    const hiringTeamId = await ctx.db.insert("hiringTeams", {
+    const hiringTeamId = await ctx.db.insert('hiringTeams', {
       ...args,
       addedAt: new Date().toISOString(),
     })
 
     // Log activity
     await logActivity(ctx, {
-      action: "team_member_added",
+      action: 'team_member_added',
       actorId: args.addedBy,
-      targetType: "job",
+      targetType: 'job',
       targetId: args.jobId,
       jobId: args.jobId,
     })
@@ -126,11 +119,11 @@ export const addToHiringTeam = mutation({
 
 // Get hiring team for a job
 export const getHiringTeam = query({
-  args: { jobId: v.id("jobs") },
+  args: { jobId: v.id('jobs') },
   handler: async (ctx, args) => {
     const teamAssignments = await ctx.db
-      .query("hiringTeams")
-      .withIndex("by_job", (q) => q.eq("jobId", args.jobId))
+      .query('hiringTeams')
+      .withIndex('by_job', (q) => q.eq('jobId', args.jobId))
       .collect()
 
     const teamWithDetails = await Promise.all(
@@ -150,19 +143,15 @@ export const getHiringTeam = query({
 // Add comment to an entity
 export const addComment = mutation({
   args: {
-    entityType: v.union(
-      v.literal("candidate"),
-      v.literal("job"),
-      v.literal("interview")
-    ),
+    entityType: v.union(v.literal('candidate'), v.literal('job'), v.literal('interview')),
     entityId: v.string(),
-    authorId: v.id("teamMembers"),
+    authorId: v.id('teamMembers'),
     content: v.string(),
-    parentId: v.optional(v.id("comments")),
-    mentions: v.optional(v.array(v.id("teamMembers"))),
+    parentId: v.optional(v.id('comments')),
+    mentions: v.optional(v.array(v.id('teamMembers'))),
   },
   handler: async (ctx, args) => {
-    const commentId = await ctx.db.insert("comments", {
+    const commentId = await ctx.db.insert('comments', {
       ...args,
       mentions: args.mentions || [],
       isEdited: false,
@@ -175,7 +164,7 @@ export const addComment = mutation({
       for (const mentionedId of args.mentions) {
         await createNotification(ctx, {
           userId: mentionedId,
-          type: "mention",
+          type: 'mention',
           fromId: args.authorId,
           entityType: args.entityType,
           entityId: args.entityId,
@@ -186,7 +175,7 @@ export const addComment = mutation({
 
     // Log activity
     await logActivity(ctx, {
-      action: "comment_added",
+      action: 'comment_added',
       actorId: args.authorId,
       targetType: args.entityType,
       targetId: args.entityId,
@@ -199,30 +188,24 @@ export const addComment = mutation({
 // Get comments for an entity
 export const getComments = query({
   args: {
-    entityType: v.union(
-      v.literal("candidate"),
-      v.literal("job"),
-      v.literal("interview")
-    ),
+    entityType: v.union(v.literal('candidate'), v.literal('job'), v.literal('interview')),
     entityId: v.string(),
   },
   handler: async (ctx, args) => {
     const comments = await ctx.db
-      .query("comments")
-      .withIndex("by_entity", (q) =>
-        q.eq("entityType", args.entityType).eq("entityId", args.entityId)
+      .query('comments')
+      .withIndex('by_entity', (q) =>
+        q.eq('entityType', args.entityType).eq('entityId', args.entityId)
       )
-      .filter((q) => q.eq(q.field("isDeleted"), false))
-      .order("desc")
+      .filter((q) => q.eq(q.field('isDeleted'), false))
+      .order('desc')
       .collect()
 
     // Get author details for each comment
     const commentsWithAuthors = await Promise.all(
       comments.map(async (comment) => {
         const author = await ctx.db.get(comment.authorId)
-        const mentions = await Promise.all(
-          comment.mentions.map(id => ctx.db.get(id))
-        )
+        const mentions = await Promise.all(comment.mentions.map((id) => ctx.db.get(id)))
         return {
           ...comment,
           author,
@@ -238,7 +221,7 @@ export const getComments = query({
 // Edit a comment
 export const editComment = mutation({
   args: {
-    commentId: v.id("comments"),
+    commentId: v.id('comments'),
     content: v.string(),
   },
   handler: async (ctx, args) => {
@@ -254,7 +237,7 @@ export const editComment = mutation({
 // Delete a comment (soft delete)
 export const deleteComment = mutation({
   args: {
-    commentId: v.id("comments"),
+    commentId: v.id('comments'),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.commentId, {
@@ -267,19 +250,19 @@ export const deleteComment = mutation({
 // Add reaction to comment
 export const addReaction = mutation({
   args: {
-    commentId: v.id("comments"),
+    commentId: v.id('comments'),
     emoji: v.string(),
-    userId: v.id("teamMembers"),
+    userId: v.id('teamMembers'),
   },
   handler: async (ctx, args) => {
     const comment = await ctx.db.get(args.commentId)
-    if (!comment) throw new Error("Comment not found")
+    if (!comment) throw new Error('Comment not found')
 
     const reactions = comment.reactions || []
 
     // Check if user already has this reaction
     const existingIndex = reactions.findIndex(
-      r => r.userId === args.userId && r.emoji === args.emoji
+      (r) => r.userId === args.userId && r.emoji === args.emoji
     )
 
     if (existingIndex === -1) {
@@ -300,15 +283,15 @@ export const addReaction = mutation({
 // Remove reaction from comment
 export const removeReaction = mutation({
   args: {
-    commentId: v.id("comments"),
+    commentId: v.id('comments'),
     emoji: v.string(),
   },
   handler: async (ctx, args) => {
     const comment = await ctx.db.get(args.commentId)
-    if (!comment) throw new Error("Comment not found")
+    if (!comment) throw new Error('Comment not found')
 
     const reactions = comment.reactions || []
-    const filteredReactions = reactions.filter(r => r.emoji !== args.emoji)
+    const filteredReactions = reactions.filter((r) => r.emoji !== args.emoji)
 
     await ctx.db.patch(args.commentId, {
       reactions: filteredReactions,
@@ -322,8 +305,8 @@ export const removeReaction = mutation({
 export const getTeamMembers = query({
   handler: async (ctx) => {
     return await ctx.db
-      .query("teamMembers")
-      .filter((q) => q.eq(q.field("isActive"), true))
+      .query('teamMembers')
+      .filter((q) => q.eq(q.field('isActive'), true))
       .collect()
   },
 })
@@ -331,10 +314,10 @@ export const getTeamMembers = query({
 // Submit interview feedback
 export const submitInterviewFeedback = mutation({
   args: {
-    interviewId: v.id("interviews"),
-    candidateId: v.id("candidates"),
-    interviewerId: v.id("teamMembers"),
-    scorecardId: v.optional(v.id("scorecards")),
+    interviewId: v.id('interviews'),
+    candidateId: v.id('candidates'),
+    interviewerId: v.id('teamMembers'),
+    scorecardId: v.optional(v.id('scorecards')),
     ratings: v.object({
       technical: v.optional(v.number()),
       communication: v.optional(v.number()),
@@ -345,25 +328,27 @@ export const submitInterviewFeedback = mutation({
     }),
     strengths: v.array(v.string()),
     concerns: v.array(v.string()),
-    questions: v.array(v.object({
-      question: v.string(),
-      answer: v.string(),
-      rating: v.optional(v.number()),
-    })),
+    questions: v.array(
+      v.object({
+        question: v.string(),
+        answer: v.string(),
+        rating: v.optional(v.number()),
+      })
+    ),
     recommendation: v.union(
-      v.literal("strong_hire"),
-      v.literal("hire"),
-      v.literal("no_hire"),
-      v.literal("strong_no_hire")
+      v.literal('strong_hire'),
+      v.literal('hire'),
+      v.literal('no_hire'),
+      v.literal('strong_no_hire')
     ),
     notes: v.string(),
   },
   handler: async (ctx, args) => {
     // Check if feedback already exists
     const existing = await ctx.db
-      .query("interviewFeedback")
-      .withIndex("by_interview", (q) => q.eq("interviewId", args.interviewId))
-      .filter((q) => q.eq(q.field("interviewerId"), args.interviewerId))
+      .query('interviewFeedback')
+      .withIndex('by_interview', (q) => q.eq('interviewId', args.interviewId))
+      .filter((q) => q.eq(q.field('interviewerId'), args.interviewerId))
       .first()
 
     if (existing) {
@@ -374,7 +359,7 @@ export const submitInterviewFeedback = mutation({
       })
     }
 
-    const feedbackId = await ctx.db.insert("interviewFeedback", {
+    const feedbackId = await ctx.db.insert('interviewFeedback', {
       ...args,
       submittedAt: new Date().toISOString(),
       isComplete: true,
@@ -382,14 +367,14 @@ export const submitInterviewFeedback = mutation({
 
     // Update interview status
     await ctx.db.patch(args.interviewId, {
-      status: "completed",
+      status: 'completed',
     })
 
     // Log activity
     await logActivity(ctx, {
-      action: "feedback_submitted",
+      action: 'feedback_submitted',
       actorId: args.interviewerId,
-      targetType: "interview",
+      targetType: 'interview',
       targetId: args.interviewId,
     })
 
@@ -400,30 +385,24 @@ export const submitInterviewFeedback = mutation({
 // Get interview feedback
 export const getInterviewFeedback = query({
   args: {
-    interviewId: v.optional(v.id("interviews")),
-    candidateId: v.optional(v.id("candidates")),
+    interviewId: v.optional(v.id('interviews')),
+    candidateId: v.optional(v.id('candidates')),
   },
   handler: async (ctx, args) => {
     let feedback
 
     if (args.interviewId !== undefined) {
       feedback = await ctx.db
-        .query("interviewFeedback")
-        .withIndex("by_interview", (q) =>
-          q.eq("interviewId", args.interviewId!)
-        )
+        .query('interviewFeedback')
+        .withIndex('by_interview', (q) => q.eq('interviewId', args.interviewId!))
         .collect()
     } else if (args.candidateId !== undefined) {
       feedback = await ctx.db
-        .query("interviewFeedback")
-        .withIndex("by_candidate", (q) =>
-          q.eq("candidateId", args.candidateId!)
-        )
+        .query('interviewFeedback')
+        .withIndex('by_candidate', (q) => q.eq('candidateId', args.candidateId!))
         .collect()
     } else {
-      feedback = await ctx.db
-        .query("interviewFeedback")
-        .collect()
+      feedback = await ctx.db.query('interviewFeedback').collect()
     }
 
     // Get interviewer details
@@ -449,44 +428,42 @@ export const createTask = mutation({
     title: v.string(),
     description: v.optional(v.string()),
     type: v.union(
-      v.literal("review_application"),
-      v.literal("schedule_interview"),
-      v.literal("provide_feedback"),
-      v.literal("check_references"),
-      v.literal("send_offer"),
-      v.literal("follow_up"),
-      v.literal("custom")
+      v.literal('review_application'),
+      v.literal('schedule_interview'),
+      v.literal('provide_feedback'),
+      v.literal('check_references'),
+      v.literal('send_offer'),
+      v.literal('follow_up'),
+      v.literal('custom')
     ),
-    assigneeId: v.id("teamMembers"),
-    creatorId: v.id("teamMembers"),
-    relatedTo: v.optional(v.object({
-      type: v.union(
-        v.literal("candidate"),
-        v.literal("job"),
-        v.literal("interview")
-      ),
-      id: v.string(),
-    })),
+    assigneeId: v.id('teamMembers'),
+    creatorId: v.id('teamMembers'),
+    relatedTo: v.optional(
+      v.object({
+        type: v.union(v.literal('candidate'), v.literal('job'), v.literal('interview')),
+        id: v.string(),
+      })
+    ),
     priority: v.union(
-      v.literal("urgent"),
-      v.literal("high"),
-      v.literal("medium"),
-      v.literal("low")
+      v.literal('urgent'),
+      v.literal('high'),
+      v.literal('medium'),
+      v.literal('low')
     ),
     dueDate: v.string(),
-    automatedBy: v.optional(v.id("workflows")),
+    automatedBy: v.optional(v.id('workflows')),
   },
   handler: async (ctx, args) => {
-    const taskId = await ctx.db.insert("tasks", {
+    const taskId = await ctx.db.insert('tasks', {
       ...args,
-      status: "pending",
+      status: 'pending',
       createdAt: new Date().toISOString(),
     })
 
     // Notify assignee
     await createNotification(ctx, {
       userId: args.assigneeId,
-      type: "task_assigned",
+      type: 'task_assigned',
       fromId: args.creatorId,
       taskId,
     })
@@ -498,12 +475,12 @@ export const createTask = mutation({
 // Update task status
 export const updateTaskStatus = mutation({
   args: {
-    taskId: v.id("tasks"),
+    taskId: v.id('tasks'),
     status: v.union(
-      v.literal("pending"),
-      v.literal("in_progress"),
-      v.literal("completed"),
-      v.literal("cancelled")
+      v.literal('pending'),
+      v.literal('in_progress'),
+      v.literal('completed'),
+      v.literal('cancelled')
     ),
   },
   handler: async (ctx, args) => {
@@ -511,7 +488,7 @@ export const updateTaskStatus = mutation({
       status: args.status,
     }
 
-    if (args.status === "completed") {
+    if (args.status === 'completed') {
       updates.completedAt = new Date().toISOString()
     }
 
@@ -521,9 +498,9 @@ export const updateTaskStatus = mutation({
     const task = await ctx.db.get(args.taskId)
     if (task) {
       await logActivity(ctx, {
-        action: "task_completed",
+        action: 'task_completed',
         actorId: task.assigneeId,
-        targetType: "task",
+        targetType: 'task',
         targetId: args.taskId,
       })
     }
@@ -535,36 +512,38 @@ export const updateTaskStatus = mutation({
 // Get tasks for a team member
 export const getMyTasks = query({
   args: {
-    teamMemberId: v.id("teamMembers"),
-    status: v.optional(v.union(
-      v.literal("pending"),
-      v.literal("in_progress"),
-      v.literal("completed"),
-      v.literal("cancelled")
-    )),
+    teamMemberId: v.id('teamMembers'),
+    status: v.optional(
+      v.union(
+        v.literal('pending'),
+        v.literal('in_progress'),
+        v.literal('completed'),
+        v.literal('cancelled')
+      )
+    ),
   },
   handler: async (ctx, args) => {
     let query = ctx.db
-      .query("tasks")
-      .withIndex("by_assignee", (q) => q.eq("assigneeId", args.teamMemberId))
+      .query('tasks')
+      .withIndex('by_assignee', (q) => q.eq('assigneeId', args.teamMemberId))
 
     if (args.status) {
-      query = query.filter((q) => q.eq(q.field("status"), args.status))
+      query = query.filter((q) => q.eq(q.field('status'), args.status))
     }
 
-    const tasks = await query.order("desc").collect()
+    const tasks = await query.order('desc').collect()
 
     // Get related entity details
     const tasksWithDetails = await Promise.all(
       tasks.map(async (task) => {
         let relatedEntity = null
         if (task.relatedTo) {
-          if (task.relatedTo.type === "candidate") {
-            relatedEntity = await ctx.db.get(task.relatedTo.id as Id<"candidates">)
-          } else if (task.relatedTo.type === "job") {
-            relatedEntity = await ctx.db.get(task.relatedTo.id as Id<"jobs">)
-          } else if (task.relatedTo.type === "interview") {
-            relatedEntity = await ctx.db.get(task.relatedTo.id as Id<"interviews">)
+          if (task.relatedTo.type === 'candidate') {
+            relatedEntity = await ctx.db.get(task.relatedTo.id as Id<'candidates'>)
+          } else if (task.relatedTo.type === 'job') {
+            relatedEntity = await ctx.db.get(task.relatedTo.id as Id<'jobs'>)
+          } else if (task.relatedTo.type === 'interview') {
+            relatedEntity = await ctx.db.get(task.relatedTo.id as Id<'interviews'>)
           }
         }
 
@@ -585,8 +564,8 @@ export const getMyTasks = query({
 // Create or update an offer
 export const upsertOffer = mutation({
   args: {
-    candidateId: v.id("candidates"),
-    jobId: v.id("jobs"),
+    candidateId: v.id('candidates'),
+    jobId: v.id('jobs'),
     details: v.object({
       salary: v.number(),
       currency: v.string(),
@@ -599,14 +578,14 @@ export const upsertOffer = mutation({
     }),
     customTerms: v.optional(v.string()),
     expiresAt: v.string(),
-    createdBy: v.id("teamMembers"),
+    createdBy: v.id('teamMembers'),
   },
   handler: async (ctx, args) => {
     // Check if offer exists
     const existing = await ctx.db
-      .query("offers")
-      .withIndex("by_candidate", (q) => q.eq("candidateId", args.candidateId))
-      .filter((q) => q.eq(q.field("jobId"), args.jobId))
+      .query('offers')
+      .withIndex('by_candidate', (q) => q.eq('candidateId', args.candidateId))
+      .filter((q) => q.eq(q.field('jobId'), args.jobId))
       .first()
 
     if (existing) {
@@ -614,13 +593,13 @@ export const upsertOffer = mutation({
         details: args.details,
         customTerms: args.customTerms,
         expiresAt: args.expiresAt,
-        status: "draft",
+        status: 'draft',
       })
     }
 
-    return await ctx.db.insert("offers", {
+    return await ctx.db.insert('offers', {
       ...args,
-      status: "draft",
+      status: 'draft',
       approvals: [],
       createdAt: new Date().toISOString(),
     })
@@ -630,33 +609,33 @@ export const upsertOffer = mutation({
 // Send offer to candidate
 export const sendOffer = mutation({
   args: {
-    offerId: v.id("offers"),
+    offerId: v.id('offers'),
     letterUrl: v.string(),
   },
   handler: async (ctx, args) => {
     const offer = await ctx.db.get(args.offerId)
-    if (!offer) throw new Error("Offer not found")
+    if (!offer) throw new Error('Offer not found')
 
-    if (offer.status !== "approved") {
-      throw new Error("Offer must be approved before sending")
+    if (offer.status !== 'approved') {
+      throw new Error('Offer must be approved before sending')
     }
 
     await ctx.db.patch(args.offerId, {
-      status: "sent",
+      status: 'sent',
       sentAt: new Date().toISOString(),
       letterUrl: args.letterUrl,
     })
 
     // Update candidate status
     await ctx.db.patch(offer.candidateId, {
-      status: "offer",
+      status: 'offer',
     })
 
     // Log activity
     await logActivity(ctx, {
-      action: "offer_sent",
+      action: 'offer_sent',
       actorId: offer.createdBy,
-      targetType: "offer",
+      targetType: 'offer',
       targetId: args.offerId,
       jobId: offer.jobId,
     })
@@ -668,23 +647,23 @@ export const sendOffer = mutation({
 // Approve/reject offer
 export const reviewOffer = mutation({
   args: {
-    offerId: v.id("offers"),
-    approverId: v.id("teamMembers"),
-    status: v.union(v.literal("approved"), v.literal("rejected")),
+    offerId: v.id('offers'),
+    approverId: v.id('teamMembers'),
+    status: v.union(v.literal('approved'), v.literal('rejected')),
     comments: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const offer = await ctx.db.get(args.offerId)
-    if (!offer) throw new Error("Offer not found")
+    if (!offer) throw new Error('Offer not found')
 
     // Update approval in array
     const approvals = offer.approvals || []
-    const existingIndex = approvals.findIndex(a => a.approverId === args.approverId)
+    const existingIndex = approvals.findIndex((a) => a.approverId === args.approverId)
 
     const approval = {
       approverId: args.approverId,
-      role: "approver", // Could be determined from team member
-      status: args.status as "approved" | "rejected",
+      role: 'approver', // Could be determined from team member
+      status: args.status as 'approved' | 'rejected',
       comments: args.comments,
       timestamp: new Date().toISOString(),
     }
@@ -696,14 +675,15 @@ export const reviewOffer = mutation({
     }
 
     // Check if all required approvals are complete
-    const allApproved = approvals.every(a => a.status === "approved")
-    const anyRejected = approvals.some(a => a.status === "rejected")
+    const allApproved = approvals.every((a) => a.status === 'approved')
+    const anyRejected = approvals.some((a) => a.status === 'rejected')
 
     let newStatus = offer.status
     if (anyRejected) {
-      newStatus = "draft" // Back to draft if rejected
-    } else if (allApproved && approvals.length >= 1) { // Adjust required approvals
-      newStatus = "approved"
+      newStatus = 'draft' // Back to draft if rejected
+    } else if (allApproved && approvals.length >= 1) {
+      // Adjust required approvals
+      newStatus = 'approved'
     }
 
     await ctx.db.patch(args.offerId, {
@@ -718,14 +698,14 @@ export const reviewOffer = mutation({
 // Get offer for a candidate and job
 export const getOffer = query({
   args: {
-    candidateId: v.id("candidates"),
-    jobId: v.id("jobs"),
+    candidateId: v.id('candidates'),
+    jobId: v.id('jobs'),
   },
   handler: async (ctx, args) => {
     const offer = await ctx.db
-      .query("offers")
-      .withIndex("by_candidate", (q) => q.eq("candidateId", args.candidateId))
-      .filter((q) => q.eq(q.field("jobId"), args.jobId))
+      .query('offers')
+      .withIndex('by_candidate', (q) => q.eq('candidateId', args.candidateId))
+      .filter((q) => q.eq(q.field('jobId'), args.jobId))
       .first()
 
     if (!offer) return null
@@ -751,7 +731,7 @@ export const getOffer = query({
 // Get activity feed
 export const getActivityFeed = query({
   args: {
-    jobId: v.optional(v.id("jobs")),
+    jobId: v.optional(v.id('jobs')),
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
@@ -763,8 +743,8 @@ export const getActivityFeed = query({
 
     // Look up user in teamMembers table
     const teamMember = await ctx.db
-      .query("teamMembers")
-      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .query('teamMembers')
+      .withIndex('by_userId', (q) => q.eq('userId', identity.subject))
       .first()
 
     if (!teamMember) {
@@ -776,37 +756,37 @@ export const getActivityFeed = query({
     if (args.jobId !== undefined) {
       // Check if user has access to this specific job
       const hiringTeamMember = await ctx.db
-        .query("hiringTeams")
-        .withIndex("by_job", (q) => q.eq("jobId", args.jobId!))
-        .filter((q) => q.eq(q.field("teamMemberId"), teamMember._id))
+        .query('hiringTeams')
+        .withIndex('by_job', (q) => q.eq('jobId', args.jobId!))
+        .filter((q) => q.eq(q.field('teamMemberId'), teamMember._id))
         .first()
 
       // Only allow access if user is on the hiring team for this job or is admin
-      if (!hiringTeamMember && teamMember.role !== "admin") {
+      if (!hiringTeamMember && teamMember.role !== 'admin') {
         return []
       }
 
       activities = await ctx.db
-        .query("activityFeed")
-        .withIndex("by_job", (q) => q.eq("jobId", args.jobId!))
-        .order("desc")
+        .query('activityFeed')
+        .withIndex('by_job', (q) => q.eq('jobId', args.jobId!))
+        .order('desc')
         .take(args.limit || 50)
     } else {
       // Get all jobs this user has access to
       let accessibleJobIds: string[] = []
 
-      if (teamMember.role === "admin") {
+      if (teamMember.role === 'admin') {
         // Admins can see all activities
-        const allJobs = await ctx.db.query("jobs").collect()
-        accessibleJobIds = allJobs.map(job => job._id)
+        const allJobs = await ctx.db.query('jobs').collect()
+        accessibleJobIds = allJobs.map((job) => job._id)
       } else {
         // Get jobs where user is on the hiring team
         const hiringTeamAssignments = await ctx.db
-          .query("hiringTeams")
-          .withIndex("by_member", (q) => q.eq("teamMemberId", teamMember._id))
+          .query('hiringTeams')
+          .withIndex('by_member', (q) => q.eq('teamMemberId', teamMember._id))
           .collect()
-        
-        accessibleJobIds = hiringTeamAssignments.map(assignment => assignment.jobId)
+
+        accessibleJobIds = hiringTeamAssignments.map((assignment) => assignment.jobId)
       }
 
       if (accessibleJobIds.length === 0) {
@@ -815,14 +795,15 @@ export const getActivityFeed = query({
 
       // Get activities for accessible jobs
       const allActivities = await ctx.db
-        .query("activityFeed")
-        .order("desc")
+        .query('activityFeed')
+        .order('desc')
         .take((args.limit || 50) * 3) // Get more to filter, then limit
 
       activities = allActivities
-        .filter(activity => 
-          activity.jobId === undefined || // Include activities without jobId
-          accessibleJobIds.includes(activity.jobId)
+        .filter(
+          (activity) =>
+            activity.jobId === undefined || // Include activities without jobId
+            accessibleJobIds.includes(activity.jobId)
         )
         .slice(0, args.limit || 50)
     }
@@ -836,21 +817,21 @@ async function logActivity(
   ctx: any,
   data: {
     action: string
-    actorId: string | Id<"teamMembers">
+    actorId: string | Id<'teamMembers'>
     targetType: string
     targetId: string | Id<any>
-    jobId?: Id<"jobs">
+    jobId?: Id<'jobs'>
   }
 ) {
   // Get actor details
-  let actorName = "System"
+  let actorName = 'System'
   let actorAvatar: string | undefined
 
-  if (typeof data.actorId === "string") {
+  if (typeof data.actorId === 'string') {
     // It's a userId, need to look up team member
     const teamMember = await ctx.db
-      .query("teamMembers")
-      .withIndex("by_userId", (q: any) => q.eq("userId", data.actorId))
+      .query('teamMembers')
+      .withIndex('by_userId', (q: any) => q.eq('userId', data.actorId))
       .first()
 
     if (teamMember) {
@@ -868,18 +849,18 @@ async function logActivity(
   }
 
   // Get target name
-  let targetName = "Unknown"
-  if (data.targetType === "candidate") {
-    const candidate = await ctx.db.get(data.targetId as Id<"candidates">)
+  let targetName = 'Unknown'
+  if (data.targetType === 'candidate') {
+    const candidate = await ctx.db.get(data.targetId as Id<'candidates'>)
     targetName = candidate?.name || targetName
-  } else if (data.targetType === "job") {
-    const job = await ctx.db.get(data.targetId as Id<"jobs">)
+  } else if (data.targetType === 'job') {
+    const job = await ctx.db.get(data.targetId as Id<'jobs'>)
     targetName = job?.title || targetName
   }
 
-  await ctx.db.insert("activityFeed", {
+  await ctx.db.insert('activityFeed', {
     actor: {
-      id: data.actorId as Id<"teamMembers">,
+      id: data.actorId as Id<'teamMembers'>,
       name: actorName,
       avatar: actorAvatar,
     },
@@ -899,13 +880,13 @@ async function logActivity(
 async function createNotification(
   ctx: any,
   data: {
-    userId: Id<"teamMembers">
+    userId: Id<'teamMembers'>
     type: string
-    fromId: Id<"teamMembers">
+    fromId: Id<'teamMembers'>
     entityType?: string
     entityId?: string
-    commentId?: Id<"comments">
-    taskId?: Id<"tasks">
+    commentId?: Id<'comments'>
+    taskId?: Id<'tasks'>
   }
 ) {
   // This would integrate with your notification system
@@ -926,7 +907,7 @@ export const saveSearch = mutation({
     entity: v.string(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("savedSearches", {
+    return await ctx.db.insert('savedSearches', {
       name: args.name,
       query: args.query,
       filters: args.filters,
@@ -940,14 +921,14 @@ export const saveSearch = mutation({
 export const getSavedSearches = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("savedSearches").collect()
+    return await ctx.db.query('savedSearches').collect()
   },
 })
 
 // Delete saved search
 export const deleteSavedSearch = mutation({
   args: {
-    id: v.id("savedSearches"),
+    id: v.id('savedSearches'),
   },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.id)
@@ -962,7 +943,7 @@ export const addSearchHistory = mutation({
     filters: v.any(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("searchHistory", {
+    await ctx.db.insert('searchHistory', {
       query: args.query,
       entity: args.entity,
       filters: args.filters,
@@ -978,10 +959,7 @@ export const getSearchHistory = query({
   },
   handler: async (ctx, args) => {
     const limit = args.limit || 10
-    return await ctx.db
-      .query("searchHistory")
-      .order("desc")
-      .take(limit)
+    return await ctx.db.query('searchHistory').order('desc').take(limit)
   },
 })
 
@@ -989,14 +967,14 @@ export const getSearchHistory = query({
 export const getEmailTemplates = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("emailTemplates").collect()
+    return await ctx.db.query('emailTemplates').collect()
   },
 })
 
 // Save email template
 export const saveEmailTemplate = mutation({
   args: {
-    _id: v.optional(v.id("emailTemplates")),
+    _id: v.optional(v.id('emailTemplates')),
     name: v.string(),
     category: v.string(),
     subject: v.string(),
@@ -1013,7 +991,7 @@ export const saveEmailTemplate = mutation({
       await ctx.db.patch(_id, data)
       return _id
     } else {
-      return await ctx.db.insert("emailTemplates", {
+      return await ctx.db.insert('emailTemplates', {
         ...data,
         createdAt: new Date().toISOString(),
         lastUsed: undefined,
@@ -1025,7 +1003,7 @@ export const saveEmailTemplate = mutation({
 // Delete email template
 export const deleteEmailTemplate = mutation({
   args: {
-    id: v.id("emailTemplates"),
+    id: v.id('emailTemplates'),
   },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.id)
@@ -1035,15 +1013,15 @@ export const deleteEmailTemplate = mutation({
 // Duplicate email template
 export const duplicateEmailTemplate = mutation({
   args: {
-    id: v.id("emailTemplates"),
+    id: v.id('emailTemplates'),
     name: v.string(),
   },
   handler: async (ctx, args) => {
     const original = await ctx.db.get(args.id)
-    if (!original) throw new Error("Template not found")
+    if (!original) throw new Error('Template not found')
 
     const { _id, _creationTime, ...templateData } = original as any
-    return await ctx.db.insert("emailTemplates", {
+    return await ctx.db.insert('emailTemplates', {
       ...templateData,
       name: args.name,
       useCount: 0,
