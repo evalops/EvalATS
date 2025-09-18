@@ -115,6 +115,11 @@ frontend/
 
 ## 🔧 Configuration
 
+### Company configuration
+
+- Company level settings are loaded from `config/company.yaml` by default. You can point to a different file by setting the `COMPANY_CONFIG_PATH` environment variable to an absolute path or a path relative to the project root.
+- The configuration file is validated and merged with sensible defaults at runtime, so you only need to provide the fields you wish to override.
+
 ### Database Schema
 The application uses Convex with the following main tables:
 - `candidates` - Candidate information and evaluation scores
