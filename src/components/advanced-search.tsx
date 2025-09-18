@@ -73,18 +73,35 @@ export function AdvancedSearch() {
   const candidates = useQuery(api.candidates.list, {}) || []
   const jobs = useQuery(api.jobs.list, {}) || []
   const interviews = useQuery(api.interviews.list, {}) || []
-  const savedSearches: any[] = [] // TODO: Implement saved searches
+  const savedSearches = useQuery(api.teams.getSavedSearches, {}) || []
 
-  // These mutations will need to be implemented in Convex
-  const saveSearch = async (name: string, filters: any) => {
-    console.log('Save search:', name, filters)
-    // TODO: Implement save search mutation
-  }
-  const deleteSearch = async (id: string) => {
-    console.log('Delete search:', id)
-    // TODO: Implement delete search mutation
-  }
+  // Convex mutations
+  const saveSearchMutation = useMutation(api.teams.saveSearch)
+  const deleteSearchMutation = useMutation(api.teams.deleteSavedSearch)
   const addToSearchHistory = useMutation(api.teams.addSearchHistory)
+
+  const saveSearch = async (name: string, filters: any) => {
+    try {
+      await saveSearchMutation({
+        name,
+        query: searchQuery,
+        filters,
+        entity: selectedEntity,
+      })
+      setSaveSearchName("")
+      // Show success message or handle UI update
+    } catch (error) {
+      console.error('Failed to save search:', error)
+    }
+  }
+
+  const deleteSearch = async (id: string) => {
+    try {
+      await deleteSearchMutation({ id: id as any })
+    } catch (error) {
+      console.error('Failed to delete search:', error)
+    }
+  }
 
   // Debounced search function
   const performSearch = useCallback(
@@ -93,8 +110,15 @@ export function AdvancedSearch() {
 
       // Add to search history
       if (query) {
-        // TODO: Fix addSearchHistory mutation
-        // await addToSearchHistory({ query, entity: entityType, filters: searchFilters })
+        try {
+          await addToSearchHistory({ 
+            query, 
+            entity: entityType, 
+            filters: searchFilters 
+          })
+        } catch (error) {
+          console.error('Failed to add to search history:', error)
+        }
       }
 
       // Simulate search with local data - replace with actual search API

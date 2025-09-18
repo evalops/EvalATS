@@ -6,6 +6,7 @@ import { api } from '../../convex/_generated/api'
 import { useToast } from '@/hooks/use-toast'
 import { ConfirmationModal } from '@/components/ui/modal'
 import { EmailComposeModal } from '@/components/modals/email-compose-modal'
+import { NotesModal } from '@/components/modals/notes-modal'
 import {
   CheckCircle,
   ArrowRight,
@@ -60,6 +61,7 @@ export function CandidateStatusActions({
   const [showRejectModal, setShowRejectModal] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
   const [showEmailModal, setShowEmailModal] = useState(false)
+  const [showNotesModal, setShowNotesModal] = useState(false)
 
   const handleStatusUpdate = async (newStatus: string, action: string) => {
     setIsUpdating(true)
@@ -167,32 +169,32 @@ export function CandidateStatusActions({
                   Send Email
                 </button>
                 <button
-                  onClick={() => {
-                    setShowDropdown(false)
-                    // TODO: Implement call functionality
-                    toast({
-                      title: 'Call Feature',
-                      description: 'Call functionality coming soon!',
-                    })
-                  }}
+                onClick={() => {
+                setShowDropdown(false)
+                // Simple implementation - open phone dialer on mobile or show phone number
+                if (candidate?.phone) {
+                window.location.href = `tel:${candidate.phone}`
+                } else {
+                  toast({
+                      title: 'No Phone Number',
+                      description: 'This candidate has no phone number on file.',
+                      })
+                  }
+                }}
                   className="w-full text-left px-4 py-2 text-sm hover:bg-accent flex items-center gap-2"
-                >
-                  <Phone className="h-4 w-4" />
-                  Schedule Call
-                </button>
+                 >
+                   <Phone className="h-4 w-4" />
+                   Call Candidate
+                 </button>
                 <button
-                  onClick={() => {
-                    setShowDropdown(false)
-                    // TODO: Implement notes functionality
-                    toast({
-                      title: 'Notes Feature',
-                      description: 'Notes functionality coming soon!',
-                    })
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-accent flex items-center gap-2"
+                onClick={() => {
+                setShowDropdown(false)
+                setShowNotesModal(true)
+                }}
+                className="w-full text-left px-4 py-2 text-sm hover:bg-accent flex items-center gap-2"
                 >
-                  <MessageSquare className="h-4 w-4" />
-                  Add Note
+                <MessageSquare className="h-4 w-4" />
+                Add Note
                 </button>
 
                 {currentStatus !== 'rejected' && currentStatus !== 'withdrawn' && (
@@ -237,6 +239,15 @@ export function CandidateStatusActions({
           candidateEmail={candidate.email}
         />
       )}
+
+      {/* Notes Modal */}
+      <NotesModal
+        isOpen={showNotesModal}
+        onClose={() => setShowNotesModal(false)}
+        entityType="candidate"
+        entityId={candidateId}
+        entityName={candidateName}
+      />
 
       {/* Click outside to close dropdown */}
       {showDropdown && (
